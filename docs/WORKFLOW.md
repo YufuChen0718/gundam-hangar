@@ -1,14 +1,14 @@
 # 团队协作流程（Git / GitHub）
 
-仓库：<https://github.com/YufuChen0718/mecha-hangar>
+仓库：<https://github.com/YufuChen0718/gundam-hangar>
 
 ## 第一次设置（每个人）
 
 1. 仓库主人在 GitHub → Settings → Collaborators 里邀请另外三位，被邀请的人去邮箱接受邀请。
 2. 本地 clone：
    ```bash
-   git clone git@github.com:YufuChen0718/mecha-hangar.git
-   cd mecha-hangar
+   git clone git@github.com:YufuChen0718/gundam-hangar.git
+   cd gundam-hangar
    npm install        # after T01 is done
    npm run dev        # open the http://localhost:5173 shown in the terminal
    ```

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gundam Hangar — CS184 Final Project Proposal</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page-container">
+    <header class="proposal-header">
+      <div class="course-tag">CS184 Computer Graphics &amp; Imaging · Final Project Proposal</div>
+      <h1>Gundam Hangar</h1>
+      <p class="subtitle">An Interactive Gundam Customization and Animation System for Desktop Web and Apple Vision Pro</p>
+
+      <div class="meta-grid">
+        <div class="meta-row">
+          <span class="meta-label">Team Members:</span>
+          <span>Yufu Chen, Zihan Wang, Junxiang You, Dongyang Dai</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Website:</span>
+          <a href="https://yufuchen0718.github.io/gundam-hangar/">https://yufuchen0718.github.io/gundam-hangar/</a>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Source:</span>
+          <a href="https://github.com/YufuChen0718/gundam-hangar">https://github.com/YufuChen0718/gundam-hangar</a>
+        </div>
+      </div>
+    </header>
+
+    <section id="summary">
+      <h2>1. Summary</h2>
+      <div class="summary-box">
+        <p>
+          We propose <strong>Gundam Hangar</strong>, a web-based interactive 3D Gundam customization and keyframe animation system built desktop-first for modern browsers and adapted for windowed operation in Apple Vision Pro Safari. Starting from a hierarchical procedural rig and transitioning to a multi-region articulated GLB Gundam asset, we will implement our own modular socket attachment transforms, per-region material recoloring, quaternion keyframe interpolation with easing, and an animation state machine supporting smooth pose blending across interrupted actions. We will evaluate our system quantitatively through socket attachment error verification, joint-angle continuity curves comparing cut versus blended transitions, and median/95th-percentile frame-time benchmarks across desktop and Vision Pro Safari, while reserving native visionOS shell integration, immersive WebXR viewing, and drag-and-snap weapon assembly as aspirational extensions.
+        </p>
+      </div>
+    </section>
+
+    <section id="problem-description">
+      <h2>2. Problem Description &amp; Technical Approach</h2>
+      <p>
+        Mecha models feature articulated joint hierarchies, distinct armor plating regions, and interchangeable equipment, making them an ideal testbed for interactive 3D graphics. However, transforming a static 3D Gundam asset into a responsive, customizable, and animated virtual hangar introduces several tightly coupled computer graphics challenges: external weapon assets often use inconsistent scales and coordinate conventions, attached equipment must remain rigidly aligned with moving limbs across arbitrary poses, discrete key poses must be interpolated into continuous motion without visual pops when users switch actions mid-animation, and the user interface must stay synchronized across desktop mouse controls and Apple Vision Pro gaze-and-pinch interactions.
+      </p>
+      <p>
+        Our project follows a <strong>desktop-first, Vision Pro (windowed Safari) second</strong> engineering route. Users inspect, recolor, equip, and animate a Gundam-inspired mobile suit inside a virtual hangar in a desktop browser, and open the exact same web application inside Apple Vision Pro Safari (windowed mode) backed by a unified state and command layer.
+      </p>
+
+      <div class="print-keep-together">
+        <h3>Key Graphics &amp; Systems Challenges</h3>
+        <ul>
+          <li><strong>Attachment Consistency:</strong> Computing and maintaining exact world-space position and orientation of interchangeable handheld weapons and back-mounted equipment across hierarchical joint motions.</li>
+          <li><strong>Animation Continuity:</strong> Sampling keyframe poses with easing and spherical linear interpolation (<code>slerp</code>), and blending smoothly from any interrupted in-flight pose to a new target clip without angular discontinuities.</li>
+          <li><strong>Cross-Device State &amp; Input Consistency:</strong> Decoupling UI controls from direct scene-graph mutation via a shared command layer so desktop orbit/tab interactions and Vision Pro Safari gaze-and-pinch controls remain strictly synchronized.</li>
+          <li><strong>Real-Time Performance:</strong> Balancing GLB triangle counts, cloned per-region PBR materials, and shadow rendering to sustain smooth frame rates on both desktop browsers and Vision Pro Safari.</li>
+        </ul>
+      </div>
+
+      <h3>2.1 Asset Preparation, Rig Abstraction, and Modular Attachments</h3>
+      <p>
+        To decouple graphics systems engineering from asset cleanup bottlenecks, we define a unified <code>MechaRig</code> interface exposing a top-level <code>displayRoot</code> (the sole node used for whole-model rotation and scaling), named program joints (<code>torso</code>, <code>head</code>, <code>rightShoulder</code>, <code>rightElbow</code>, <code>rightWrist</code>, <code>leftShoulder</code>, <code>leftElbow</code>, <code>leftWrist</code>), initial bind-pose rotations, named attachment sockets (<code>rightHand</code>, <code>leftHand</code>, <code>back</code>), and four isolated PBR material regions (<code>primary</code>, <code>secondary</code>, <code>accent</code>, <code>frame</code>). In Week 1, a procedural hierarchical box prototype (<code>proceduralMecha.ts</code>) implements <code>MechaRig</code> so animation, equipment, and UI modules can be developed and tested immediately. In Week 2, we standardize a full mecha asset and equipment models in Blender (+Y up, +Z forward, units in meters, isolated regional materials) and map its skeleton to <code>MechaRig</code> via <code>rigConfig.ts</code> and <code>loadMecha.ts</code>.
+      </p>
+      <p>
+        Each weapon (rifle, beam sword) and accessory (removable backpack) attaches to a target socket with an asset-specific calibration offset that aligns its grip center and forward axis (+Z). The equipment's world transformation matrix is given by the hierarchical chain:
+      </p>
+      <div class="equation-block" aria-label="Equipment world transformation equation">
+        <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+          <mrow>
+            <msubsup>
+              <mi>M</mi>
+              <mtext>equipment</mtext>
+              <mtext>world</mtext>
+            </msubsup>
+            <mo>=</mo>
+            <msubsup>
+              <mi>M</mi>
+              <mtext>joint</mtext>
+              <mtext>world</mtext>
+            </msubsup>
+            <mo>&#x22C5;</mo>
+            <msubsup>
+              <mi>M</mi>
+              <mtext>socket</mtext>
+              <mtext>joint</mtext>
+            </msubsup>
+            <mo>&#x22C5;</mo>
+            <msubsup>
+              <mi>M</mi>
+              <mtext>equipment</mtext>
+              <mtext>socket</mtext>
+            </msubsup>
+          </mrow>
+        </math>
+      </div>
+
+      <h3>2.2 Custom Keyframe Animation and Pose Transition Blending</h3>
+      <p>
+        Rather than relying on Three.js's built-in <code>AnimationMixer</code>, <code>AnimationClip</code>, or <code>KeyframeTrack</code>, we implement our own keyframe animation pipeline from scratch using only basic math primitives (<code>Quaternion</code>, <code>Matrix4</code>, <code>Quaternion.slerp</code>). We author keyframe clips (<code>clips.ts</code>) for three upper-body actions—<strong>idle</strong>, <strong>aiming a rifle</strong>, and <strong>swinging a beam sword</strong>—storing joint rotations relative to each joint's bind pose (applied as <code>joint.quaternion = bindPose &times; offset</code>).
+      </p>
+      <p>
+        At each frame, our pose sampler (<code>samplePose.ts</code>) locates the bounding keyframes, applies timing/easing curves, and interpolates joint orientations via quaternion <code>slerp</code>. Our playback state machine (<code>animator.ts</code>) manages looping, holding, mid-action interruption, and transition blending: when a user triggers a new action while another is playing, the animator captures a snapshot of the current pose and blends smoothly into the target clip over a configurable transition window, supporting both <code>blend</code> and abrupt <code>cut</code> modes for direct experimental comparison.
+      </p>
+
+      <h3>2.3 Shared Command Architecture and Vision Pro Adaptation</h3>
+      <p>
+        All user interactions flow through a strict unidirectional architecture: UI components invoke pure operations in <code>commands.ts</code> (<code>setColorPreset</code>, <code>setRegionColor</code>, <code>equipWeapon</code>, <code>setBackpackVisible</code>, <code>playAction</code>, <code>setTransitionMode</code>, <code>rotateModel</code>, <code>resetModelTransform</code>), which update a serializable JSON store (<code>HangarState</code>) and drive the rig, equipment manager, appearance controller, and animator within a single <code>renderer.setAnimationLoop</code> render loop.
+      </p>
+      <p>
+        The baseline desktop interface provides <code>OrbitControls</code> inspection alongside tabbed controls for Appearance, Equipment, Animation, and Debug diagnostics. For our baseline Apple Vision Pro milestone, the same web application runs in Vision Pro Safari (windowed mode) with gaze-and-pinch friendly target sizing and explicit on-screen rotation/zoom controls. Immersive spatial viewing via WebXR and a native visionOS <code>WKWebView</code> shell are structured as aspirational extensions atop the shared <code>commands</code> layer.
+      </p>
+
+      <div class="print-keep-together">
+        <h3>2.4 Library Capabilities vs. Custom Team Implementation</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Provided by Libraries / External Tools</th>
+                <th>Implemented by Our Team (Course Work)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>WebGL rendering, scene graph, <code>GLTFLoader</code>, <code>OrbitControls</code>, and low-level math primitives (<code>Quaternion.slerp</code>, <code>Matrix4</code>) via Three.js</td>
+                <td><code>MechaRig</code> abstraction, procedural box prototype, bone/socket mapping, hierarchical socket attachment &amp; offset calibration, and per-region material isolation</td>
+              </tr>
+              <tr>
+                <td>Raw 3D mesh generation/sourcing (e.g., Meshy or documented open mecha assets) and Blender modeling tools</td>
+                <td>Blender coordinate standardization, rigid/skeletal preparation, material slot partitioning, and GLB export pipeline</td>
+              </tr>
+              <tr>
+                <td>Browser DOM events, Safari windowed rendering on macOS and Apple Vision Pro</td>
+                <td>Custom keyframe data format, easing + quaternion pose sampler, animation state machine, snapshot transition blending (<code>cut</code> vs. <code>blend</code>), shared state/commands store, UI tabs, and quantitative evaluation tools</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="goals-and-deliverables">
+      <h2>3. Goals and Deliverables</h2>
+
+      <h3>3.1 Planned (Baseline) vs. Aspirational Deliverables</h3>
+      <p>
+        To guarantee a reliable, well-tested system within four weeks, we draw a strict boundary between our required <strong>Baseline Deliverables</strong> (desktop web + windowed Vision Pro Safari) and our <strong>Aspirational Deliverables</strong> (native visionOS wrapper, immersive WebXR mode, and spatial drag-and-snap assembly). Immersive XR is explicitly <em>not</em> a baseline deliverable.
+      </p>
+
+      <div class="deliverable-grid">
+        <div class="card">
+          <h4>
+            <span>Planned Deliverables</span>
+            <span class="badge badge-baseline">Baseline (Required)</span>
+          </h4>
+          <ul>
+            <li><strong>Articulated Gundam Rig:</strong> Procedural box-prototype rig in Week 1 and full articulated GLB Gundam mobile suit in Week 2 implementing <code>MechaRig</code>.</li>
+            <li><strong>Regional Appearance System:</strong> 3 curated color presets plus independent color pickers for 4 armor regions (<code>primary</code>, <code>secondary</code>, <code>accent</code>, <code>frame</code>).</li>
+            <li><strong>Modular Equipment Sockets:</strong> 2 swappable handheld weapons (<code>rifle</code>, <code>beam sword</code>) and 1 removable <code>backpack</code> with calibrated socket offsets.</li>
+            <li><strong>Custom Animation &amp; Blending:</strong> 3 upper-body keyframe clips (<code>idle</code>, <code>aim</code>, <code>sword swing</code>) with mid-action interruption and smooth quaternion transition blending.</li>
+            <li><strong>Desktop Web Hangar UI:</strong> Interactive camera orbit/zoom and Appearance, Equipment, Animation, and Debug tabs.</li>
+            <li><strong>Vision Pro Safari (Windowed):</strong> Running the same web app inside Apple Vision Pro Safari with enlarged gaze/pinch targets, explicit rotate/zoom buttons, and device frame-time profiling.</li>
+            <li><strong>Quantitative Evaluation Suite:</strong> Socket attachment error verification, joint-angle continuity CSV export/plots (<code>cut</code> vs. <code>blend</code>), and median/p95 frame-time diagnostics.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h4>
+            <span>Stretch Extensions</span>
+            <span class="badge badge-aspirational">Aspirational (If Time Permits)</span>
+          </h4>
+          <ul>
+            <li><strong>Native visionOS Shell:</strong> Packaging the web hangar inside a native visionOS application container using <code>WKWebView</code>.</li>
+            <li><strong>WebXR Immersive Mode:</strong> Rendering the Gundam stereoscopically in space with floating spatial menus via Safari WebXR.</li>
+            <li><strong>Drag-and-Snap Weapon Assembly:</strong> Interactive spatial manipulation where dragging a weapon within distance and angular thresholds of a compatible socket displays a preview and snaps it into place.</li>
+            <li><strong>Explicitly Out of Scope:</strong> Full-body inverse kinematics (IK), walking locomotion, combat physics, complex multi-mode transformations, multiplayer networking, and real-world room reconstruction.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="demo-sequence">
+        <strong>Planned End-to-End Demo Sequence:</strong><br />
+        Load Hangar Scene &rarr; Orbit &amp; Zoom to Inspect Gundam &rarr; Switch Color Presets &amp; Customize 4 Armor Regions &rarr; Equip Beam Sword &rarr; Play Sword Swing Animation &rarr; Swap to Rifle Mid-Action &rarr; Smoothly Blend into Aiming Pose (demonstrated on Desktop Browser and Windowed Vision Pro Safari).
+      </div>
+
+      <div class="print-keep-together">
+        <h3>3.2 Evaluation Metrics</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Evaluation Dimension</th>
+                <th>Quantitative / Qualitative Methodology</th>
+                <th>Diagnostic Output</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Attachment Correctness</strong></td>
+                <td>Across sampled keyframes of all three clips, compare the scene-graph world transform of attached weapons against an explicit matrix product <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>M</mi><mtext>joint</mtext><mtext>world</mtext></msubsup><msubsup><mi>M</mi><mtext>socket</mtext><mtext>joint</mtext></msubsup><msubsup><mi>M</mi><mtext>equipment</mtext><mtext>socket</mtext></msubsup></mrow></math>, and visually inspect grip alignment across poses.</td>
+                <td>Position error (mm) &amp; angular error (deg) check + multi-pose grip screenshots</td>
+              </tr>
+              <tr>
+                <td><strong>Animation Continuity</strong></td>
+                <td>Trigger interactive action switches (e.g., <code>swing &rarr; aim</code> mid-swing) under both <code>cut</code> and <code>blend</code> transition modes and record per-frame joint angles and angular velocities.</td>
+                <td>Joint-angle time-series CSV export and comparative continuity plots</td>
+              </tr>
+              <tr>
+                <td><strong>Interaction Reliability</strong></td>
+                <td>Execute structured stress checklists combining rapid weapon swaps, regional recoloring, mid-clip interruptions, and camera/transform resets across desktop and Vision Pro Safari.</td>
+                <td>Verification pass/fail matrix confirming zero orphaned meshes or desynchronized state</td>
+              </tr>
+              <tr>
+                <td><strong>Rendering Performance</strong></td>
+                <td>Measure frame intervals over fixed benchmark runs (target ~60 FPS at 1920&times;1080 on desktop; windowed Safari characterization on Vision Pro), comparing procedural prototype vs. full GLB and shadows on vs. off.</td>
+                <td>Median and 95th-percentile (p95) frame time (ms) charts across configurations</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="print-keep-together">
+        <h3>3.3 Questions We Plan to Answer</h3>
+        <ol>
+          <li><strong>Modular Socket Reusability:</strong> Can a shared hierarchical socket and offset transform system support multiple weapon and accessory combinations across all upper-body animations without re-authoring per-weapon clips?</li>
+          <li><strong>Transition Blending Quantitative Benefit:</strong> How much does snapshot-based quaternion pose blending reduce peak angular velocity spikes (pose discontinuities) compared to immediate action cuts during interactive switching?</li>
+          <li><strong>Cross-Device Rendering Trade-offs:</strong> How do model triangle complexity, per-region material cloning, and dynamic shadow maps impact median and p95 frame times on a desktop browser versus windowed Safari on Apple Vision Pro?</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="schedule">
+      <h2>4. Schedule &amp; Team Responsibilities</h2>
+
+      <div class="print-keep-together">
+        <h3>4.1 Weekly Schedule (Nov 11 – Dec 6)</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Week / Period</th>
+                <th>Planned Engineering Tasks</th>
+                <th>Milestone / Verification Deliverable</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Prep</strong><br />Nov 7 – Nov 10</td>
+                <td>Finalize architecture &amp; desktop-first plan, define module boundaries (<code>MechaRig</code>, <code>commands</code>, <code>HangarState</code>), assign roles, publish proposal website and GitHub Pages workflow.</td>
+                <td><strong>Tue Nov 10:</strong> Submit Proposal PDF (with clickable website link) to Gradescope.</td>
+              </tr>
+              <tr>
+                <td><strong>Week 1</strong><br />Nov 11 – Nov 17</td>
+                <td>Initialize Vite + TypeScript + Three.js scaffold and hangar scene (T01–T02); build procedural box-prototype rig (T03); implement equipment sockets with placeholder meshes (T04), regional color system (T05), and keyframe pose sampling + idle clip (T06); audit candidate GLB mecha assets in Blender (T09 prep).</td>
+                <td>On box prototype: shoulder/arm hierarchy moves cleanly with weapon attached, 4 armor regions recolor independently, and idle animation loops.</td>
+              </tr>
+              <tr>
+                <td><strong>Week 2</strong><br />Nov 18 – Nov 24</td>
+                <td>Implement animation state machine &amp; pose transition blending for <code>idle</code>, <code>aim</code>, and <code>swing</code> (T07); wire shared store &amp; desktop tabbed UI (T08); integrate real GLB mecha and weapon models (T09); configure automated GitHub Pages build (T10); run first windowed test in Apple Vision Pro Safari.</td>
+                <td><strong>Sun Nov 22:</strong> Submit Milestone webpage, ~1-minute video (all 4 members speaking), and 2–3 presentation slides; end-to-end desktop demo loop working.</td>
+              </tr>
+              <tr>
+                <td><strong>Week 3</strong><br />Nov 25 – Dec 1</td>
+                <td>Build evaluation instrumentation (T11): export joint-angle CSVs and plot <code>cut</code> vs. <code>blend</code> continuity, verify socket attachment matrix error, and benchmark median/p95 frame times; adapt UI for Vision Pro Safari with enlarged controls and explicit rotate/zoom buttons (T12); explore aspirational extensions only after baseline is locked.</td>
+                <td>Complete baseline on both desktop and Vision Pro Safari (windowed) with full quantitative evaluation charts generated.</td>
+              </tr>
+              <tr>
+                <td><strong>Week 4</strong><br />Dec 2 – Dec 6</td>
+                <td><strong>Dec 2 feature freeze</strong> (bug fixes and polish only thereafter); record 1–2 minute final video and showcase clip; write final report webpage and prepare 5-minute presentation slides.</td>
+                <td><strong>Sun Dec 6:</strong> Final report webpage, PDF, video, and slides submitted; <strong>Dec 7–8:</strong> Live final presentation.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="print-keep-together">
+        <h3>4.2 Division of Work</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Team Member</th>
+                <th>Primary Responsibilities</th>
+                <th>Primary Codebase Scope</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Yufu Chen</strong></td>
+                <td>3D asset sourcing &amp; Blender cleanup, skeleton/joint configuration, attachment socket calibration, material region partitioning, and regional appearance system.</td>
+                <td><code>src/mecha/</code> (<code>rigConfig.ts</code>, <code>loadMecha.ts</code>, <code>appearance.ts</code>), <code>public/assets/</code></td>
+              </tr>
+              <tr>
+                <td><strong>Zihan Wang</strong></td>
+                <td>Procedural box prototype rig, keyframe pose authoring, easing &amp; quaternion pose interpolation, animation playback state machine, and smooth transition blending.</td>
+                <td><code>src/mecha/proceduralMecha.ts</code>, <code>src/animation/</code> (<code>clips.ts</code>, <code>samplePose.ts</code>, <code>animator.ts</code>)</td>
+              </tr>
+              <tr>
+                <td><strong>Junxiang You</strong></td>
+                <td>Modular equipment attachment &amp; offset system, Apple Vision Pro Safari windowed testing and control adaptation, plus aspirational WebXR / drag-and-snap features.</td>
+                <td><code>src/mecha/equipment.ts</code>, Vision Pro UI adaptation, optional <code>src/xr/</code></td>
+              </tr>
+              <tr>
+                <td><strong>Dongyang Dai</strong></td>
+                <td>Scene initialization, shared state store &amp; command layer, desktop tabbed UI, quantitative evaluation &amp; performance diagnostics, and project website/deployment.</td>
+                <td><code>src/scene/</code>, <code>src/app/</code>, <code>src/ui/</code>, <code>src/debug/</code>, <code>website/</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="print-keep-together">
+        <h3>4.3 Risk Management</h3>
+        <ul>
+          <li><strong>AI/External Model Rigging &amp; Deformation Issues:</strong> Candidate GLB assets will be inspected in Blender during Week 1. If skeletal skinning causes severe armor warping, we will partition the mesh into rigid hierarchical sub-parts matching our <code>MechaRig</code> joint structure.</li>
+          <li><strong>Asset Integration Delays:</strong> Because the Week 1 procedural box prototype implements the exact same <code>MechaRig</code> interface as the final GLB asset, animation, equipment, UI, and evaluation systems can be built and verified independently without blocking on 3D modeling.</li>
+          <li><strong>Vision Pro Device Time &amp; Platform Constraints:</strong> Making Vision Pro Safari (windowed mode) our baseline guarantees cross-device demonstration using standard web technologies, while keeping native visionOS <code>WKWebView</code> and immersive WebXR as zero-risk aspirational goals.</li>
+          <li><strong>Scope Creep:</strong> We enforce a strict feature priority order: <em>Socket Attachments &gt; Animation Blending &gt; Desktop UI &gt; Vision Pro Windowed Safari &gt; Aspirational Extensions</em>.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="resources">
+      <h2>5. Resources &amp; References</h2>
+
+      <div class="print-keep-together">
+        <h3>5.1 Platform, Hardware, and Software</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Resource / Tool</th>
+                <th>Role in Project</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Vite + TypeScript (Strict)</strong></td>
+                <td>Development server, static type checking for rig/state interfaces, and production bundling.</td>
+              </tr>
+              <tr>
+                <td><strong>Three.js (WebGL) + Plain HTML/CSS</strong></td>
+                <td>3D scene graph, PBR materials, <code>GLTFLoader</code>, <code>OrbitControls</code>, quaternion/matrix math primitives, and lightweight framework-free UI tabs.</td>
+              </tr>
+              <tr>
+                <td><strong>Blender &amp; Meshy / Open 3D Assets</strong></td>
+                <td>Sourcing base mecha and weapon meshes, standardizing scale/orientation (+Y up, +Z forward), splitting regional materials, and exporting optimized GLB files (&lt; 20 MB).</td>
+              </tr>
+              <tr>
+                <td><strong>Desktop Computers &amp; Apple Vision Pro</strong></td>
+                <td>Primary macOS/Windows development machines (targeting 60 FPS at 1920&times;1080) and Apple Vision Pro running visionOS Safari for windowed cross-device testing and profiling.</td>
+              </tr>
+              <tr>
+                <td><strong>GitHub &amp; GitHub Pages (Actions)</strong></td>
+                <td>Version control, individual contribution tracking, and automated HTTPS deployment of the proposal page, reports, and live interactive hangar demo.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="print-keep-together">
+        <h3>5.2 References</h3>
+        <ul>
+          <li>
+            <strong>Three.js Documentation — <code>Quaternion</code> &amp; <code>Matrix4</code>:</strong> Mathematical primitives for local/world transformations and spherical linear interpolation (<code>slerp</code>).
+            <a href="https://threejs.org/docs/#api/en/math/Quaternion">https://threejs.org/docs/#api/en/math/Quaternion</a>
+          </li>
+          <li>
+            <strong>Three.js Documentation — <code>GLTFLoader</code>:</strong> Loading hierarchical glTF/GLB 3D models, skeletons, and PBR materials.
+            <a href="https://threejs.org/docs/#examples/en/loaders/GLTFLoader">https://threejs.org/docs/#examples/en/loaders/GLTFLoader</a>
+          </li>
+          <li>
+            <strong>Khronos Group — glTF 2.0 Specification:</strong> Coordinate system conventions (+Y up, +Z forward, meters) and node hierarchy transformations.
+            <a href="https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html">https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html</a>
+          </li>
+          <li>
+            <strong>Apple Developer — Designing for visionOS &amp; Safari Web Content:</strong> Guidelines for comfortable gaze-and-pinch target sizing and web layout in Apple Vision Pro Safari (plus aspirational WebXR support).
+            <a href="https://developer.apple.com/design/human-interface-guidelines/designing-for-visionos">https://developer.apple.com/design/human-interface-guidelines/designing-for-visionos</a>
+          </li>
+          <li>
+            <strong>WebKit Blog — Introducing Natural Input for WebXR in Apple Vision Pro:</strong> Reference for aspirational spatial input extensions in Safari.
+            <a href="https://webkit.org/blog/15162/introducing-natural-input-for-webxr-in-apple-vision-pro/">https://webkit.org/blog/15162/introducing-natural-input-for-webxr-in-apple-vision-pro/</a>
+          </li>
+          <li>
+            <strong>Meshy Documentation — 3D Asset Generation &amp; Rigging:</strong> Reference for AI-assisted 3D mesh generation and rigging constraints prior to Blender cleanup.
+            <a href="https://docs.meshy.ai/">https://docs.meshy.ai/</a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <footer class="proposal-footer">
+      <span>CS184 Final Project Proposal · Fall 2026</span>
+      <span>Yufu Chen · Zihan Wang · Junxiang You · Dongyang Dai</span>
+    </footer>
+  </main>
+</body>
+</html>

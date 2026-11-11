@@ -1,4 +1,4 @@
-# Mecha Hangar: Project Plan
+# Gundam Hangar: Project Plan
 
 > CS184 Final Project · Fall 2026
 > 路线：**先完成电脑端（桌面浏览器），再适配 Vision Pro（窗口式）**。沉浸式空间展示是 aspirational 目标。

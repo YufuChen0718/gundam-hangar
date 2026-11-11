@@ -1,0 +1,421 @@
+:root {
+  --bg: #f6f8fa;
+  --surface: #ffffff;
+  --surface-alt: #f8fafc;
+  --text: #1e293b;
+  --text-muted: #475569;
+  --heading: #0f172a;
+  --accent: #1d4ed8;
+  --accent-soft: #eff6ff;
+  --border: #cbd5e1;
+  --border-light: #e2e8f0;
+  --badge-baseline-bg: #dcfce7;
+  --badge-baseline-text: #166534;
+  --badge-aspirational-bg: #fef3c7;
+  --badge-aspirational-text: #92400e;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 2.5rem 1.25rem 4rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+  color: var(--text);
+  background-color: var(--bg);
+}
+
+.page-container {
+  max-width: 880px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 2.75rem 3rem;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+}
+
+/* Header */
+.proposal-header {
+  border-bottom: 2px solid var(--heading);
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.course-tag {
+  display: inline-block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+}
+
+.proposal-header h1 {
+  font-size: 2.1rem;
+  line-height: 1.2;
+  color: var(--heading);
+  margin: 0 0 0.4rem 0;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 1.12rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin: 0 0 1.1rem 0;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.45rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 0.85rem 1.1rem;
+  font-size: 0.94rem;
+}
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: baseline;
+}
+
+.meta-label {
+  font-weight: 700;
+  color: var(--heading);
+  min-width: 7.5rem;
+}
+
+/* Links */
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: #1e40af;
+}
+
+/* Typography & Sections */
+section {
+  margin-bottom: 2rem;
+}
+
+h2 {
+  font-size: 1.35rem;
+  color: var(--heading);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.35rem;
+  margin: 1.8rem 0 0.85rem 0;
+}
+
+h3 {
+  font-size: 1.08rem;
+  color: var(--heading);
+  margin: 1.25rem 0 0.5rem 0;
+}
+
+p {
+  margin: 0 0 0.8rem 0;
+}
+
+ul,
+ol {
+  margin: 0 0 0.9rem 0;
+  padding-left: 1.4rem;
+}
+
+li {
+  margin-bottom: 0.35rem;
+}
+
+li > strong {
+  color: var(--heading);
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.88em;
+  background: var(--surface-alt);
+  border: 1px solid var(--border-light);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+/* Summary Highlight */
+.summary-box {
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  padding: 0.95rem 1.2rem;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 1.5rem;
+}
+
+.summary-box p:last-child {
+  margin-bottom: 0;
+}
+
+/* Equation Block */
+.equation-block {
+  background: var(--surface-alt);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 0.85rem 1.2rem;
+  margin: 0.9rem 0;
+  text-align: center;
+  font-family: "Cambria Math", "STIX Two Math", "Latin Modern Math", Georgia, serif;
+  font-size: 1.08rem;
+}
+
+/* Deliverable Cards & Badges */
+.deliverable-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 0.85rem 0 1.1rem;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem 1.15rem;
+  background: var(--surface);
+}
+
+.card h4 {
+  margin: 0 0 0.6rem 0;
+  font-size: 1rem;
+  color: var(--heading);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+
+.badge-baseline {
+  background: var(--badge-baseline-bg);
+  color: var(--badge-baseline-text);
+}
+
+.badge-aspirational {
+  background: var(--badge-aspirational-bg);
+  color: var(--badge-aspirational-text);
+}
+
+.demo-sequence {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.85rem 1.1rem;
+  margin: 0.9rem 0;
+  font-size: 0.95rem;
+}
+
+.demo-sequence strong {
+  color: var(--heading);
+}
+
+/* Tables */
+.table-wrap {
+  overflow-x: auto;
+  margin: 0.85rem 0 1.2rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+th,
+td {
+  border: 1px solid var(--border);
+  padding: 0.55rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: var(--surface-alt);
+  color: var(--heading);
+  font-weight: 700;
+}
+
+tbody tr:nth-child(even) {
+  background: #fcfcfd;
+}
+
+/* Footer */
+.proposal-footer {
+  margin-top: 2.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-light);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+@media (max-width: 720px) {
+  body {
+    padding: 1rem 0.5rem 2rem;
+  }
+
+  .page-container {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .deliverable-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Print Rules for Safari: File -> Print -> Save as PDF */
+@media print {
+  @page {
+    size: letter;
+    margin: 0.55in 0.6in;
+  }
+
+  html {
+    font-size: 10pt;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 1.42;
+  }
+
+  .page-container {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .proposal-header {
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+    border-bottom: 1.5pt solid #000000;
+  }
+
+  .proposal-header h1 {
+    font-size: 18pt;
+  }
+
+  .subtitle {
+    font-size: 11pt;
+    margin-bottom: 0.6rem;
+  }
+
+  h2 {
+    font-size: 12.5pt;
+    margin-top: 1rem;
+    margin-bottom: 0.45rem;
+    padding-bottom: 0.2rem;
+    border-bottom: 0.75pt solid #94a3b8;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  h3,
+  h4 {
+    font-size: 10.5pt;
+    margin-top: 0.75rem;
+    margin-bottom: 0.3rem;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  section {
+    margin-bottom: 1rem;
+  }
+
+  p,
+  ul,
+  ol {
+    margin-bottom: 0.5rem;
+  }
+
+  li {
+    margin-bottom: 0.2rem;
+  }
+
+  /* Keep grouped elements together across page breaks */
+  .summary-box,
+  .meta-grid,
+  .equation-block,
+  .deliverable-grid,
+  .card,
+  .demo-sequence,
+  .print-keep-together,
+  table,
+  tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  th,
+  td {
+    padding: 0.35rem 0.5rem;
+    border-color: #94a3b8 !important;
+    font-size: 9.2pt;
+  }
+
+  th {
+    background: #f1f5f9 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .summary-box,
+  .meta-grid,
+  .badge,
+  .demo-sequence,
+  .equation-block {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  a {
+    color: #1d4ed8 !important;
+    text-decoration: underline !important;
+  }
+}

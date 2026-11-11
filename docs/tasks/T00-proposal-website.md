@@ -11,7 +11,7 @@
 ## Tonight's quick option
 1. Write `website/index.html`, push to main
 2. Pages: Source = *GitHub Actions*, using the official "Static HTML" workflow template with the upload path changed to `website` (T10 later replaces it with the full workflow that also builds the demo)
-3. URL: `https://yufuchen0718.github.io/mecha-hangar/`
+3. URL: `https://yufuchen0718.github.io/gundam-hangar/`
 
 ## Acceptance criteria
 - [ ] The URL opens on a phone/computer, and every link on the page is clickable

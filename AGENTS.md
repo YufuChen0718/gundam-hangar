@@ -1,6 +1,6 @@
 # Instructions for AI coding agents (dsh, Antigravity, etc.)
 
-You are helping a 4-person CS184 team build **Mecha Hangar**. Read these files before writing any code:
+You are helping a 4-person CS184 team build **Gundam Hangar**. Read these files before writing any code:
 
 1. `docs/ARCHITECTURE.md`: module layout, interfaces, coordinate conventions (**binding**)
 2. The task card you were given in `docs/tasks/`: scope and acceptance criteria
@@ -17,4 +17,5 @@ You are helping a 4-person CS184 team build **Mecha Hangar**. Read these files b
 - **Log your work:** append a short entry to `docs/progress.md` (date, task id, what changed, known issues).
 - **Attribution:** if you copy or adapt code from a tutorial, example, or any external source, add it to `docs/asset-sources.md`.
 - **Commits:** small, with message prefix by area (`asset:`, `anim:`, `equip:`, `ui:`, `xr:`, `web:`, `docs:`, `fix:`). Do not commit `node_modules/`, `dist/`, or large binaries outside `public/assets/` and `assets-src/`.
+- Never add Co-Authored-By or any AI attribution trailers to commit messages.
 - **Ask instead of guessing** when the task card conflicts with ARCHITECTURE.md or the existing code.

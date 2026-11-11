@@ -8,6 +8,6 @@
 - Add a link to the demo on the website pages
 
 ## Acceptance criteria
-- [ ] `https://yufuchen0718.github.io/mecha-hangar/` shows the website
-- [ ] `https://yufuchen0718.github.io/mecha-hangar/demo/` runs the demo (no 404 on resources)
+- [ ] `https://yufuchen0718.github.io/gundam-hangar/` shows the website
+- [ ] `https://yufuchen0718.github.io/gundam-hangar/demo/` runs the demo (no 404 on resources)
 - [ ] The site updates automatically within about 2 minutes of a push

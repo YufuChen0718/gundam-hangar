@@ -1,6 +1,6 @@
-# Mecha Hangar
+# Gundam Hangar
 
-**CS184 Final Project (Fall 2026).** An interactive mecha customization and animation system: a desktop web app first, then adapted to Apple Vision Pro.
+**CS184 Final Project (Fall 2026).** An interactive Gundam customization and animation system: a desktop web app first, then adapted to Apple Vision Pro.
 
 > This repository currently holds only the **plan and the framework design**. Implementation is done task by task using the cards in `docs/tasks/` (written by team members, or by AI coding tools such as dsh or Antigravity).
 
