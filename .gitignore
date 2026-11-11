@@ -1,0 +1,16 @@
+node_modules/
+dist/
+_site/
+.DS_Store
+*.log
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Blender autosaves / backups (keep the .blend sources, skip the noise)
+*.blend1
+*.blend2
+
+# Local env files
+.env
+.env.*
