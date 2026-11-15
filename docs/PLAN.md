@@ -5,6 +5,10 @@
 
 ---
 
+> **Nov 15 update:** after GSI feedback, priorities are set by [TECHNICAL-CORE.md](TECHNICAL-CORE.md): full-body rig, our own skinning shader, spline interpolation, pose blending, IK, each with an evaluation. The proposal's deliverables stay; UI polish, presets and Vision Pro get minimal time at the end. Where this file and TECHNICAL-CORE.md disagree, TECHNICAL-CORE.md wins.
+
+---
+
 ## 0. 关键日期
 
 | 日期 | 事项 |

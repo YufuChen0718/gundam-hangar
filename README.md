@@ -2,7 +2,16 @@
 
 **CS184 Final Project (Fall 2026).** An interactive Gundam customization and animation system: a desktop web app first, then adapted to Apple Vision Pro.
 
-> This repository currently holds only the **plan and the framework design**. Implementation is done task by task using the cards in `docs/tasks/` (written by team members, or by AI coding tools such as dsh or Antigravity).
+> The repository now includes a runnable **desktop single-arm prototype**, alongside the project plan and proposal website. See [the prototype guide](docs/DESKTOP-PROTOTYPE.md) and [current progress](docs/PROGRESS-2026-11-14.md).
+
+## Run the desktop prototype
+
+```sh
+npm ci
+npm run dev
+```
+
+Use `npm test` for animation checks and `npm run build` for strict TypeScript checking and production output. The current prototype supports the supplied model, shoulder/elbow/wrist controls, a raise-arm animation, and source/processed asset comparison. Vision Pro and the full customization feature set are still future work.
 
 ## Where to start
 
@@ -16,7 +25,7 @@
 | Record progress / issues / experiment data | [docs/progress.md](docs/progress.md), `docs/results/` |
 | Record asset and code sources (required by the course) | [docs/asset-sources.md](docs/asset-sources.md) |
 
-## Repository layout (current)
+## Planning and reporting layout
 
 ```
 Final_Project/
@@ -34,4 +43,4 @@ Final_Project/
 └── website/             # proposal / milestone / final pages (GitHub Pages)
 ```
 
-`src/`, `public/`, `package.json` and so on are created by task **T01** following [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+`src/`, `public/`, `scripts/`, `tests/`, and the root package files now implement the first desktop slice. Module responsibilities follow [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); the limited asset adapter is documented in [docs/DESKTOP-PROTOTYPE.md](docs/DESKTOP-PROTOTYPE.md).

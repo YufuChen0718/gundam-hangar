@@ -1,0 +1,128 @@
+{
+  "url": "http://127.0.0.1:5173/",
+  "browser": "157.0.8103.51",
+  "checks": [
+    "GLB and textures loaded",
+    "shared boundaries and weapon attachment remain aligned in four poses",
+    "weapon hide/show",
+    "shield hide/show",
+    "part colors, joint axes, wireframe",
+    "original/prepared switching, inappropriate controls disabled",
+    "play, pause, and reset",
+    "390px layout without horizontal overflow",
+    "no console errors or failed HTTP responses"
+  ],
+  "seamTests": [
+    {
+      "angles": [
+        0,
+        0,
+        0
+      ],
+      "skinSeamGap": 5.194807131962089e-8,
+      "boundaryGroups": 90,
+      "attachmentError": 2.486410087150353e-16,
+      "shoulderRotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "elbowRotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "weaponVisible": true,
+      "mode": "prepared",
+      "playing": false,
+      "time": 0,
+      "bindError": 0
+    },
+    {
+      "angles": [
+        20,
+        40,
+        0
+      ],
+      "skinSeamGap": 5.194807143316572e-8,
+      "boundaryGroups": 90,
+      "attachmentError": 2.2887833992611187e-16,
+      "shoulderRotation": [
+        -0.1736481776669303,
+        0,
+        0,
+        0.984807753012208
+      ],
+      "elbowRotation": [
+        -0.3420201433256687,
+        0,
+        0,
+        0.9396926207859084
+      ],
+      "weaponVisible": true,
+      "mode": "prepared",
+      "playing": false,
+      "time": 0,
+      "bindError": 0.6981317007977316
+    },
+    {
+      "angles": [
+        30,
+        55,
+        0
+      ],
+      "skinSeamGap": 5.1948071120577194e-8,
+      "boundaryGroups": 90,
+      "attachmentError": 2.2887833992611187e-16,
+      "shoulderRotation": [
+        -0.25881904510252074,
+        0,
+        0,
+        0.9659258262890683
+      ],
+      "elbowRotation": [
+        -0.4617486132350339,
+        0,
+        0,
+        0.8870108331782217
+      ],
+      "weaponVisible": true,
+      "mode": "prepared",
+      "playing": false,
+      "time": 0,
+      "bindError": 0.9599310885968813
+    },
+    {
+      "angles": [
+        55,
+        85,
+        20
+      ],
+      "skinSeamGap": 5.1948071275194264e-8,
+      "boundaryGroups": 90,
+      "attachmentError": 2.2336880404788363e-16,
+      "shoulderRotation": [
+        -0.4617486132350339,
+        0,
+        0,
+        0.8870108331782217
+      ],
+      "elbowRotation": [
+        -0.6755902076156602,
+        0,
+        0,
+        0.737277336810124
+      ],
+      "weaponVisible": true,
+      "mode": "prepared",
+      "playing": false,
+      "time": 0,
+      "bindError": 1.4835298641951804
+    }
+  ],
+  "errors": [],
+  "failedRequests": [],
+  "notes": "Headless Chrome acceptance run; not a device performance benchmark."
+}

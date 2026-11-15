@@ -1,0 +1,202 @@
+{
+  "file": "/Users/jerrychen/Downloads/Meshy_AI_Gundam_Sentinel_in_the_Hangar_20260704_texture.blend",
+  "blender_version": "5.2.0 LTS",
+  "objects": [
+    {
+      "name": "Mesh_0",
+      "type": "MESH",
+      "parent": null,
+      "parent_type": "OBJECT",
+      "parent_bone": "",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "dimensions": [
+        1.3818359375,
+        1.068465232849121,
+        1.9102752208709717
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "modifiers": [],
+      "vertex_groups": [],
+      "vertices": 4913,
+      "edges": 14892,
+      "polygons": 9944,
+      "triangles": 9944,
+      "uv_layers": [
+        "UVMap"
+      ],
+      "materials": [
+        "Material_0"
+      ],
+      "material_face_counts": {
+        "0": 9944
+      },
+      "shape_keys": [],
+      "connected_components": 2,
+      "largest_components": [
+        {
+          "vertices": 4572,
+          "local_min": [
+            -0.6911709904670715,
+            -0.5337759852409363,
+            -0.9566131830215454
+          ],
+          "local_max": [
+            0.5203480124473572,
+            0.53468918800354,
+            0.953662097454071
+          ]
+        },
+        {
+          "vertices": 341,
+          "local_min": [
+            0.3823919892311096,
+            -0.36105096340179443,
+            -0.4673020541667938
+          ],
+          "local_max": [
+            0.6906650066375732,
+            0.15304194390773773,
+            0.7228410840034485
+          ]
+        }
+      ],
+      "loose_vertices": 0
+    }
+  ],
+  "materials": [
+    {
+      "name": "Material_0",
+      "nodes": [
+        {
+          "name": "Principled BSDF",
+          "type": "BSDF_PRINCIPLED",
+          "image": null
+        },
+        {
+          "name": "Material Output",
+          "type": "OUTPUT_MATERIAL",
+          "image": null
+        },
+        {
+          "name": "Image Texture",
+          "type": "TEX_IMAGE",
+          "image": "Image_3"
+        },
+        {
+          "name": "Image Texture.001",
+          "type": "TEX_IMAGE",
+          "image": "Image_0"
+        },
+        {
+          "name": "Separate Color",
+          "type": "SEPARATE_COLOR",
+          "image": null
+        },
+        {
+          "name": "Image Texture.002",
+          "type": "TEX_IMAGE",
+          "image": "Image_1"
+        },
+        {
+          "name": "Normal Map",
+          "type": "NORMAL_MAP",
+          "image": null
+        },
+        {
+          "name": "Image Texture.003",
+          "type": "TEX_IMAGE",
+          "image": "normal"
+        }
+      ],
+      "links": [
+        {
+          "from": "Principled BSDF.BSDF",
+          "to": "Material Output.Surface"
+        },
+        {
+          "from": "Image Texture.Color",
+          "to": "Principled BSDF.Emission Color"
+        },
+        {
+          "from": "Image Texture.001.Color",
+          "to": "Principled BSDF.Base Color"
+        },
+        {
+          "from": "Separate Color.Blue",
+          "to": "Principled BSDF.Metallic"
+        },
+        {
+          "from": "Separate Color.Green",
+          "to": "Principled BSDF.Roughness"
+        },
+        {
+          "from": "Image Texture.002.Color",
+          "to": "Separate Color.Color"
+        },
+        {
+          "from": "Normal Map.Normal",
+          "to": "Principled BSDF.Normal"
+        },
+        {
+          "from": "Image Texture.003.Color",
+          "to": "Normal Map.Color"
+        }
+      ]
+    }
+  ],
+  "images": [
+    {
+      "name": "Image_0",
+      "size": [
+        2048,
+        2048
+      ],
+      "source": "FILE",
+      "filepath": "",
+      "packed": true,
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "Image_1",
+      "size": [
+        2048,
+        2048
+      ],
+      "source": "FILE",
+      "filepath": "",
+      "packed": true,
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "Image_3",
+      "size": [
+        2048,
+        2048
+      ],
+      "source": "FILE",
+      "filepath": "",
+      "packed": true,
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "normal",
+      "size": [
+        2048,
+        2048
+      ],
+      "source": "FILE",
+      "filepath": "",
+      "packed": true,
+      "colorspace": "Non-Color"
+    }
+  ],
+  "actions": []
+}
