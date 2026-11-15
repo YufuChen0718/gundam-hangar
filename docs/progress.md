@@ -5,6 +5,13 @@ These notes feed directly into the milestone and final reports.
 
 ---
 
+## 2026-11-15 · T13 Full-body rig, FK, and joint limits (M1, M2)
+- Generalized `scripts/prepare_mecha.py` from the right arm to a 15-joint full-body hierarchy rooted at `pelvis` (`pelvis` → `torso` → `head`, bilateral `shoulder` → `elbow` → `wrist` + hand sockets, and bilateral `hip` → `knee` → `ankle`) across 17 connected-component-cleaned mesh parts preserving all 9,944 original triangles.
+- Computed shared vertex weights on the original vertex indices (`0..4912`) with narrow 2-ring joint blend bands and rigid armor interiors; all 9 full-body test poses pass the seam check across 367 shared boundary groups (max separation $\le 0.000249\text{ mm}$ in Blender and $0.000046\text{ mm}$ in WebGL, well under the $10^{-5}\text{ m}$ threshold).
+- Added per-joint rotation limits in `src/mecha/rigConfig.ts` (including one-way knee `[0, 75]` and elbow `[0, 90]` limits), FK clamping and automatic pelvis vertical grounding in `src/animation/animator.ts` so both feet remain planted on the platform (`y = 0`), and grouped sliders for all 15 joints + 9 test-pose presets + "Reset pose" in `src/ui/desktopPanel.ts`.
+- Saved evaluation table and front/side pose gallery screenshots in `docs/results/t13-evaluation.md` and `docs/results/pose-gallery-*.png`.
+- **Known issues / limitations:** Two-ring joint transition bands stretch slightly near extreme joint limits; waist skirt armor and shoulder pauldrons can self-intersect limbs past $\sim 35^\circ$; foot grounding uses vertical pelvis compensation (analytic two-bone IK is T16).
+
 ## 2026-11-14 · Desktop single-arm prototype and motion-seam fix
 - Saved the implementation and original/processed assets into the actual repository; source-copy SHA-256 matches the user-provided model.
 - Added the Vite/TypeScript/Three.js viewer, original/processed comparison, shoulder/elbow/wrist controls, weapon/shield visibility, debug views, and a custom six-second raise-arm animation with pause/seek/reset.

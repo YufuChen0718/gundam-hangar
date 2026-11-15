@@ -1,9 +1,11 @@
 {
-  "url": "http://127.0.0.1:5173/",
+  "url": "http://127.0.0.1:5174/",
   "browser": "157.0.8103.51",
   "checks": [
     "GLB and textures loaded",
-    "shared boundaries and weapon attachment remain aligned in four poses",
+    "all 9 full-body test poses pass seam check (<1e-5 m), attachment check (<1e-6 m), and keep feet on platform",
+    "captured front and side pose gallery screenshots",
+    "all 15 joints poseable via viewer sliders; pelvis moves entire body hierarchy",
     "weapon hide/show",
     "shield hide/show",
     "part colors, joint axes, wireframe",
@@ -14,115 +16,232 @@
   ],
   "seamTests": [
     {
-      "angles": [
-        0,
-        0,
-        0
-      ],
-      "skinSeamGap": 5.194807131962089e-8,
-      "boundaryGroups": 90,
-      "attachmentError": 2.486410087150353e-16,
-      "shoulderRotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "elbowRotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "weaponVisible": true,
-      "mode": "prepared",
-      "playing": false,
-      "time": 0,
-      "bindError": 0
+      "pose": "bind",
+      "angles": {
+        "pelvis": 0,
+        "torso": 0,
+        "head": 0,
+        "rightShoulder": 0,
+        "rightElbow": 0,
+        "rightWrist": 0,
+        "leftShoulder": 0,
+        "leftElbow": 0,
+        "leftWrist": 0,
+        "rightHip": 0,
+        "rightKnee": 0,
+        "rightAnkle": 0,
+        "leftHip": 0,
+        "leftKnee": 0,
+        "leftAnkle": 0
+      },
+      "boundaryGroups": 367,
+      "skinSeamGap": 4.556540175772906e-8,
+      "attachmentError": 1.4946834900704541e-16,
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.007866084575653076
     },
     {
-      "angles": [
-        20,
-        40,
-        0
-      ],
-      "skinSeamGap": 5.194807143316572e-8,
-      "boundaryGroups": 90,
-      "attachmentError": 2.2887833992611187e-16,
-      "shoulderRotation": [
-        -0.1736481776669303,
-        0,
-        0,
-        0.984807753012208
-      ],
-      "elbowRotation": [
-        -0.3420201433256687,
-        0,
-        0,
-        0.9396926207859084
-      ],
-      "weaponVisible": true,
-      "mode": "prepared",
-      "playing": false,
-      "time": 0,
-      "bindError": 0.6981317007977316
+      "pose": "rightArmAim",
+      "angles": {
+        "pelvis": 0,
+        "torso": 0,
+        "head": 0,
+        "rightShoulder": 29.999999999999996,
+        "rightElbow": 55,
+        "rightWrist": 10,
+        "leftShoulder": 0,
+        "leftElbow": 0,
+        "leftWrist": 0,
+        "rightHip": 0,
+        "rightKnee": 0,
+        "rightAnkle": 0,
+        "leftHip": 0,
+        "leftKnee": 0,
+        "leftAnkle": 0
+      },
+      "boundaryGroups": 367,
+      "skinSeamGap": 4.556540156873297e-8,
+      "attachmentError": 1.5700924586837752e-16,
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.007866084575653076
     },
     {
-      "angles": [
-        30,
-        55,
-        0
-      ],
-      "skinSeamGap": 5.1948071120577194e-8,
-      "boundaryGroups": 90,
-      "attachmentError": 2.2887833992611187e-16,
-      "shoulderRotation": [
-        -0.25881904510252074,
-        0,
-        0,
-        0.9659258262890683
-      ],
-      "elbowRotation": [
-        -0.4617486132350339,
-        0,
-        0,
-        0.8870108331782217
-      ],
-      "weaponVisible": true,
-      "mode": "prepared",
-      "playing": false,
-      "time": 0,
-      "bindError": 0.9599310885968813
+      "pose": "leftArmGuard",
+      "angles": {
+        "pelvis": 0,
+        "torso": 0,
+        "head": 0,
+        "rightShoulder": 0,
+        "rightElbow": 0,
+        "rightWrist": 0,
+        "leftShoulder": 35,
+        "leftElbow": 65.00000000000001,
+        "leftWrist": -14.999999999999998,
+        "rightHip": 0,
+        "rightKnee": 0,
+        "rightAnkle": 0,
+        "leftHip": 0,
+        "leftKnee": 0,
+        "leftAnkle": 0
+      },
+      "boundaryGroups": 367,
+      "skinSeamGap": 4.556540175772906e-8,
+      "attachmentError": 1.4946834900704541e-16,
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.007866084575653076
     },
     {
-      "angles": [
-        55,
-        85,
-        20
-      ],
-      "skinSeamGap": 5.1948071275194264e-8,
-      "boundaryGroups": 90,
-      "attachmentError": 2.2336880404788363e-16,
-      "shoulderRotation": [
-        -0.4617486132350339,
-        0,
-        0,
-        0.8870108331782217
-      ],
-      "elbowRotation": [
-        -0.6755902076156602,
-        0,
-        0,
-        0.737277336810124
-      ],
-      "weaponVisible": true,
-      "mode": "prepared",
-      "playing": false,
-      "time": 0,
-      "bindError": 1.4835298641951804
+      "pose": "dualArmReady",
+      "angles": {
+        "pelvis": 0,
+        "torso": 0,
+        "head": 0,
+        "rightShoulder": 45.00000000000001,
+        "rightElbow": 75,
+        "rightWrist": 14.999999999999998,
+        "leftShoulder": 40,
+        "leftElbow": 59.99999999999999,
+        "leftWrist": -14.999999999999998,
+        "rightHip": 0,
+        "rightKnee": 0,
+        "rightAnkle": 0,
+        "leftHip": 0,
+        "leftKnee": 0,
+        "leftAnkle": 0
+      },
+      "boundaryGroups": 367,
+      "skinSeamGap": 4.556540160728726e-8,
+      "attachmentError": 2.498001805406602e-16,
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.007866084575653076
+    },
+    {
+      "pose": "torsoTwist",
+      "angles": {
+        "pelvis": -14.999999999999998,
+        "torso": 29.999999999999996,
+        "head": -25,
+        "rightShoulder": 19.999999999999996,
+        "rightElbow": 40,
+        "rightWrist": 0,
+        "leftShoulder": 19.999999999999996,
+        "leftElbow": 35,
+        "leftWrist": 0,
+        "rightHip": 0,
+        "rightKnee": 0,
+        "rightAnkle": 0,
+        "leftHip": 0,
+        "leftKnee": 0,
+        "leftAnkle": 0
+      },
+      "boundaryGroups": 367,
+      "skinSeamGap": 4.556540178217412e-8,
+      "attachmentError": 1.5700924586837752e-16,
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.007866084575653076
+    },
+    {
+      "pose": "crouch",
+      "angles": {
+        "pelvis": 0,
+        "torso": 0,
+        "head": 0,
+        "rightShoulder": 25,
+        "rightElbow": 45.00000000000001,
+        "rightWrist": 0,
+        "leftShoulder": 19.999999999999996,
+        "leftElbow": 40,
+        "leftWrist": 0,
+        "rightHip": 22,
+        "rightKnee": 44,
+        "rightAnkle": 22,
+        "leftHip": 22,
+        "leftKnee": 44,
+        "leftAnkle": 22
+      },
+      "boundaryGroups": 367,
+      "skinSeamGap": 4.556540183840236e-8,
+      "attachmentError": 1.4946834900704541e-16,
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.007866084575653076
+    },
+    {
+      "pose": "deepCrouchAim",
+      "angles": {
+        "pelvis": 0,
+        "torso": 14.999999999999998,
+        "head": -14.999999999999998,
+        "rightShoulder": 50.00000000000001,
+        "rightElbow": 79.99999999999999,
+        "rightWrist": 14.999999999999998,
+        "leftShoulder": 40,
+        "leftElbow": 70,
+        "leftWrist": -10,
+        "rightHip": 32,
+        "rightKnee": 64,
+        "rightAnkle": 32,
+        "leftHip": 32,
+        "leftKnee": 64,
+        "leftAnkle": 32
+      },
+      "boundaryGroups": 367,
+      "skinSeamGap": 4.556540176098174e-8,
+      "attachmentError": 2.482534153247273e-16,
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.007866084575653076
+    },
+    {
+      "pose": "fullBodyTwistCrouch",
+      "angles": {
+        "pelvis": 19.999999999999996,
+        "torso": -29.999999999999996,
+        "head": 25,
+        "rightShoulder": 40,
+        "rightElbow": 65.00000000000001,
+        "rightWrist": -10,
+        "leftShoulder": 29.999999999999996,
+        "leftElbow": 55,
+        "leftWrist": 14.999999999999998,
+        "rightHip": 18.000000000000004,
+        "rightKnee": 35.99999999999999,
+        "rightAnkle": 18.000000000000004,
+        "leftHip": 18.000000000000004,
+        "leftKnee": 35.99999999999999,
+        "leftAnkle": 18.000000000000004
+      },
+      "boundaryGroups": 367,
+      "skinSeamGap": 4.5565401645471654e-8,
+      "attachmentError": 2.514331927660129e-16,
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.007866084575653076
+    },
+    {
+      "pose": "maxArticulation",
+      "angles": {
+        "pelvis": -25,
+        "torso": 35,
+        "head": -35,
+        "rightShoulder": 55,
+        "rightElbow": 85,
+        "rightWrist": 19.999999999999996,
+        "leftShoulder": 55,
+        "leftElbow": 79.99999999999999,
+        "leftWrist": -19.999999999999996,
+        "rightHip": 29.999999999999996,
+        "rightKnee": 59.99999999999999,
+        "rightAnkle": 29.999999999999996,
+        "leftHip": 29.999999999999996,
+        "leftKnee": 59.99999999999999,
+        "leftAnkle": 29.999999999999996
+      },
+      "boundaryGroups": 367,
+      "skinSeamGap": 4.556540176643615e-8,
+      "attachmentError": 2.498001805406602e-16,
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.007866084575653076
     }
   ],
   "errors": [],
   "failedRequests": [],
-  "notes": "Headless Chrome acceptance run; not a device performance benchmark."
+  "notes": "Headless Chrome acceptance run for T13 15-joint full-body rig; not a device performance benchmark."
 }

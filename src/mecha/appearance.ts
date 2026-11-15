@@ -1,14 +1,27 @@
 import { Mesh, MeshStandardMaterial } from "three";
 import type { Group } from "three";
 import type { ArmPreviewRig } from "./types";
+
 const colors: Record<string, number> = {
-  body: 0x7c899a,
-  upperArm: 0xf2a44d,
-  forearm: 0x46c9c1,
-  hand: 0xab88dd,
+  waistPart: 0x68829e,
+  chestPart: 0x4f7cac,
+  headPart: 0xe8c547,
+  rightUpperArm: 0xf2a44d,
+  rightForearm: 0x46c9c1,
+  rightPalm: 0xab88dd,
+  leftUpperArm: 0xf48c64,
+  leftForearm: 0x56b886,
+  leftPalm: 0xc287e8,
+  rightThigh: 0x5c9ead,
+  rightShin: 0x82b366,
+  rightFoot: 0xd96b6b,
+  leftThigh: 0x4a8fe7,
+  leftShin: 0x93c47d,
+  leftFoot: 0xe06666,
   rifle: 0xea6676,
   shield: 0x7b9ec2,
 };
+
 export class Appearance {
   private materials = new Map<string, MeshStandardMaterial>();
   constructor(private rig: ArmPreviewRig) {

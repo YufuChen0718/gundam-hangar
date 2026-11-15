@@ -362,14 +362,19 @@ h1 {
 .presets {
   display: flex;
   gap: 8px;
-  margin: 19px 0 27px;
+  margin: 14px 0 12px;
+}
+.presets-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
 }
 .presets button {
   flex: 1;
   border: 1px solid #43505c;
   background: #26303a;
   color: #d6dee5;
-  padding: 8px 0;
+  padding: 7px 4px;
   font-size: 11px;
   border-radius: 3px;
 }
@@ -377,11 +382,30 @@ h1 {
   border-color: var(--accent);
   color: var(--accent);
 }
+.reset-pose-btn {
+  width: 100%;
+  margin: 0 0 18px;
+  padding: 8px 10px;
+  border: 1px solid #5a4b36;
+  background: #2b2620;
+  color: var(--accent);
+  font-size: 11px;
+  border-radius: 3px;
+}
+.reset-pose-btn:hover {
+  border-color: var(--accent);
+  background: #383024;
+}
+.joint-group {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #2e3843;
+}
 .slider-label {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 19px;
+  margin-top: 12px;
   font-size: 12px;
 }
 .slider-label small {

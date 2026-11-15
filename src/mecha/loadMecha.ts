@@ -1,10 +1,25 @@
-import { Box3, Group, Mesh, Quaternion, SRGBColorSpace } from "three";
+import {
+  Box3,
+  Group,
+  Mesh,
+  Quaternion,
+  SkinnedMesh,
+  SRGBColorSpace,
+  Vector3,
+} from "three";
 import type { Material, Object3D } from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { JOINTS } from "./types";
-import type { ArmPreviewRig, JointName, SocketName } from "./types";
+import type {
+  ArmPreviewRig,
+  FootGroundSample,
+  JointName,
+  SocketName,
+} from "./types";
 import { modelPaths, rigConfig } from "./rigConfig";
+
 const loader = new GLTFLoader();
+
 function prepare(root: Object3D) {
   root.traverse((o) => {
     if (o instanceof Mesh) {
@@ -16,11 +31,13 @@ function prepare(root: Object3D) {
     }
   });
 }
+
 function requireNode(root: Object3D, name: string): Object3D {
   const node = root.getObjectByName(name);
   if (!node) throw new Error(`模型缺少节点：${name}`);
   return node;
 }
+
 export async function loadPrepared(): Promise<ArmPreviewRig> {
   const gltf = await loader.loadAsync(modelPaths.prepared);
   prepare(gltf.scene);
@@ -46,8 +63,65 @@ export async function loadPrepared(): Promise<ArmPreviewRig> {
   displayRoot.traverse((o) => {
     if (o instanceof Mesh) originalMaterials.set(o, o.material);
   });
-  return { displayRoot, joints, bindPose, sockets, parts, originalMaterials };
+
+  displayRoot.updateMatrixWorld(true);
+  displayRoot.traverse((o) => {
+    if (o instanceof SkinnedMesh) o.skeleton.update();
+  });
+
+  const pelvisBindPosition = joints.pelvis.position.clone();
+  const leftAnklePos = joints.leftAnkle.getWorldPosition(new Vector3());
+  const rightAnklePos = joints.rightAnkle.getWorldPosition(new Vector3());
+  displayRoot.worldToLocal(leftAnklePos);
+  displayRoot.worldToLocal(rightAnklePos);
+  const bindAnkleY = Math.min(leftAnklePos.y, rightAnklePos.y);
+
+  const footGroundSamples: FootGroundSample[] = [];
+  let bindFootMinY = Infinity;
+  for (const [partName, ankleJoint] of [
+    ["leftFoot", joints.leftAnkle],
+    ["rightFoot", joints.rightAnkle],
+  ] as const) {
+    const footObj = parts[partName];
+    if (footObj instanceof Mesh) {
+      const posAttr = footObj.geometry.attributes.position;
+      const v = new Vector3();
+      const rootPt = new Vector3();
+      let partMinY = Infinity;
+      const candidates: { rootY: number; worldPt: Vector3 }[] = [];
+      for (let i = 0; i < posAttr.count; i++) {
+        footObj.getVertexPosition(i, v);
+        footObj.localToWorld(v);
+        rootPt.copy(v);
+        displayRoot.worldToLocal(rootPt);
+        if (rootPt.y < partMinY) partMinY = rootPt.y;
+        if (rootPt.y < bindFootMinY) bindFootMinY = rootPt.y;
+        candidates.push({ rootY: rootPt.y, worldPt: v.clone() });
+      }
+      for (const c of candidates) {
+        if (c.rootY <= partMinY + 0.015) {
+          const localPoint = ankleJoint.worldToLocal(c.worldPt.clone());
+          footGroundSamples.push({ ankleJoint, localPoint });
+        }
+      }
+    }
+  }
+  if (!Number.isFinite(bindFootMinY)) bindFootMinY = 0;
+
+  return {
+    displayRoot,
+    joints,
+    bindPose,
+    sockets,
+    parts,
+    originalMaterials,
+    pelvisBindPosition,
+    bindAnkleY,
+    bindFootMinY,
+    footGroundSamples,
+  };
 }
+
 export async function loadOriginal(): Promise<Group> {
   const gltf = await loader.loadAsync(modelPaths.original);
   prepare(gltf.scene);

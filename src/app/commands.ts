@@ -8,12 +8,26 @@ import {
 } from "three";
 import type { Group } from "three";
 import type { Store } from "./state";
-import type { ArmPreviewRig, JointAngles, ModelMode } from "../mecha/types";
+import { JOINTS } from "../mecha/types";
+import type {
+  ArmPreviewRig,
+  JointAngles,
+  JointName,
+  ModelMode,
+  PoseInput,
+  PosePresetName,
+} from "../mecha/types";
+import {
+  clampJointAngle,
+  normalizePoseInput,
+  TEST_POSES,
+} from "../mecha/rigConfig";
 import { loadOriginal } from "../mecha/loadMecha";
 import { EquipmentManager } from "../mecha/equipment";
 import { Appearance } from "../mecha/appearance";
 import { Animator } from "../animation/animator";
 import type { createScene } from "../scene/createScene";
+
 export function createCommands(
   store: Store,
   rig: ArmPreviewRig,
@@ -24,20 +38,22 @@ export function createCommands(
     appearance = new Appearance(rig);
   let original: Group | undefined;
   let originalPromise: Promise<Group> | undefined;
+
   const helpers = [
-    rig.joints.rightShoulder,
-    rig.joints.rightElbow,
-    rig.joints.rightWrist,
+    ...JOINTS.map((j) => rig.joints[j]),
     rig.sockets.rightHand,
+    rig.sockets.leftHand,
   ].map((j) => {
-    const h = new AxesHelper(0.14);
+    const h = new AxesHelper(0.11);
     h.visible = false;
     h.renderOrder = 4;
     j.add(h);
     return h;
   });
+
   const repaint = () =>
     appearance.apply(store.get().parts, store.get().wireframe, original);
+
   function sync() {
     store.set({
       angles: animator.angles(),
@@ -45,26 +61,47 @@ export function createCommands(
       playing: animator.playing,
     });
   }
-  function manual(angles: JointAngles) {
+
+  function manual(angles: PoseInput) {
     if (store.get().mode !== "prepared") return;
-    animator.manual({
-      shoulder: MathUtils.clamp(angles.shoulder, 0, 55),
-      elbow: MathUtils.clamp(angles.elbow, 0, 85),
-      wrist: MathUtils.clamp(angles.wrist, -20, 20),
-    });
+    animator.manual(normalizePoseInput(angles));
     sync();
   }
+
+  const legacyMap: Record<string, JointName> = {
+    shoulder: "rightShoulder",
+    elbow: "rightElbow",
+    wrist: "rightWrist",
+  };
+
   const commands = {
-    setJoint: (name: keyof JointAngles, value: number) =>
-      manual({ ...store.get().angles, [name]: value }),
-    pose: (name: "rest" | "raise" | "aim") =>
-      manual(
-        name === "rest"
-          ? { shoulder: 0, elbow: 0, wrist: 0 }
-          : name === "raise"
-            ? { shoulder: 12, elbow: 25, wrist: 0 }
-            : { shoulder: 20, elbow: 40, wrist: 0 },
-      ),
+    setJoint: (
+      name: JointName | "shoulder" | "elbow" | "wrist",
+      value: number,
+    ) => {
+      const joint = (legacyMap[name] ?? name) as JointName;
+      manual({
+        ...store.get().angles,
+        [joint]: clampJointAngle(joint, value),
+      });
+    },
+    setPoseAngles: (angles: PoseInput) => manual(angles),
+    pose: (name: PosePresetName) => {
+      if (name === "rest" || name === "bind") {
+        manual({});
+        return;
+      }
+      if (name === "raise") {
+        manual({ rightShoulder: 12, rightElbow: 25, rightWrist: 0 });
+        return;
+      }
+      if (name === "aim") {
+        manual({ rightShoulder: 20, rightElbow: 40, rightWrist: 0 });
+        return;
+      }
+      const preset = TEST_POSES.find((p) => p.id === name);
+      if (preset) manual(preset.angles);
+    },
     play: () => {
       if (store.get().mode !== "prepared") return;
       if (animator.playing) animator.pause();
@@ -151,6 +188,7 @@ export function createCommands(
     zoom: (direction: "in" | "out") =>
       world.zoom(direction === "in" ? 0.85 : 1.15),
   };
+
   let accumulator = 0;
   function update(dt: number) {
     if (store.get().mode === "prepared") {
@@ -162,6 +200,7 @@ export function createCommands(
       }
     }
   }
+
   // Match duplicate boundary vertices in the bind pose and measure their actual skinned positions.
   rig.displayRoot.updateMatrixWorld(true);
   const vertices = new Map<string, { mesh: Mesh; index: number }[]>();
@@ -188,6 +227,7 @@ export function createCommands(
   const boundaries = [...vertices.values()].filter(
     (group) => new Set(group.map((g) => g.mesh.uuid)).size > 1,
   );
+
   function seamError() {
     rig.displayRoot.traverse((o) => {
       if (o instanceof SkinnedMesh) o.skeleton.update();
@@ -206,16 +246,46 @@ export function createCommands(
     }
     return max;
   }
+
+  function partMinPlatformY(partName: string): number {
+    const part = rig.parts[partName];
+    if (!(part instanceof Mesh)) return 0;
+    const count = part.geometry.attributes.position.count;
+    const v = new Vector3();
+    let minY = Infinity;
+    for (let i = 0; i < count; i++) {
+      part.getVertexPosition(i, v);
+      part.localToWorld(v);
+      rig.displayRoot.worldToLocal(v);
+      if (v.y < minY) minY = v.y;
+    }
+    return Number.isFinite(minY) ? minY : 0;
+  }
+
   const gripLocal = rig.parts.rifle.getWorldPosition(new Vector3());
   rig.sockets.rightHand.worldToLocal(gripLocal);
+
   function diagnostics() {
     rig.displayRoot.updateMatrixWorld(true);
+    const seam = seamError();
     const expected = rig.sockets.rightHand.localToWorld(gripLocal.clone());
     const actual = rig.parts.rifle.getWorldPosition(new Vector3());
+    const jointWorldPositions = Object.fromEntries(
+      JOINTS.map((j) => [
+        j,
+        rig.joints[j].getWorldPosition(new Vector3()).toArray(),
+      ]),
+    ) as Record<JointName, [number, number, number]>;
+    const leftFootMinY = partMinPlatformY("leftFoot");
+    const rightFootMinY = partMinPlatformY("rightFoot");
     return {
-      skinSeamGap: seamError(),
+      skinSeamGap: seam,
       boundaryGroups: boundaries.length,
       attachmentError: expected.distanceTo(actual),
+      leftFootMinY,
+      rightFootMinY,
+      jointWorldPositions,
+      angles: store.get().angles as JointAngles,
       shoulderRotation: rig.joints.rightShoulder.quaternion.toArray(),
       elbowRotation: rig.joints.rightElbow.quaternion.toArray(),
       weaponVisible: rig.parts.rifle.visible,
@@ -223,7 +293,7 @@ export function createCommands(
       playing: animator.playing,
       time: animator.time,
       bindError: Math.max(
-        ...(["rightShoulder", "rightElbow", "rightWrist"] as const).map((j) =>
+        ...JOINTS.map((j) =>
           new Quaternion()
             .copy(rig.joints[j].quaternion)
             .angleTo(rig.bindPose[j]),
@@ -231,6 +301,8 @@ export function createCommands(
       ),
     };
   }
+
   return { commands, update, diagnostics };
 }
+
 export type Commands = ReturnType<typeof createCommands>["commands"];
