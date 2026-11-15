@@ -22,4 +22,16 @@ When you finish, check the box below and add a line to `docs/progress.md`.
 | [T11](T11-evaluation-tools.md) | Evaluation tools: frame time, joint curves, attachment error | D | T07 T08 | Nov 26 | ⬜ |
 | [T12](T12-vision-pro.md) | Vision Pro Safari testing and interaction adaptation | C | T08 T10 | Nov 29 | ⬜ |
 
+## Added Nov 15 (after GSI feedback; see [../TECHNICAL-CORE.md](../TECHNICAL-CORE.md))
+
+Focus moved to methods we implement and evaluate ourselves. T03 (box prototype) is superseded by the real-model rig. Current priority order: **T13 → T14 → T07 → T15 → T17**, then T04, T16, T11; T05 / T08 polish / T12 last.
+
+| ID | Task | Method | Priority | Target date | Status |
+|---|---|---|---|---|---|
+| [T13](T13-full-body-rig.md) | Full-body rig + FK + joint limits | M1, M2 | Must | Nov 17 | ⬜ |
+| [T14](T14-custom-lbs-shader.md) | Our own Linear Blend Skinning shader | M3 | Must | Nov 19 | ⬜ |
+| [T15](T15-spline-interpolation.md) | Quaternion spline interpolation | M4 | Must | Nov 24 | ⬜ |
+| [T16](T16-two-bone-ik.md) | Two-bone analytic IK | M7 | Should | Nov 29 | ⬜ |
+| [T17](T17-milestone.md) | Milestone webpage + video + slides | n/a | Must | **Nov 22** | ⬜ |
+
 Aspirational (only after the core is stable, starting Week 3): visionOS WKWebView shell, WebXR immersive mode, drag-and-snap assembly. Write separate cards for these when the time comes.

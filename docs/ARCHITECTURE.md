@@ -96,3 +96,10 @@ public/assets/textures/
 |---|---|
 | WebGL rendering, scene graph, `Quaternion.slerp`, `Matrix4`, GLTFLoader, OrbitControls | rig abstraction and joint mapping, socket / equipment assembly and offsets, keyframe sampling and easing, animation state machine and transition blending, shared state / commands layer, UI, evaluation tools |
 | Asset generation (Meshy etc.) | Blender cleanup, joint setup, material regions |
+
+
+## 7. First desktop asset slice (2026-11-13)
+
+The user requested an integrated source-copy/export/viewer/single-arm experiment before the full feature set. This slice preserves the stack, command boundary, program joint names, and single render loop. It uses a narrower `ArmPreviewRig` interface because independent armor-color regions and the complete action/equipment system are not ready. The target `MechaRig` above remains the contract for the later full integration.
+
+After user review revealed cracks in rigid face cuts, the processed asset now uses shared vertex weights across part boundaries, with a narrow deforming joint band and an independently wrist-attached rifle. Three.js supplies skeletal deformation; the asset-processing script supplies the weights and validates continuity. The two GLB versions remain available for comparison.

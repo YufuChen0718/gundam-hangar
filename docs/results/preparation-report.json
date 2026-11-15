@@ -1,0 +1,83 @@
+{
+  "source_triangles": 9944,
+  "part_triangles": {
+    "body": 7071,
+    "upperArm": 476,
+    "forearm": 213,
+    "hand": 159,
+    "rifle": 1323,
+    "shield": 702
+  },
+  "source_faces_preserved": true,
+  "articulated_joints": [
+    "rightShoulder",
+    "rightElbow",
+    "rightWrist"
+  ],
+  "method": "Shared vertex skin weights across separated parts, rigid armor interiors with narrow weighted joint bands; independent wrist-attached rifle.",
+  "cleanup": [
+    {
+      "from": "upperArm",
+      "to": "body",
+      "faces": 5
+    },
+    {
+      "from": "upperArm",
+      "to": "body",
+      "faces": 1
+    },
+    {
+      "from": "forearm",
+      "to": "rifle",
+      "faces": 13
+    },
+    {
+      "from": "rifle",
+      "to": "body",
+      "faces": 4
+    }
+  ],
+  "seam_checks": [
+    {
+      "angles_deg": [
+        0,
+        0,
+        0
+      ],
+      "shared_vertices_checked": 90,
+      "max_boundary_separation_m": 5.960464477539063e-08
+    },
+    {
+      "angles_deg": [
+        20,
+        40,
+        0
+      ],
+      "shared_vertices_checked": 90,
+      "max_boundary_separation_m": 1.3328003749250113e-07
+    },
+    {
+      "angles_deg": [
+        30,
+        55,
+        0
+      ],
+      "shared_vertices_checked": 90,
+      "max_boundary_separation_m": 1.2731557704981462e-07
+    },
+    {
+      "angles_deg": [
+        55,
+        85,
+        20
+      ],
+      "shared_vertices_checked": 90,
+      "max_boundary_separation_m": 1.284009809763289e-07
+    }
+  ],
+  "limitations": [
+    "Single-arm prototype, no full-body animation",
+    "Joint bands can deform slightly; collision avoidance is not implemented",
+    "One shared textured material; armor recoloring remains future work"
+  ]
+}
