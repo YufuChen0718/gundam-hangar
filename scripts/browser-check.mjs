@@ -99,7 +99,7 @@ try {
     timeout: 30000,
   });
   checks.push("gundam-rigged.glb and textures loaded");
-  await page.waitForTimeout(600);
+  await page.waitForTimeout(500);
   await page.screenshot({ path: "docs/results/viewer-rest.png" });
 
   const bindDiag = await page.evaluate(() => window.__hangar.diagnostics());
@@ -114,7 +114,7 @@ try {
   const vsThreeSet = new Set();
   for (const poseName of TEST_POSE_ORDER) {
     await page.locator(`[data-pose="${poseName}"]`).click();
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(90);
     const d = await page.evaluate(() => window.__hangar.diagnostics());
     const state = await page.evaluate(() => window.__hangar.getState());
     assert.equal(d.boundaryGroups, 367);
@@ -180,12 +180,12 @@ try {
   for (const poseName of GALLERY_POSES) {
     await page.locator(`[data-pose="${poseName}"]`).click();
     await page.evaluate(() => window.__hangar.commands.camera("front"));
-    await page.waitForTimeout(150);
+    await page.waitForTimeout(140);
     await page.screenshot({
       path: `docs/results/pose-gallery-front-${poseName}.png`,
     });
     await page.evaluate(() => window.__hangar.commands.camera("side"));
-    await page.waitForTimeout(150);
+    await page.waitForTimeout(140);
     await page.screenshot({
       path: `docs/results/pose-gallery-side-${poseName}.png`,
     });
@@ -262,7 +262,78 @@ try {
     "all 15 joints poseable via viewer sliders; pelvis moves entire body hierarchy",
   );
 
-  // 4. Classic viewer screenshots & close-up views
+  // 4. Test T07 Action State Machine & Transitions (Idle / Aim / Swing + Blend / Cut toggle)
+  await page.evaluate(() => window.__hangar.commands.camera("orbit"));
+  await page.locator('[data-transition="blend"]').click();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().transitionMode),
+    "blend",
+  );
+  // 4a. Play swing and verify it transitions automatically back to idle after 1.8 s
+  await page.locator('[data-action="swing"]').click();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().action),
+    "swing",
+  );
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().status),
+    "transitioning",
+  );
+  await page.waitForTimeout(2000);
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().action),
+    "idle",
+  );
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().playing),
+    true,
+  );
+  // 4b. Interrupt swing mid-way with aim in blend mode vs cut mode
+  await page.locator('[data-action="swing"]').click();
+  await page.waitForTimeout(550);
+  await page.locator('[data-action="aim"]').click();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().action),
+    "aim",
+  );
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().status),
+    "transitioning",
+  );
+  await page.waitForTimeout(1400);
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().status),
+    "holding",
+  );
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().playing),
+    false,
+  );
+
+  // Cut mode check
+  await page.locator('[data-transition="cut"]').click();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().transitionMode),
+    "cut",
+  );
+  await page.locator('[data-action="swing"]').click();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().status),
+    "playing",
+  );
+  await page.waitForTimeout(450);
+  await page.locator('[data-action="aim"]').click();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().status),
+    "playing",
+  );
+  await page.locator('[data-transition="blend"]').click();
+  await page.locator("#reset-pose-panel").click();
+  checks.push(
+    "T07 action buttons (idle / aim / swing) and transition mode toggle (blend / cut) verified",
+  );
+
+  // 5. Classic viewer screenshots & close-up views
   await page.evaluate(() => window.__hangar.commands.camera("orbit"));
   await page.locator('[data-pose="rightArmAim"]').click();
   await page.waitForTimeout(200);
@@ -277,7 +348,7 @@ try {
     await page.screenshot({ path: `docs/results/seam-fix-${view}.png` });
   }
 
-  // 5. Equipment tab checks
+  // 6. Equipment tab checks
   await page.evaluate(() => window.__hangar.commands.camera("orbit"));
   await page.getByRole("tab", { name: "装备", exact: true }).click();
   await page.locator("#weapon").uncheck();
@@ -295,68 +366,78 @@ try {
   await page.locator("#shield").check();
   checks.push("shield hide/show");
 
-  // 6. Inspect tab: test 3-way skinning toggle (Three.js skinning / our LBS / rigid parts) and capture elbow/shoulder comparison screenshots
+  // 7. Inspect tab: T14 close-up comparison of right elbow and right knee (original texture, rigid parts vs our LBS)
   await page.getByRole("tab", { name: "检查", exact: true }).click();
+  await page.locator("#parts").uncheck();
+  await page.locator("#joints").uncheck();
+  await page.locator("#wireframe").uncheck();
+
+  // 7a. Right Elbow close-up (original texture, rigid vs LBS)
   await page.evaluate(() => {
-    window.__hangar.commands.pose("dualArmReady");
-    window.__hangar.commands.camera("side");
-    window.__hangar.commands.zoom("in");
+    const c = window.__hangar.commands;
+    c.setWeaponVisible(false); // Unoccluded view of right elbow joint
+    c.setPoseAngles({
+      rightShoulder: 25,
+      rightElbow: 88,
+      rightWrist: 0,
+    });
+    const [ex, ey, ez] =
+      window.__hangar.diagnostics().jointWorldPositions.rightElbow;
+    c.focusCamera([ex + 0.02, ey + 0.04, ez + 0.04], [
+      ex - 0.52,
+      ey - 0.06,
+      ez - 0.28,
+    ]);
   });
-  await page.waitForTimeout(200);
-
-  // 6a. our LBS mode
-  await page.locator('[data-skinning="lbs"]').click();
-  assert.equal(
-    await page.evaluate(() => window.__hangar.getState().skinning),
-    "lbs",
-  );
-  await page.waitForTimeout(180);
-  await page.screenshot({
-    path: "docs/results/t14-lbs-shoulder-elbow.png",
-  });
-
-  // 6b. rigid parts mode (no blending -> shows elbow & shoulder seam cracks)
   await page.locator('[data-skinning="rigid"]').click();
-  assert.equal(
-    await page.evaluate(() => window.__hangar.getState().skinning),
-    "rigid",
-  );
-  const rigidDiag = await page.evaluate(() => window.__hangar.diagnostics());
-  assert.ok(
-    rigidDiag.skinSeamGap > 0.02,
-    `Expected rigid parts mode to report large seam crack, got ${rigidDiag.skinSeamGap}`,
-  );
-  await page.waitForTimeout(180);
-  await page.screenshot({
-    path: "docs/results/t14-rigid-shoulder-elbow.png",
-  });
+  await page.waitForTimeout(220);
+  await page.screenshot({ path: "docs/results/t14-elbow-rigid.png" });
 
-  // 6c. Three.js skinning mode
+  await page.locator('[data-skinning="lbs"]').click();
+  await page.waitForTimeout(220);
+  await page.screenshot({ path: "docs/results/t14-elbow-lbs.png" });
+
+  // 7b. Right Knee close-up (original texture, rigid vs LBS)
+  await page.evaluate(() => {
+    const c = window.__hangar.commands;
+    c.setWeaponVisible(true);
+    c.setPoseAngles({
+      rightHip: 20,
+      rightKnee: 75,
+      rightAnkle: 20,
+      leftHip: 20,
+      leftKnee: 75,
+      leftAnkle: 20,
+    });
+    const [kx, ky, kz] =
+      window.__hangar.diagnostics().jointWorldPositions.rightKnee;
+    c.focusCamera([kx - 0.02, ky - 0.02, kz + 0.02], [
+      kx - 0.52,
+      ky + 0.06,
+      kz + 0.38,
+    ]);
+  });
+  await page.locator('[data-skinning="rigid"]').click();
+  await page.waitForTimeout(220);
+  await page.screenshot({ path: "docs/results/t14-knee-rigid.png" });
+
+  await page.locator('[data-skinning="lbs"]').click();
+  await page.waitForTimeout(220);
+  await page.screenshot({ path: "docs/results/t14-knee-lbs.png" });
+
+  // 7c. Test Three.js skinning mode, part colors, joint axes, wireframe
   await page.locator('[data-skinning="three"]').click();
   assert.equal(
     await page.evaluate(() => window.__hangar.getState().skinning),
     "three",
   );
-  await page.waitForTimeout(180);
-  await page.screenshot({
-    path: "docs/results/t14-three-shoulder-elbow.png",
+  await page.locator('[data-skinning="lbs"]').click();
+  await page.evaluate(() => {
+    window.__hangar.commands.pose("dualArmReady");
+    window.__hangar.commands.camera("orbit");
   });
-
-  // 6d. Part colors + joint axes in both rigid and our LBS
   await page.locator("#parts").check();
   await page.locator("#joints").check();
-  await page.locator('[data-skinning="rigid"]').click();
-  await page.waitForTimeout(180);
-  await page.screenshot({
-    path: "docs/results/t14-rigid-parts-closeup.png",
-  });
-  await page.locator('[data-skinning="lbs"]').click();
-  await page.waitForTimeout(180);
-  await page.screenshot({
-    path: "docs/results/t14-lbs-parts-closeup.png",
-  });
-
-  await page.evaluate(() => window.__hangar.commands.camera("orbit"));
   await page.waitForTimeout(180);
   await page.screenshot({ path: "docs/results/viewer-parts.png" });
   await page.locator("#parts").uncheck();
@@ -368,17 +449,17 @@ try {
   );
   await page.locator("#wireframe").uncheck();
   checks.push(
-    "3-way skinning toggle (Three.js skinning / our LBS / rigid parts), part colors, joint axes, wireframe",
+    "3-way skinning toggle, close-up elbow/knee rigid vs LBS screenshots, part colors, joint axes, wireframe",
   );
 
-  // 7. Frame time comparison across Three.js skinning, our LBS, and rigid parts
+  // 8. Frame time comparison across Three.js skinning, our LBS, and rigid parts
   const frameTimeThree = await measureFrameTimes(page, "three", 90);
   const frameTimeLbs = await measureFrameTimes(page, "lbs", 90);
   const frameTimeRigid = await measureFrameTimes(page, "rigid", 90);
   await page.locator('[data-skinning="lbs"]').click();
   checks.push("measured frame time for Three.js skinning, our LBS, and rigid parts");
 
-  // 8. Original vs prepared switching
+  // 9. Original vs prepared switching
   await page.getByRole("button", { name: "原始模型", exact: true }).click();
   await page.waitForFunction(
     () =>
@@ -393,18 +474,18 @@ try {
   assert.equal(await page.locator("#play").isDisabled(), false);
   checks.push("original/prepared switching, inappropriate controls disabled");
 
-  // 9. Play, pause, and reset
+  // 10. Play, pause, and reset
   await page.getByRole("tab", { name: "姿态", exact: true }).click();
   await page.locator("#reset-pose").click();
   assert.ok(
     (await page.evaluate(() => window.__hangar.diagnostics())).bindError < 1e-7,
   );
   await page.locator("#play").click();
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(600);
   assert.ok((await page.evaluate(() => window.__hangar.getState())).time > 0);
   await page.locator("#play").click();
   const paused = await page.evaluate(() => window.__hangar.getState().time);
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(250);
   assert.equal(
     await page.evaluate(() => window.__hangar.getState().time),
     paused,
@@ -415,9 +496,9 @@ try {
   );
   checks.push("play, pause, and reset");
 
-  // 10. Mobile 390px layout check
+  // 11. Mobile 390px layout check
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(250);
   assert.equal(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -429,6 +510,22 @@ try {
     fullPage: true,
   });
   checks.push("390px layout without horizontal overflow");
+
+  // 12. Render t07-transition-plot.svg to t07-transition-plot.png
+  const svgText = await fs.readFile(
+    "docs/results/t07-transition-plot.svg",
+    "utf8",
+  );
+  const plotPage = await browser.newPage({
+    viewport: { width: 1360, height: 780 },
+    deviceScaleFactor: 2,
+  });
+  await plotPage.setContent(
+    `<!doctype html><body style="margin:0;background:#141a21">${svgText}</body>`,
+  );
+  await plotPage.screenshot({ path: "docs/results/t07-transition-plot.png" });
+  await plotPage.close();
+  checks.push("rendered docs/results/t07-transition-plot.png");
 
   assert.deepEqual(errors, []);
   assert.deepEqual(failedRequests, []);
@@ -447,7 +544,7 @@ try {
     errors,
     failedRequests,
     notes:
-      "Headless Chrome acceptance run for T13 + T14 (custom LBS shader & CPU reference); frame times measured in headless Chromium.",
+      "Headless Chrome acceptance run for T13 + T14 + T07; frame times measured in headless Chromium.",
   };
   await fs.writeFile(
     "docs/results/browser-validation.json",

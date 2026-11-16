@@ -6,36 +6,38 @@
     "all 9 full-body test poses report distinct per-pose LBS seam gaps (<1e-5 m) and LBS-vs-Three.js diffs (<1e-6 m)",
     "captured front and side pose gallery screenshots",
     "all 15 joints poseable via viewer sliders; pelvis moves entire body hierarchy",
+    "T07 action buttons (idle / aim / swing) and transition mode toggle (blend / cut) verified",
     "weapon hide/show",
     "shield hide/show",
-    "3-way skinning toggle (Three.js skinning / our LBS / rigid parts), part colors, joint axes, wireframe",
+    "3-way skinning toggle, close-up elbow/knee rigid vs LBS screenshots, part colors, joint axes, wireframe",
     "measured frame time for Three.js skinning, our LBS, and rigid parts",
     "original/prepared switching, inappropriate controls disabled",
     "play, pause, and reset",
     "390px layout without horizontal overflow",
+    "rendered docs/results/t07-transition-plot.png",
     "no console errors or failed HTTP responses"
   ],
   "frameTimes": {
     "three": {
       "mode": "three",
       "samples": 85,
-      "meanMs": 16.665,
+      "meanMs": 16.68,
       "medianMs": 16.7,
-      "p95Ms": 17.8
+      "p95Ms": 18
     },
     "lbs": {
       "mode": "lbs",
       "samples": 85,
-      "meanMs": 16.665,
-      "medianMs": 16.7,
-      "p95Ms": 18
+      "meanMs": 16.641,
+      "medianMs": 16.6,
+      "p95Ms": 17.7
     },
     "rigid": {
       "mode": "rigid",
       "samples": 85,
-      "meanMs": 16.674,
+      "meanMs": 16.666,
       "medianMs": 16.6,
-      "p95Ms": 18.1
+      "p95Ms": 17.7
     }
   },
   "seamTests": [
@@ -321,5 +323,5 @@
   ],
   "errors": [],
   "failedRequests": [],
-  "notes": "Headless Chrome acceptance run for T13 + T14 (custom LBS shader & CPU reference); frame times measured in headless Chromium."
+  "notes": "Headless Chrome acceptance run for T13 + T14 + T07; frame times measured in headless Chromium."
 }

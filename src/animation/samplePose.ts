@@ -1,11 +1,13 @@
 import { Euler, MathUtils, Quaternion } from "three";
 import { JOINTS } from "../mecha/types";
 import type { JointName } from "../mecha/types";
-import type { Clip, Ease } from "./clips";
+import type { ActionName, Clip, Ease } from "./clips";
 export type Pose = Record<JointName, Quaternion>;
 export interface PreparedClip {
+  name: string;
   duration: number;
   loop: boolean;
+  next?: ActionName;
   keys: { t: number; pose: Pose; ease: Ease }[];
 }
 export function emptyPose(): Pose {

@@ -54,13 +54,12 @@ All three paths stay locked at the 60 Hz (`16.67 ms`) vsync budget.
 
 ---
 
-## 4. Side-by-Side Comparison Screenshots (Shoulder & Elbow)
+## 4. Close-Up Comparison Screenshots (Right Elbow & Right Knee)
 
 Saved in `docs/results/`:
-- **Textured view (`dualArmReady`, side close-up):**
-  - Our LBS: `docs/results/t14-lbs-shoulder-elbow.png`
-  - Rigid parts (no blending — visible cracks at elbow and shoulder): `docs/results/t14-rigid-shoulder-elbow.png`
-  - Three.js `SkinnedMesh` reference: `docs/results/t14-three-shoulder-elbow.png`
-- **Part-colored view with joint axes (`dualArmReady`, side close-up):**
-  - Our LBS: `docs/results/t14-lbs-parts-closeup.png`
-  - Rigid parts (no blending): `docs/results/t14-rigid-parts-closeup.png`
+- **Right Elbow (`rightShoulder: 25°, rightElbow: 88°`, original texture):**
+  - Rigid parts (no blending — visible seam crack): `docs/results/t14-elbow-rigid.png`
+  - Our LBS (shared-weight blending): `docs/results/t14-elbow-lbs.png`
+- **Right Knee (`rightHip: 20°, rightKnee: 75°, rightAnkle: 20°`, original texture):**
+  - Rigid parts (no blending — visible seam crack): `docs/results/t14-knee-rigid.png`
+  - Our LBS (shared-weight blending): `docs/results/t14-knee-lbs.png`

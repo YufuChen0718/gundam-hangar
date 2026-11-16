@@ -20,6 +20,7 @@ import { loadOriginal } from "../mecha/loadMecha";
 import { EquipmentManager } from "../mecha/equipment";
 import { Appearance } from "../mecha/appearance";
 import { Animator } from "../animation/animator";
+import type { ActionName, TransitionMode } from "../animation/clips";
 import type { createScene } from "../scene/createScene";
 
 export function createCommands(
@@ -50,8 +51,12 @@ export function createCommands(
 
   function sync() {
     store.set({
+      action: animator.action,
+      status: animator.status,
+      transitionMode: animator.transitionMode,
       angles: animator.angles(),
       time: animator.time,
+      duration: animator.duration,
       playing: animator.playing,
     });
   }
@@ -102,6 +107,16 @@ export function createCommands(
       else if (animator.time > 0 && animator.time < animator.duration)
         animator.resume();
       else animator.play();
+      sync();
+    },
+    playAction: (action: ActionName) => {
+      if (store.get().mode !== "prepared") return;
+      animator.play(action);
+      sync();
+    },
+    setTransitionMode: (mode: TransitionMode) => {
+      animator.setTransitionMode(mode);
+      store.set({ transitionMode: mode });
       sync();
     },
     seek: (time: number) => {
@@ -188,6 +203,10 @@ export function createCommands(
               : world.resetCamera(),
     zoom: (direction: "in" | "out") =>
       world.zoom(direction === "in" ? 0.85 : 1.15),
+    focusCamera: (
+      target: [number, number, number],
+      cameraPos: [number, number, number],
+    ) => world.focus(target, cameraPos),
   };
 
   let accumulator = 0;
@@ -258,6 +277,9 @@ export function createCommands(
     const rightFootMinY = partMinPlatformY("rightFoot");
     return {
       skinningMode,
+      action: animator.action,
+      status: animator.status,
+      transitionMode: animator.transitionMode,
       skinSeamGap: activeSeam.maxGap,
       skinSeamMeanGap: activeSeam.meanGap,
       lbsSeamGapMax: lbsSeam.maxGap,

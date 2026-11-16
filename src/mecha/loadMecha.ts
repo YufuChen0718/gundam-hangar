@@ -1,5 +1,12 @@
-import { Box3, Group, Mesh, SRGBColorSpace, Vector3 } from "three";
-import type { Material, Object3D, Quaternion } from "three";
+import {
+  Box3,
+  Group,
+  Mesh,
+  MeshStandardMaterial,
+  SRGBColorSpace,
+  Vector3,
+} from "three";
+import type { Material, Object3D, Quaternion, Texture } from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { JOINTS } from "./types";
 import type {
@@ -20,6 +27,22 @@ function prepare(root: Object3D) {
       o.receiveShadow = true;
       for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
         if ("map" in m && m.map) m.map.colorSpace = SRGBColorSpace;
+        // Sharper textures at grazing angles, and a gentler normal map: the
+        // generated normal map carries baked dither noise that reads as grain.
+        for (const key of [
+          "map",
+          "normalMap",
+          "roughnessMap",
+          "metalnessMap",
+          "emissiveMap",
+        ] as const) {
+          const tex = (m as Record<string, unknown>)[key] as Texture | null;
+          if (tex) {
+            tex.anisotropy = 8;
+            tex.needsUpdate = true;
+          }
+        }
+        if (m instanceof MeshStandardMaterial) m.normalScale.setScalar(0.6);
       }
     }
   });
