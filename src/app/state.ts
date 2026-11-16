@@ -1,4 +1,9 @@
 import type { JointAngles, ModelMode, SkinningMode } from "../mecha/types";
+import type {
+  ActionName,
+  AnimatorStatus,
+  TransitionMode,
+} from "../animation/clips";
 import { zeroJointAngles } from "../mecha/rigConfig";
 
 export interface HangarState {
@@ -6,6 +11,9 @@ export interface HangarState {
   error: string | null;
   mode: ModelMode;
   skinning: SkinningMode;
+  action: ActionName;
+  status: AnimatorStatus;
+  transitionMode: TransitionMode;
   angles: JointAngles;
   weapon: boolean;
   shield: boolean;
@@ -13,6 +21,7 @@ export interface HangarState {
   parts: boolean;
   joints: boolean;
   time: number;
+  duration: number;
   playing: boolean;
   modelYawDeg: number;
   loading: boolean;
@@ -24,6 +33,9 @@ export function createStore() {
     error: null,
     mode: "prepared",
     skinning: "lbs",
+    action: "idle",
+    status: "holding",
+    transitionMode: "blend",
     angles: zeroJointAngles(),
     weapon: true,
     shield: true,
@@ -31,6 +43,7 @@ export function createStore() {
     parts: false,
     joints: false,
     time: 0,
+    duration: 6,
     playing: false,
     modelYawDeg: 0,
     loading: false,

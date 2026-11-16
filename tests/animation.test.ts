@@ -331,3 +331,73 @@ test("custom LBS CPU reference matches Three.js skinning and reports distinct pe
     `Expected per-pose LBS vs Three.js diffs to differ across all 9 poses: ${vsThreeMaxs.join(", ")}`,
   );
 });
+
+test("swing automatically returns to idle while aim holds its final pose", () => {
+  const r = rig(),
+    a = new Animator(r);
+  a.play("swing");
+  assert.equal(a.action, "swing");
+  assert.equal(a.status, "transitioning");
+  for (let i = 0; i < 120; i++) a.update(1 / 60); // 2.0 s > 1.8 s swing duration
+  assert.equal(a.action, "idle");
+  assert.equal(a.playing, true);
+
+  a.play("aim");
+  assert.equal(a.action, "aim");
+  for (let i = 0; i < 90; i++) a.update(1 / 60); // 1.5 s > 1.2 s aim duration
+  assert.equal(a.action, "aim");
+  assert.equal(a.status, "holding");
+  assert.equal(a.playing, false);
+  assert.ok(Math.abs(a.jointAngleDeg("rightShoulder") - 36) < 0.5);
+  assert.ok(Math.abs(a.jointAngleDeg("torso") - 22) < 0.5);
+  assert.ok(Math.abs(a.jointAngleDeg("rightKnee") - 32) < 0.5);
+});
+
+test("switching idle -> swing -> aim mid-swing blends smoothly in blend mode and jumps in cut mode", () => {
+  const dt = 1 / 60;
+  function runSwitch(mode: "blend" | "cut") {
+    const r = rig(),
+      a = new Animator(r);
+    a.setTransitionMode(mode);
+    a.play("idle");
+    let prevShoulder = a.jointAngleDeg("rightShoulder");
+    let prevTorso = a.jointAngleDeg("torso");
+    let prevKnee = a.jointAngleDeg("rightKnee");
+    let maxShoulderVel = 0;
+    let maxTorsoVel = 0;
+    let maxKneeVel = 0;
+    for (let step = 1; step <= 150; step++) {
+      if (step === 36) a.play("swing"); // t = 0.60 s: idle -> swing
+      if (step === 87) a.play("aim"); // t = 1.45 s: mid-swing strike -> aim
+      a.update(dt);
+      const curShoulder = a.jointAngleDeg("rightShoulder");
+      const curTorso = a.jointAngleDeg("torso");
+      const curKnee = a.jointAngleDeg("rightKnee");
+      maxShoulderVel = Math.max(
+        maxShoulderVel,
+        Math.abs(curShoulder - prevShoulder) / dt,
+      );
+      maxTorsoVel = Math.max(maxTorsoVel, Math.abs(curTorso - prevTorso) / dt);
+      maxKneeVel = Math.max(maxKneeVel, Math.abs(curKnee - prevKnee) / dt);
+      prevShoulder = curShoulder;
+      prevTorso = curTorso;
+      prevKnee = curKnee;
+    }
+    return { maxShoulderVel, maxTorsoVel, maxKneeVel };
+  }
+
+  const blendStats = runSwitch("blend");
+  const cutStats = runSwitch("cut");
+  assert.ok(
+    cutStats.maxShoulderVel > blendStats.maxShoulderVel * 4,
+    `Expected cut shoulder velocity spike (${cutStats.maxShoulderVel}) > 4x blend (${blendStats.maxShoulderVel})`,
+  );
+  assert.ok(
+    cutStats.maxTorsoVel > blendStats.maxTorsoVel * 4,
+    `Expected cut torso velocity spike (${cutStats.maxTorsoVel}) > 4x blend (${blendStats.maxTorsoVel})`,
+  );
+  assert.ok(
+    cutStats.maxKneeVel > blendStats.maxKneeVel * 4,
+    `Expected cut knee velocity spike (${cutStats.maxKneeVel}) > 4x blend (${blendStats.maxKneeVel})`,
+  );
+});

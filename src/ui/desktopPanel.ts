@@ -2,6 +2,7 @@ import type { Store } from "../app/state";
 import type { Commands } from "../app/commands";
 import { JOINTS } from "../mecha/types";
 import type { JointName, PosePresetName, SkinningMode } from "../mecha/types";
+import type { ActionName, TransitionMode } from "../animation/clips";
 import { JOINT_LIMITS, TEST_POSES } from "../mecha/rigConfig";
 
 const JOINT_GROUPS: {
@@ -65,7 +66,7 @@ export function createLayout(root: HTMLElement) {
  </section><aside class="inspector"><div class="panel-heading"><div class="eyebrow">CONTROL DECK</div><h2>模型实验台 <span>15J</span></h2><p>骨盆为根节点的 15 关节层级 FK 与测试姿态库。</p></div>
  <div class="model-switch" role="group" aria-label="模型版本"><button data-model="prepared" class="active" disabled>全身绑定版</button><button data-model="original" disabled>原始模型</button></div>
  <div class="tabs" role="tablist"><button role="tab" aria-selected="true" aria-controls="panel-pose" data-tab="pose" class="active">姿态</button><button role="tab" aria-selected="false" aria-controls="panel-equipment" data-tab="equipment">装备</button><button role="tab" aria-selected="false" aria-controls="panel-inspect" data-tab="inspect">检查</button></div>
- <div class="panel-content"><section id="panel-pose" role="tabpanel"><div class="section-caption">TEST POSES <span>9 组全身测试姿态</span></div><div class="presets presets-grid">${TEST_POSES.map(
+ <div class="panel-content"><section id="panel-pose" role="tabpanel"><div class="section-caption">ACTIONS <span>idle / aim / swing</span></div><div class="presets"><button data-action="idle" disabled>Idle</button><button data-action="aim" disabled>Aim</button><button data-action="swing" disabled>Swing</button></div><div class="section-caption">TRANSITION <span>M5 切换方式</span></div><div class="model-switch" style="margin:10px 0 18px" role="group" aria-label="动作切换方式"><button data-transition="blend" class="active" disabled>Blend (0.3s)</button><button data-transition="cut" disabled>Cut</button></div><div class="section-caption">TEST POSES <span>9 组全身测试姿态</span></div><div class="presets presets-grid">${TEST_POSES.map(
    (p) =>
      `<button data-pose="${p.id}" title="${p.label}" disabled>${p.shortLabel}</button>`,
  ).join(
@@ -123,6 +124,18 @@ export function bindPanel(store: Store, c: Commands) {
       (b) => (b.onclick = () => c.pose(b.dataset.pose as PosePresetName)),
     );
   document
+    .querySelectorAll<HTMLButtonElement>("[data-action]")
+    .forEach(
+      (b) => (b.onclick = () => c.playAction(b.dataset.action as ActionName)),
+    );
+  document
+    .querySelectorAll<HTMLButtonElement>("[data-transition]")
+    .forEach(
+      (b) =>
+        (b.onclick = () =>
+          c.setTransitionMode(b.dataset.transition as TransitionMode)),
+    );
+  document
     .querySelectorAll<HTMLButtonElement>("[data-camera]")
     .forEach(
       (b) =>
@@ -169,6 +182,21 @@ export function bindPanel(store: Store, c: Commands) {
       .querySelectorAll<HTMLButtonElement>("[data-pose]")
       .forEach((b) => (b.disabled = armDisabled));
     document
+      .querySelectorAll<HTMLButtonElement>("[data-action]")
+      .forEach((b) => {
+        b.disabled = armDisabled;
+        b.classList.toggle("active", b.dataset.action === s.action);
+      });
+    document
+      .querySelectorAll<HTMLButtonElement>("[data-transition]")
+      .forEach((b) => {
+        b.disabled = armDisabled;
+        b.classList.toggle(
+          "active",
+          b.dataset.transition === s.transitionMode,
+        );
+      });
+    document
       .querySelectorAll<HTMLButtonElement>("[data-model]")
       .forEach((b) => {
         b.disabled = disabled;
@@ -197,8 +225,10 @@ export function bindPanel(store: Store, c: Commands) {
       "aria-label",
       s.playing ? "暂停动画" : "播放全身动画",
     );
+    el<HTMLInputElement>("timeline").max = String(s.duration);
     el<HTMLInputElement>("timeline").value = String(s.time);
-    el("time-label").textContent = `${s.time.toFixed(2)} / 6.00 s`;
+    el("time-label").textContent =
+      `${s.time.toFixed(2)} / ${s.duration.toFixed(2)} s`;
     el("stage-status").textContent = s.loading
       ? "正在加载原始资产"
       : s.mode === "original"

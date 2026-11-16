@@ -29,7 +29,7 @@ export function createScene(container: HTMLElement) {
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.target.set(0, 0.96, 0);
-  controls.minDistance = 2.1;
+  controls.minDistance = 0.35;
   controls.maxDistance = 8;
   controls.maxPolarAngle = Math.PI * 0.54;
   const light = new DirectionalLight(0xfff4e4, 3.8);
@@ -106,6 +106,14 @@ export function createScene(container: HTMLElement) {
       .add(controls.target);
     controls.update();
   }
+  function focus(
+    target: [number, number, number],
+    cameraPos: [number, number, number],
+  ) {
+    controls.target.set(target[0], target[1], target[2]);
+    camera.position.set(cameraPos[0], cameraPos[1], cameraPos[2]);
+    controls.update();
+  }
   const resize = new ResizeObserver(() => {
     const { width, height } = container.getBoundingClientRect();
     if (!width || !height) return;
@@ -126,5 +134,6 @@ export function createScene(container: HTMLElement) {
     back,
     top,
     zoom,
+    focus,
   };
 }

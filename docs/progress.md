@@ -5,6 +5,14 @@ These notes feed directly into the milestone and final reports.
 
 ---
 
+## 2026-11-15 · T07 Animation state machine and pose transitions (M5)
+- Added whole-body action clips (`idle` looping breathing/sway, `aim` raised-rifle hold with torso twist and slight knee bend, and `swing` wind-up $\to$ downward strike $\to$ follow-through $\to$ auto-return to `idle`) in `src/animation/clips.ts` for the 15-joint `gundam-rigged.glb` model on the `our LBS` path, respecting all joint limits and keeping both feet planted on the platform.
+- Upgraded `src/animation/animator.ts` with states (`playing | transitioning | holding`), `transitionMode: 'blend' | 'cut'`, `play(action)` pose snapshotting with $0.3\text{ s}$ smoothstep quaternion slerp blending, automatic `next` clip chaining (`swing -> idle`), and `jointAngleDeg(joint)`.
+- Added the three action buttons (`Idle`, `Aim`, `Swing`) and `Blend (0.3s)` / `Cut` toggle in `src/ui/desktopPanel.ts`.
+- Recorded `rightShoulder`, `torso`, and `rightKnee` joint angles and angular velocities across an `idle -> swing -> aim` mid-swing interrupt in both `blend` and `cut` modes (`docs/results/t07-transition-curves.csv`, `docs/results/t07-transition-plot.svg`, `docs/results/t07-transition-plot.png`, `docs/results/t07-evaluation.md`): at the `swing -> aim` switch ($t = 1.45\text{ s}$), `blend` reduces peak angular velocity from $1562.59^\circ/\text{s} \to 168.47^\circ/\text{s}$ ($9.3\times$) on `rightShoulder`, $1678.22^\circ/\text{s} \to 120.99^\circ/\text{s}$ ($13.9\times$) on `torso`, and $2398.38^\circ/\text{s} \to 181.39^\circ/\text{s}$ ($13.2\times$) on `rightKnee`.
+- Re-shot close-up original-texture T14 comparisons at the right elbow and right knee (`docs/results/t14-elbow-rigid.png`, `docs/results/t14-elbow-lbs.png`, `docs/results/t14-knee-rigid.png`, `docs/results/t14-knee-lbs.png`).
+- **Known issues:** `swing` currently uses the equipped rifle; the second weapon (beam saber) will be added in T04.
+
 ## 2026-11-15 · T14 Our own Linear Blend Skinning shader & CPU reference (M3)
 - Renamed `mecha-right-arm.glb` / `.blend` to `gundam-rigged.glb` / `.blend` across the repository and updated all references.
 - Implemented our own Linear Blend Skinning (`src/mecha/lbs.ts`) on plain `THREE.Mesh` objects using a custom `ShaderMaterial` (no `SkinnedMesh`, `Skeleton.update()`, or Three.js skinning shader chunks on the `"lbs"` or `"rigid"` paths) and added a 3-way toggle (**Three.js skinning / our LBS / rigid parts**) in the Inspect panel.

@@ -1,5 +1,10 @@
 import { MathUtils, Quaternion, Vector3 } from "three";
-import type { ArmPreviewRig, JointAngles, PoseInput } from "../mecha/types";
+import type {
+  ArmPreviewRig,
+  JointAngles,
+  JointName,
+  PoseInput,
+} from "../mecha/types";
 import { JOINTS } from "../mecha/types";
 import {
   clampJointAngle,
@@ -7,22 +12,48 @@ import {
   jointQuatToAngle,
   normalizePoseInput,
 } from "../mecha/rigConfig";
-import { raiseArm } from "./clips";
+import { CLIPS, raiseArm } from "./clips";
+import type { ActionName, AnimatorStatus, TransitionMode } from "./clips";
 import { compileClip, emptyPose, samplePose } from "./samplePose";
+import type { PreparedClip } from "./samplePose";
 
 export class Animator {
-  readonly duration = raiseArm.duration;
+  action: ActionName = "idle";
+  status: AnimatorStatus = "holding";
+  transitionMode: TransitionMode = "blend";
+  transitionDuration = 0.3;
   time = 0;
   playing = false;
-  private clip = compileClip(raiseArm);
+
+  private compiledClips: Record<ActionName, PreparedClip> = {
+    idle: compileClip(CLIPS.idle),
+    aim: compileClip(CLIPS.aim),
+    swing: compileClip(CLIPS.swing),
+  };
+  private demoClip = compileClip(raiseArm);
+  private activeClip: PreparedClip = this.demoClip;
   private pose = emptyPose();
   private start = emptyPose();
   private temp = emptyPose();
   private blendElapsed = 1;
   private tmpA = new Vector3();
   private tmpB = new Vector3();
+  private tmpQ = new Quaternion();
 
   constructor(private rig: ArmPreviewRig) {}
+
+  get duration(): number {
+    return this.activeClip.duration;
+  }
+
+  private snapshotCurrentPose() {
+    for (const j of JOINTS) {
+      this.start[j]
+        .copy(this.rig.bindPose[j])
+        .invert()
+        .multiply(this.rig.joints[j].quaternion);
+    }
+  }
 
   private apply() {
     for (const j of JOINTS) {
@@ -64,74 +95,177 @@ export class Animator {
     this.rig.lbs?.updateBoneMatrices();
   }
 
-  play() {
-    for (const j of JOINTS)
-      this.start[j]
-        .copy(this.rig.bindPose[j])
-        .invert()
-        .multiply(this.rig.joints[j].quaternion);
+  setTransitionMode(mode: TransitionMode) {
+    this.transitionMode = mode;
+  }
+
+  play(action?: ActionName) {
+    this.snapshotCurrentPose();
+    if (action) {
+      this.action = action;
+      this.activeClip = this.compiledClips[action];
+    } else {
+      this.activeClip = this.demoClip;
+    }
     this.time = 0;
-    this.blendElapsed = 0;
     this.playing = true;
+
+    if (this.transitionMode === "blend" && this.transitionDuration > 0) {
+      this.blendElapsed = 0;
+      this.status = "transitioning";
+      for (const j of JOINTS) {
+        this.pose[j].copy(this.start[j]);
+      }
+      this.apply();
+    } else {
+      this.blendElapsed = this.transitionDuration;
+      this.status = "playing";
+      samplePose(this.activeClip, 0, this.pose);
+      this.apply();
+    }
   }
 
   pause() {
     this.playing = false;
+    this.status = "holding";
   }
 
   resume() {
-    if (this.time >= this.duration) this.play();
-    else this.playing = true;
+    if (!this.activeClip.loop && this.time >= this.activeClip.duration) {
+      this.play();
+    } else {
+      this.playing = true;
+      this.status =
+        this.transitionMode === "blend" &&
+        this.blendElapsed < this.transitionDuration
+          ? "transitioning"
+          : "playing";
+    }
   }
 
   seek(t: number) {
-    this.time = MathUtils.clamp(t, 0, this.duration);
+    this.time = MathUtils.clamp(t, 0, this.activeClip.duration);
     this.playing = false;
-    this.blendElapsed = 1;
-    samplePose(this.clip, this.time, this.pose);
+    this.status = "holding";
+    this.blendElapsed = this.transitionDuration;
+    samplePose(this.activeClip, this.time, this.pose);
     this.apply();
   }
 
   reset() {
-    this.seek(0);
+    this.activeClip = this.demoClip;
+    this.time = 0;
+    this.playing = false;
+    this.status = "holding";
+    this.blendElapsed = this.transitionDuration;
+    for (const j of JOINTS) {
+      this.pose[j].identity();
+    }
+    this.apply();
   }
 
   manual(input: PoseInput) {
     const normalized = normalizePoseInput(input);
     this.time = 0;
     this.playing = false;
-    this.blendElapsed = 1;
+    this.status = "holding";
+    this.blendElapsed = this.transitionDuration;
     for (const j of JOINTS) {
       this.pose[j].setFromEuler(jointAngleToEuler(j, normalized[j]));
     }
     this.apply();
   }
 
+  private evaluateCurrentTime() {
+    samplePose(this.activeClip, this.time, this.temp);
+    if (
+      this.transitionMode === "blend" &&
+      this.transitionDuration > 0 &&
+      this.blendElapsed < this.transitionDuration
+    ) {
+      const u = MathUtils.clamp(
+        this.blendElapsed / this.transitionDuration,
+        0,
+        1,
+      );
+      const smooth = u * u * (3 - 2 * u);
+      for (const j of JOINTS) {
+        this.pose[j].copy(this.start[j]).slerp(this.temp[j], smooth);
+      }
+      this.status = "transitioning";
+    } else {
+      for (const j of JOINTS) {
+        this.pose[j].copy(this.temp[j]);
+      }
+      if (this.playing) this.status = "playing";
+    }
+  }
+
   update(dt: number) {
     if (!this.playing) return;
     if (!Number.isFinite(dt) || dt < 0) throw new Error("Invalid dt");
-    this.time = Math.min(this.duration, this.time + dt);
+
+    const nextTime = this.time + dt;
     this.blendElapsed += dt;
-    samplePose(this.clip, this.time, this.pose);
-    const w = Math.min(1, this.blendElapsed / 0.3),
-      smooth = w * w * (3 - 2 * w);
-    if (w < 1) {
-      samplePose(this.clip, this.time, this.temp);
-      for (const j of JOINTS)
-        this.pose[j].copy(this.start[j]).slerp(this.temp[j], smooth);
+
+    if (this.activeClip.loop) {
+      this.time =
+        ((nextTime % this.activeClip.duration) + this.activeClip.duration) %
+        this.activeClip.duration;
+      this.evaluateCurrentTime();
+      this.apply();
+      return;
     }
+
+    if (nextTime < this.activeClip.duration) {
+      this.time = nextTime;
+      this.evaluateCurrentTime();
+      this.apply();
+      return;
+    }
+
+    // Reached end of a non-looping clip
+    const overflow = Math.max(0, nextTime - this.activeClip.duration);
+    this.time = this.activeClip.duration;
+    this.evaluateCurrentTime();
     this.apply();
-    if (this.time >= this.duration) this.playing = false;
+
+    if (this.activeClip.next) {
+      // Automatically transition to next action (e.g. swing -> idle)
+      this.snapshotCurrentPose();
+      this.action = this.activeClip.next;
+      this.activeClip = this.compiledClips[this.action];
+      this.time = this.activeClip.loop
+        ? overflow % this.activeClip.duration
+        : Math.min(this.activeClip.duration, overflow);
+      if (this.transitionMode === "blend" && this.transitionDuration > 0) {
+        this.blendElapsed = overflow;
+        this.status =
+          overflow < this.transitionDuration ? "transitioning" : "playing";
+      } else {
+        this.blendElapsed = this.transitionDuration;
+        this.status = "playing";
+      }
+      this.evaluateCurrentTime();
+      this.apply();
+    } else {
+      this.playing = false;
+      this.status = "holding";
+    }
+  }
+
+  jointAngleDeg(joint: JointName): number {
+    this.tmpQ
+      .copy(this.rig.bindPose[joint])
+      .invert()
+      .multiply(this.rig.joints[joint].quaternion);
+    return clampJointAngle(joint, jointQuatToAngle(joint, this.tmpQ));
   }
 
   angles(): JointAngles {
-    const q = new Quaternion();
     const out = {} as JointAngles;
     for (const j of JOINTS) {
-      q.copy(this.rig.bindPose[j])
-        .invert()
-        .multiply(this.rig.joints[j].quaternion);
-      out[j] = clampJointAngle(j, jointQuatToAngle(j, q));
+      out[j] = this.jointAngleDeg(j);
     }
     return out;
   }
