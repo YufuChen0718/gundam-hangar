@@ -1,8 +1,11 @@
-import type { JointAngles, ModelMode } from "../mecha/types";
+import type { JointAngles, ModelMode, SkinningMode } from "../mecha/types";
+import { zeroJointAngles } from "../mecha/rigConfig";
+
 export interface HangarState {
   ready: boolean;
   error: string | null;
   mode: ModelMode;
+  skinning: SkinningMode;
   angles: JointAngles;
   weapon: boolean;
   shield: boolean;
@@ -14,12 +17,14 @@ export interface HangarState {
   modelYawDeg: number;
   loading: boolean;
 }
+
 export function createStore() {
   let state: HangarState = {
     ready: false,
     error: null,
     mode: "prepared",
-    angles: { shoulder: 0, elbow: 0, wrist: 0 },
+    skinning: "lbs",
+    angles: zeroJointAngles(),
     weapon: true,
     shield: true,
     wireframe: false,
@@ -44,4 +49,5 @@ export function createStore() {
     },
   };
 }
+
 export type Store = ReturnType<typeof createStore>;

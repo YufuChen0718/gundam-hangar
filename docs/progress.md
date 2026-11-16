@@ -5,6 +5,22 @@ These notes feed directly into the milestone and final reports.
 
 ---
 
+## 2026-11-15 · T14 Our own Linear Blend Skinning shader & CPU reference (M3)
+- Renamed `mecha-right-arm.glb` / `.blend` to `gundam-rigged.glb` / `.blend` across the repository and updated all references.
+- Implemented our own Linear Blend Skinning (`src/mecha/lbs.ts`) on plain `THREE.Mesh` objects using a custom `ShaderMaterial` (no `SkinnedMesh`, `Skeleton.update()`, or Three.js skinning shader chunks on the `"lbs"` or `"rigid"` paths) and added a 3-way toggle (**Three.js skinning / our LBS / rigid parts**) in the Inspect panel.
+- **LBS Equation & CPU vs. GPU split:**
+  - **CPU (per frame):** Our hierarchical FK computes each joint's world transform $W_j$. For each mesh part $m$ (with primary joint bind origin $\mathbf{o}_m$ and precomputed relative inverse bind matrices $\widetilde{B}_{m, j}^{-1} = B_j^{-1} T(\mathbf{o}_m)$), the CPU computes $M_{m, j} = W_{\text{root}}^{-1} W_j \widetilde{B}_{m, j}^{-1}$ and uploads the 15 matrices as `uniform mat4 uBoneMatrices[15]` (`Float32Array(15 * 16)`).
+  - **GPU (vertex & fragment shaders):** The vertex shader reads per-vertex `skinIndex` and `skinWeight` attributes and evaluates $\mathbf{p}' = \sum_{k=0}^{3} w_k (M_{m, j_k} (\mathbf{p} - \mathbf{o}_m))$ and $\mathbf{n}' = \mathrm{normalize}\big(\sum_{k=0}^{3} w_k (\mathrm{mat3}(M_{m, j_k}) \mathbf{n})\big)$ (or $\mathbf{p}_{\text{rigid}}' = M_{m, \text{primary}(m)} (\mathbf{p} - \mathbf{o}_m)$ in `rigid parts` mode). The fragment shader samples the original 2K base-color texture (or part debug color) with key/fill directional + hemisphere lighting.
+- **CPU LBS Reference & Evaluation (`docs/results/t14-evaluation.md`):** Implemented `LbsManager.cpuPosition` matching the shader math to recompute per-pose browser seam gaps ($4.47 \times 10^{-8}\text{ m}$ to $9.54 \times 10^{-8}\text{ m}$ across the 9 test poses, vs. $103\text{–}236\text{ mm}$ cracks in `rigid parts` mode) and per-vertex differences against Three.js skinning ($1.05 \times 10^{-8}\text{ m}$ to $7.12 \times 10^{-8}\text{ m}$ max diff across 11,694 skinned vertices). Saved shoulder/elbow comparison screenshots (`docs/results/t14-*.png`).
+- **Known issues:** Linear Blend Skinning can exhibit slight volume loss ("candy-wrapper" effect) under extreme twisting; dual quaternion skinning is an optional comparison (M9).
+
+## 2026-11-15 · T13 Full-body rig, FK, and joint limits (M1, M2)
+- Generalized `scripts/prepare_mecha.py` from the right arm to a 15-joint full-body hierarchy rooted at `pelvis` (`pelvis` → `torso` → `head`, bilateral `shoulder` → `elbow` → `wrist` + hand sockets, and bilateral `hip` → `knee` → `ankle`) across 17 connected-component-cleaned mesh parts preserving all 9,944 original triangles.
+- Computed shared vertex weights on the original vertex indices (`0..4912`) with narrow 2-ring joint blend bands and rigid armor interiors; all 9 full-body test poses pass the seam check across 367 shared boundary groups (max separation $\le 0.000249\text{ mm}$ in Blender and $0.000046\text{ mm}$ in WebGL, well under the $10^{-5}\text{ m}$ threshold).
+- Added per-joint rotation limits in `src/mecha/rigConfig.ts` (including one-way knee `[0, 75]` and elbow `[0, 90]` limits), FK clamping and automatic pelvis vertical grounding in `src/animation/animator.ts` so both feet remain planted on the platform (`y = 0`), and grouped sliders for all 15 joints + 9 test-pose presets + "Reset pose" in `src/ui/desktopPanel.ts`.
+- Saved evaluation table and front/side pose gallery screenshots in `docs/results/t13-evaluation.md` and `docs/results/pose-gallery-*.png`.
+- **Known issues / limitations:** Two-ring joint transition bands stretch slightly near extreme joint limits; waist skirt armor and shoulder pauldrons can self-intersect limbs past $\sim 35^\circ$; foot grounding uses vertical pelvis compensation (analytic two-bone IK is T16).
+
 ## 2026-11-14 · Desktop single-arm prototype and motion-seam fix
 - Saved the implementation and original/processed assets into the actual repository; source-copy SHA-256 matches the user-provided model.
 - Added the Vite/TypeScript/Three.js viewer, original/processed comparison, shoulder/elbow/wrist controls, weapon/shield visibility, debug views, and a custom six-second raise-arm animation with pause/seek/reset.
