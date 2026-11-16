@@ -6,6 +6,10 @@ export class EquipmentManager {
     this.rig.parts.rifle.visible = visible;
   }
   setShieldVisible(visible: boolean) {
-    this.rig.parts.shield.visible = visible;
+    if (this.rig.lbs) {
+      this.rig.lbs.setShieldVisible(visible);
+    } else {
+      this.rig.parts.shield.visible = visible;
+    }
   }
 }

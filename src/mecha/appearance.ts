@@ -32,8 +32,9 @@ export class Appearance {
       );
   }
   apply(parts: boolean, wireframe: boolean, original?: Group) {
+    this.rig.lbs?.setAppearance(parts, wireframe);
     for (const [object, material] of this.rig.originalMaterials) {
-      if (!(object instanceof Mesh)) continue;
+      if (!(object instanceof Mesh) || object.name.endsWith("_lbs")) continue;
       object.material = parts
         ? (this.materials.get(object.name) ?? material)
         : material;

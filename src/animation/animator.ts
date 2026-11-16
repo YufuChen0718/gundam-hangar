@@ -58,7 +58,10 @@ export class Animator {
       }
       this.rig.joints.pelvis.position.y += dy;
       this.rig.displayRoot.updateMatrixWorld(true);
+    } else {
+      this.rig.displayRoot.updateMatrixWorld(true);
     }
+    this.rig.lbs?.updateBoneMatrices();
   }
 
   play() {

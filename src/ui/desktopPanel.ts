@@ -1,7 +1,7 @@
 import type { Store } from "../app/state";
 import type { Commands } from "../app/commands";
 import { JOINTS } from "../mecha/types";
-import type { JointName, PosePresetName } from "../mecha/types";
+import type { JointName, PosePresetName, SkinningMode } from "../mecha/types";
 import { JOINT_LIMITS, TEST_POSES } from "../mecha/rigConfig";
 
 const JOINT_GROUPS: {
@@ -81,9 +81,9 @@ export function createLayout(root: HTMLElement) {
  ).join("")}
  <div class="note"><span>层级与限位</span>骨盆（Pelvis）为全身根节点；膝、肘仅向单侧弯曲，下蹲时双足自动保持在展示台表面。</div></section>
  <section id="panel-equipment" role="tabpanel" hidden><div class="section-caption">ATTACHMENTS <span>随关节运动</span></div><label class="toggle-row"><span>步枪<small>rightHand → rifleOffset</small></span><input id="weapon" type="checkbox" checked disabled/></label><label class="toggle-row"><span>盾牌<small>随左前臂（leftElbow）运动</small></span><input id="shield" type="checkbox" checked disabled/></label><div class="note"><span>挂点验证</span>步枪通过右手挂点跟随右臂，护盾随左前臂关节联动。</div></section>
- <section id="panel-inspect" role="tabpanel" hidden><div class="section-caption">DIAGNOSTICS <span>结构与外观</span></div><label class="toggle-row"><span>线框<small>观察几何密度</small></span><input id="wireframe" type="checkbox" disabled/></label><label class="toggle-row"><span>部件着色<small>显示 17 个全身切分部件</small></span><input id="parts" type="checkbox" disabled/></label><label class="toggle-row"><span>关节坐标轴<small>全部 15 个关节与手部挂点</small></span><input id="joints" type="checkbox" disabled/></label><div class="legend"><span style="--c:#68829e">骨盆</span><span style="--c:#4f7cac">胸腰</span><span style="--c:#e8c547">头部</span><span style="--c:#f2a44d">上臂</span><span style="--c:#46c9c1">前臂</span><span style="--c:#5c9ead">大腿</span><span style="--c:#82b366">小腿</span><span style="--c:#d96b6b">足部</span></div><div class="note"><span>显示说明</span>共享边界顶点权重在原始顶点索引上计算，保证全部 17 个部件在全身大角度姿态下零裂缝。</div></section>
+ <section id="panel-inspect" role="tabpanel" hidden><div class="section-caption">SKINNING <span>M3 蒙皮方式</span></div><div class="model-switch" style="margin:10px 0 18px" role="group" aria-label="蒙皮方式"><button data-skinning="three" disabled>Three.js skinning</button><button data-skinning="lbs" class="active" disabled>our LBS</button><button data-skinning="rigid" disabled>rigid parts</button></div><div class="section-caption">DIAGNOSTICS <span>结构与外观</span></div><label class="toggle-row"><span>线框<small>观察几何密度</small></span><input id="wireframe" type="checkbox" disabled/></label><label class="toggle-row"><span>部件着色<small>显示 17 个全身切分部件</small></span><input id="parts" type="checkbox" disabled/></label><label class="toggle-row"><span>关节坐标轴<small>全部 15 个关节与手部挂点</small></span><input id="joints" type="checkbox" disabled/></label><div class="legend"><span style="--c:#68829e">骨盆</span><span style="--c:#4f7cac">胸腰</span><span style="--c:#e8c547">头部</span><span style="--c:#f2a44d">上臂</span><span style="--c:#46c9c1">前臂</span><span style="--c:#5c9ead">大腿</span><span style="--c:#82b366">小腿</span><span style="--c:#d96b6b">足部</span></div><div class="note"><span>显示说明</span>共享边界顶点权重在原始顶点索引上计算，保证全部 17 个部件在全身大角度姿态下零裂缝。</div></section>
  <div id="original-note" class="note" hidden><span>原始资产</span>这个版本没有骨架，姿态与装备控件已停用。切回全身绑定版可继续操作。</div><div id="error" class="error" role="alert" hidden></div></div>
- <div class="asset-info"><div class="section-caption">SOURCE ASSET <span>MESHY · 15 JOINTS</span></div><dl><div><dt>原始三角面</dt><dd>9,944</dd></div><div><dt>全身关节数</dt><dd>15 (Pelvis Root)</dd></div><div><dt>共享边界组</dt><dd>367</dd></div><div><dt>挂点位置误差</dt><dd id="attachment-error">—</dd></div><div><dt>运动边界误差</dt><dd id="seam-error">—</dd></div><div><dt>浏览器帧间隔</dt><dd id="frame-time">—</dd></div></dl><a href="./assets/models/mecha-right-arm.glb" download>下载处理版 GLB <span>↗</span></a></div></aside></main><footer>GUNDAM HANGAR <span>原始模型保留 · 15 关节全身绑定 · 桌面优先</span></footer>`;
+ <div class="asset-info"><div class="section-caption">SOURCE ASSET <span>MESHY · 15 JOINTS</span></div><dl><div><dt>原始三角面</dt><dd>9,944</dd></div><div><dt>全身关节数</dt><dd>15 (Pelvis Root)</dd></div><div><dt>共享边界组</dt><dd>367</dd></div><div><dt>挂点位置误差</dt><dd id="attachment-error">—</dd></div><div><dt>运动边界误差</dt><dd id="seam-error">—</dd></div><div><dt>浏览器帧间隔</dt><dd id="frame-time">—</dd></div></dl><a href="./assets/models/gundam-rigged.glb" download>下载处理版 GLB <span>↗</span></a></div></aside></main><footer>GUNDAM HANGAR <span>原始模型保留 · 15 关节全身绑定 · 桌面优先</span></footer>`;
   return document.querySelector<HTMLElement>("#viewport")!;
 }
 
@@ -109,6 +109,13 @@ export function bindPanel(store: Store, c: Commands) {
       (b) =>
         (b.onclick = () =>
           void c.setModel(b.dataset.model as "prepared" | "original")),
+    );
+  document
+    .querySelectorAll<HTMLButtonElement>("[data-skinning]")
+    .forEach(
+      (b) =>
+        (b.onclick = () =>
+          c.setSkinningMode(b.dataset.skinning as SkinningMode)),
     );
   document
     .querySelectorAll<HTMLButtonElement>("[data-pose]")
@@ -166,6 +173,12 @@ export function bindPanel(store: Store, c: Commands) {
       .forEach((b) => {
         b.disabled = disabled;
         b.classList.toggle("active", b.dataset.model === s.mode);
+      });
+    document
+      .querySelectorAll<HTMLButtonElement>("[data-skinning]")
+      .forEach((b) => {
+        b.disabled = armDisabled;
+        b.classList.toggle("active", b.dataset.skinning === s.skinning);
       });
     for (const j of JOINTS) {
       el<HTMLOutputElement>(`${j}-value`).value = `${Math.round(s.angles[j])}°`;

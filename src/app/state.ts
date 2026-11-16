@@ -1,10 +1,11 @@
-import type { JointAngles, ModelMode } from "../mecha/types";
+import type { JointAngles, ModelMode, SkinningMode } from "../mecha/types";
 import { zeroJointAngles } from "../mecha/rigConfig";
 
 export interface HangarState {
   ready: boolean;
   error: string | null;
   mode: ModelMode;
+  skinning: SkinningMode;
   angles: JointAngles;
   weapon: boolean;
   shield: boolean;
@@ -22,6 +23,7 @@ export function createStore() {
     ready: false,
     error: null,
     mode: "prepared",
+    skinning: "lbs",
     angles: zeroJointAngles(),
     weapon: true,
     shield: true,

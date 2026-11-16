@@ -1,13 +1,5 @@
-import {
-  Box3,
-  Group,
-  Mesh,
-  Quaternion,
-  SkinnedMesh,
-  SRGBColorSpace,
-  Vector3,
-} from "three";
-import type { Material, Object3D } from "three";
+import { Box3, Group, Mesh, SRGBColorSpace, Vector3 } from "three";
+import type { Material, Object3D, Quaternion } from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { JOINTS } from "./types";
 import type {
@@ -17,6 +9,7 @@ import type {
   SocketName,
 } from "./types";
 import { modelPaths, rigConfig } from "./rigConfig";
+import { LbsManager } from "./lbs";
 
 const loader = new GLTFLoader();
 
@@ -56,6 +49,10 @@ export async function loadPrepared(): Promise<ArmPreviewRig> {
       requireNode(gltf.scene, n),
     ]),
   ) as Record<SocketName, Object3D>;
+  const rifleOffset = gltf.scene.getObjectByName("rifleOffset");
+  if (rifleOffset) {
+    rifleOffset.quaternion.copy(sockets.rightHand.quaternion).invert();
+  }
   const parts = Object.fromEntries(
     rigConfig.partNames.map((n) => [n, requireNode(gltf.scene, n)]),
   );
@@ -65,9 +62,7 @@ export async function loadPrepared(): Promise<ArmPreviewRig> {
   });
 
   displayRoot.updateMatrixWorld(true);
-  displayRoot.traverse((o) => {
-    if (o instanceof SkinnedMesh) o.skeleton.update();
-  });
+  const lbs = new LbsManager(displayRoot, parts);
 
   const pelvisBindPosition = joints.pelvis.position.clone();
   const leftAnklePos = joints.leftAnkle.getWorldPosition(new Vector3());
@@ -90,8 +85,7 @@ export async function loadPrepared(): Promise<ArmPreviewRig> {
       let partMinY = Infinity;
       const candidates: { rootY: number; worldPt: Vector3 }[] = [];
       for (let i = 0; i < posAttr.count; i++) {
-        footObj.getVertexPosition(i, v);
-        footObj.localToWorld(v);
+        lbs.cpuPosition(footObj, i, "lbs", v);
         rootPt.copy(v);
         displayRoot.worldToLocal(rootPt);
         if (rootPt.y < partMinY) partMinY = rootPt.y;
@@ -119,6 +113,7 @@ export async function loadPrepared(): Promise<ArmPreviewRig> {
     bindAnkleY,
     bindFootMinY,
     footGroundSamples,
+    lbs,
   };
 }
 

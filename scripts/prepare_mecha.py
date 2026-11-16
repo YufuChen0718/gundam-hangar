@@ -411,9 +411,9 @@ for pb in arm.pose.bones:
     pb.location = (0.0, 0.0, 0.0)
 bpy.context.view_layer.update()
 
-bpy.ops.wm.save_as_mainfile(filepath=str(out / 'assets-src/mecha-right-arm.blend'))
+bpy.ops.wm.save_as_mainfile(filepath=str(out / 'assets-src/gundam-rigged.blend'))
 bpy.ops.export_scene.gltf(
-    filepath=str(out / 'public/assets/models/mecha-right-arm.glb'),
+    filepath=str(out / 'public/assets/models/gundam-rigged.glb'),
     export_format='GLB',
     export_yup=True,
     export_animations=False,

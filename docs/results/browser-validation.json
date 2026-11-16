@@ -2,18 +2,42 @@
   "url": "http://127.0.0.1:5174/",
   "browser": "157.0.8103.51",
   "checks": [
-    "GLB and textures loaded",
-    "all 9 full-body test poses pass seam check (<1e-5 m), attachment check (<1e-6 m), and keep feet on platform",
+    "gundam-rigged.glb and textures loaded",
+    "all 9 full-body test poses report distinct per-pose LBS seam gaps (<1e-5 m) and LBS-vs-Three.js diffs (<1e-6 m)",
     "captured front and side pose gallery screenshots",
     "all 15 joints poseable via viewer sliders; pelvis moves entire body hierarchy",
     "weapon hide/show",
     "shield hide/show",
-    "part colors, joint axes, wireframe",
+    "3-way skinning toggle (Three.js skinning / our LBS / rigid parts), part colors, joint axes, wireframe",
+    "measured frame time for Three.js skinning, our LBS, and rigid parts",
     "original/prepared switching, inappropriate controls disabled",
     "play, pause, and reset",
     "390px layout without horizontal overflow",
     "no console errors or failed HTTP responses"
   ],
+  "frameTimes": {
+    "three": {
+      "mode": "three",
+      "samples": 85,
+      "meanMs": 16.665,
+      "medianMs": 16.7,
+      "p95Ms": 17.8
+    },
+    "lbs": {
+      "mode": "lbs",
+      "samples": 85,
+      "meanMs": 16.665,
+      "medianMs": 16.7,
+      "p95Ms": 18
+    },
+    "rigid": {
+      "mode": "rigid",
+      "samples": 85,
+      "meanMs": 16.674,
+      "medianMs": 16.6,
+      "p95Ms": 18.1
+    }
+  },
   "seamTests": [
     {
       "pose": "bind",
@@ -35,7 +59,13 @@
         "leftAnkle": 0
       },
       "boundaryGroups": 367,
-      "skinSeamGap": 4.556540175772906e-8,
+      "skinnedVertexCount": 11694,
+      "skinSeamGap": 4.4732832799264756e-8,
+      "skinSeamMeanGap": 1.978792375257485e-9,
+      "rigidSeamGapMax": 4.4732832799264756e-8,
+      "rigidSeamGapMean": 1.1883954250052445e-9,
+      "lbsVsThreeMaxDiff": 1.0536712441742e-8,
+      "lbsVsThreeMeanDiff": 3.7299747397449104e-9,
       "attachmentError": 1.4946834900704541e-16,
       "leftFootMinY": 0,
       "rightFootMinY": 0.007866084575653076
@@ -60,7 +90,13 @@
         "leftAnkle": 0
       },
       "boundaryGroups": 367,
-      "skinSeamGap": 4.556540156873297e-8,
+      "skinnedVertexCount": 11694,
+      "skinSeamGap": 9.290947089575844e-8,
+      "skinSeamMeanGap": 6.936905813132518e-9,
+      "rigidSeamGapMax": 0.10300659809799792,
+      "rigidSeamGapMean": 0.003974796732285984,
+      "lbsVsThreeMaxDiff": 5.994657323620463e-8,
+      "lbsVsThreeMeanDiff": 5.371548646174518e-9,
       "attachmentError": 1.5700924586837752e-16,
       "leftFootMinY": 0,
       "rightFootMinY": 0.007866084575653076
@@ -85,7 +121,13 @@
         "leftAnkle": 0
       },
       "boundaryGroups": 367,
-      "skinSeamGap": 4.556540175772906e-8,
+      "skinnedVertexCount": 11694,
+      "skinSeamGap": 9.090838676207953e-8,
+      "skinSeamMeanGap": 8.181001052709783e-9,
+      "rigidSeamGapMax": 0.1533750761761827,
+      "rigidSeamGapMean": 0.009303672384324406,
+      "lbsVsThreeMaxDiff": 5.849429165334843e-8,
+      "lbsVsThreeMeanDiff": 8.72915991659686e-9,
       "attachmentError": 1.4946834900704541e-16,
       "leftFootMinY": 0,
       "rightFootMinY": 0.007866084575653076
@@ -110,7 +152,13 @@
         "leftAnkle": 0
       },
       "boundaryGroups": 367,
-      "skinSeamGap": 4.556540160728726e-8,
+      "skinnedVertexCount": 11694,
+      "skinSeamGap": 6.869764853340933e-8,
+      "skinSeamMeanGap": 8.950083186561767e-9,
+      "rigidSeamGapMax": 0.17444747251736806,
+      "rigidSeamGapMean": 0.015649980779472102,
+      "lbsVsThreeMaxDiff": 5.640788956283039e-8,
+      "lbsVsThreeMeanDiff": 8.193452463832474e-9,
       "attachmentError": 2.498001805406602e-16,
       "leftFootMinY": 0,
       "rightFootMinY": 0.007866084575653076
@@ -135,7 +183,13 @@
         "leftAnkle": 0
       },
       "boundaryGroups": 367,
-      "skinSeamGap": 4.556540178217412e-8,
+      "skinnedVertexCount": 11694,
+      "skinSeamGap": 5.9395566400554e-8,
+      "skinSeamMeanGap": 1.2576855434582806e-8,
+      "rigidSeamGapMax": 0.13335824032914606,
+      "rigidSeamGapMean": 0.02157026022915982,
+      "lbsVsThreeMaxDiff": 7.12375559905544e-8,
+      "lbsVsThreeMeanDiff": 1.17684889046799e-8,
       "attachmentError": 1.5700924586837752e-16,
       "leftFootMinY": 0,
       "rightFootMinY": 0.007866084575653076
@@ -160,7 +214,13 @@
         "leftAnkle": 22
       },
       "boundaryGroups": 367,
-      "skinSeamGap": 4.556540183840236e-8,
+      "skinnedVertexCount": 11694,
+      "skinSeamGap": 7.829492371157877e-8,
+      "skinSeamMeanGap": 1.3307834720939956e-8,
+      "rigidSeamGapMax": 0.1501385118172114,
+      "rigidSeamGapMean": 0.01807883211979232,
+      "lbsVsThreeMaxDiff": 5.649979884468533e-8,
+      "lbsVsThreeMeanDiff": 1.4849126851665513e-8,
       "attachmentError": 1.4946834900704541e-16,
       "leftFootMinY": 0,
       "rightFootMinY": 0.007866084575653076
@@ -185,7 +245,13 @@
         "leftAnkle": 32
       },
       "boundaryGroups": 367,
-      "skinSeamGap": 4.556540176098174e-8,
+      "skinnedVertexCount": 11694,
+      "skinSeamGap": 8.413095178372434e-8,
+      "skinSeamMeanGap": 1.551667981023649e-8,
+      "rigidSeamGapMax": 0.21238625103499473,
+      "rigidSeamGapMean": 0.03751887485897966,
+      "lbsVsThreeMaxDiff": 5.592073312990217e-8,
+      "lbsVsThreeMeanDiff": 2.6948154791254547e-8,
       "attachmentError": 2.482534153247273e-16,
       "leftFootMinY": 0,
       "rightFootMinY": 0.007866084575653076
@@ -210,10 +276,16 @@
         "leftAnkle": 18.000000000000004
       },
       "boundaryGroups": 367,
-      "skinSeamGap": 4.5565401645471654e-8,
+      "skinnedVertexCount": 11694,
+      "skinSeamGap": 9.544291999371037e-8,
+      "skinSeamMeanGap": 1.634318734475333e-8,
+      "rigidSeamGapMax": 0.13611953194268558,
+      "rigidSeamGapMean": 0.03477233482451854,
+      "lbsVsThreeMaxDiff": 5.93152847340436e-8,
+      "lbsVsThreeMeanDiff": 1.7946260808846668e-8,
       "attachmentError": 2.514331927660129e-16,
-      "leftFootMinY": 0,
-      "rightFootMinY": 0.007866084575653076
+      "leftFootMinY": 5.551115123125783e-17,
+      "rightFootMinY": 0.007866084575653132
     },
     {
       "pose": "maxArticulation",
@@ -235,7 +307,13 @@
         "leftAnkle": 29.999999999999996
       },
       "boundaryGroups": 367,
-      "skinSeamGap": 4.556540176643615e-8,
+      "skinnedVertexCount": 11694,
+      "skinSeamGap": 7.429631924138078e-8,
+      "skinSeamMeanGap": 1.727558769947848e-8,
+      "rigidSeamGapMax": 0.23551500470600947,
+      "rigidSeamGapMean": 0.050032377085367875,
+      "lbsVsThreeMaxDiff": 5.984257269934967e-8,
+      "lbsVsThreeMeanDiff": 2.8303587812348798e-8,
       "attachmentError": 2.498001805406602e-16,
       "leftFootMinY": 0,
       "rightFootMinY": 0.007866084575653076
@@ -243,5 +321,5 @@
   ],
   "errors": [],
   "failedRequests": [],
-  "notes": "Headless Chrome acceptance run for T13 15-joint full-body rig; not a device performance benchmark."
+  "notes": "Headless Chrome acceptance run for T13 + T14 (custom LBS shader & CPU reference); frame times measured in headless Chromium."
 }

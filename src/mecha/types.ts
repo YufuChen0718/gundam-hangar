@@ -47,6 +47,36 @@ export interface FootGroundSample {
   localPoint: Vector3;
 }
 
+export type SkinningMode = "three" | "lbs" | "rigid";
+
+export interface SeamStats {
+  maxGap: number;
+  meanGap: number;
+  boundaryGroups: number;
+}
+
+export interface LbsComparisonStats {
+  maxDiff: number;
+  meanDiff: number;
+  vertexCount: number;
+}
+
+export interface LbsController {
+  getMode(): SkinningMode;
+  setMode(mode: SkinningMode): void;
+  setShieldVisible(visible: boolean): void;
+  setAppearance(parts: boolean, wireframe: boolean): void;
+  updateBoneMatrices(): void;
+  cpuPosition(
+    mesh: Object3D,
+    index: number,
+    mode: "lbs" | "rigid",
+    target: Vector3,
+  ): Vector3;
+  computeSeamStats(mode?: "lbs" | "rigid"): SeamStats;
+  compareWithThreeSkinning(): LbsComparisonStats;
+}
+
 /** Full-body 15-joint preview rig adapter. */
 export interface ArmPreviewRig {
   displayRoot: Group;
@@ -59,6 +89,7 @@ export interface ArmPreviewRig {
   bindAnkleY?: number;
   bindFootMinY?: number;
   footGroundSamples?: FootGroundSample[];
+  lbs?: LbsController;
 }
 
 export type ModelMode = "prepared" | "original";

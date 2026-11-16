@@ -39,9 +39,9 @@ node scripts/browser-check.mjs
 ## 资产
 
 - `assets-src/mecha-original.blend`：用户原文件的完整副本。
-- `assets-src/mecha-right-arm.blend`：单臂骨架、共享边界权重、独立武器与盾牌。
+- `assets-src/gundam-rigged.blend`：全身骨架、共享边界权重、独立武器与盾牌。
 - `public/assets/models/mecha-original.glb`：原始静态模型。
-- `public/assets/models/mecha-right-arm.glb`：可在当前应用中运动的模型。
+- `public/assets/models/gundam-rigged.glb`：可在当前应用中运动的模型。
 
 贴图仍是原资产的单材质贴图。原始 9,944 个三角面全部保留，UV 保留；没有新建完整身体几何。肩甲主体和武器尽量保持刚性，关节边界通过共享权重连续变形。当前并非全身绑定。
 

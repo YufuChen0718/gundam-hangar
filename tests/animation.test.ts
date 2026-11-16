@@ -1,15 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import { Group, Object3D, Quaternion, Vector3 } from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import {
   compileClip,
   emptyPose,
   samplePose,
 } from "../src/animation/samplePose";
 import { Animator } from "../src/animation/animator";
+import { LbsManager } from "../src/mecha/lbs";
 import { JOINTS } from "../src/mecha/types";
-import type { ArmPreviewRig, JointName } from "../src/mecha/types";
-import { JOINT_LIMITS, TEST_POSES } from "../src/mecha/rigConfig";
+import type { ArmPreviewRig, JointName, SocketName } from "../src/mecha/types";
+import { JOINT_LIMITS, rigConfig, TEST_POSES } from "../src/mecha/rigConfig";
 
 function rig(): ArmPreviewRig {
   const root = new Group();
@@ -235,4 +238,96 @@ test("moving pelvis moves the whole body while feet stay grounded in test poses"
       `Right ankle left platform on ${preset.id}`,
     );
   }
+});
+
+test("custom LBS CPU reference matches Three.js skinning and reports distinct per-pose seam gaps on gundam-rigged.glb", async () => {
+  Object.assign(globalThis, {
+    self: globalThis,
+    createImageBitmap: async () => ({ width: 1, height: 1, close() {} }),
+  });
+  const buf = fs.readFileSync("public/assets/models/gundam-rigged.glb");
+  const loader = new GLTFLoader();
+  const gltf = await loader.parseAsync(
+    buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength),
+    "",
+  );
+  const displayRoot = new Group();
+  displayRoot.add(gltf.scene);
+  const joints = Object.fromEntries(
+    JOINTS.map((j) => [j, gltf.scene.getObjectByName(j)!]),
+  ) as Record<JointName, Object3D>;
+  const bindPose = Object.fromEntries(
+    JOINTS.map((j) => [j, joints[j].quaternion.clone()]),
+  ) as Record<JointName, Quaternion>;
+  const sockets = Object.fromEntries(
+    Object.entries(rigConfig.sockets).map(([s, n]) => [
+      s,
+      gltf.scene.getObjectByName(n)!,
+    ]),
+  ) as Record<SocketName, Object3D>;
+  const rifleOffset = gltf.scene.getObjectByName("rifleOffset");
+  if (rifleOffset) {
+    rifleOffset.quaternion.copy(sockets.rightHand.quaternion).invert();
+  }
+  const parts = Object.fromEntries(
+    rigConfig.partNames.map((n) => [n, gltf.scene.getObjectByName(n)!]),
+  );
+  displayRoot.updateMatrixWorld(true);
+  const lbs = new LbsManager(displayRoot, parts);
+  const pelvisBindPosition = joints.pelvis.position.clone();
+  const bindAnkleY = Math.min(
+    displayRoot.worldToLocal(joints.leftAnkle.getWorldPosition(new Vector3()))
+      .y,
+    displayRoot.worldToLocal(joints.rightAnkle.getWorldPosition(new Vector3()))
+      .y,
+  );
+  const fullRig: ArmPreviewRig = {
+    displayRoot,
+    joints,
+    bindPose,
+    sockets,
+    parts,
+    originalMaterials: new Map(),
+    pelvisBindPosition,
+    bindAnkleY,
+    bindFootMinY: 0,
+    lbs,
+  };
+  const animator = new Animator(fullRig);
+
+  const seamMaxs: number[] = [];
+  const vsThreeMaxs: number[] = [];
+  for (const preset of TEST_POSES) {
+    animator.manual(preset.angles);
+    const seam = lbs.computeSeamStats("lbs");
+    const rigidSeam = lbs.computeSeamStats("rigid");
+    const vsThree = lbs.compareWithThreeSkinning();
+    assert.equal(seam.boundaryGroups, 367);
+    assert.ok(
+      seam.maxGap < 1e-5,
+      `LBS seam gap exceeded threshold on ${preset.id}: ${seam.maxGap}`,
+    );
+    assert.ok(
+      vsThree.maxDiff < 1e-6,
+      `LBS vs Three.js max diff exceeded threshold on ${preset.id}: ${vsThree.maxDiff}`,
+    );
+    if (preset.id !== "bind") {
+      assert.ok(
+        rigidSeam.maxGap > 0.01,
+        `Expected rigid-parts mode to show visible seam crack (>10 mm) on ${preset.id}, got ${rigidSeam.maxGap}`,
+      );
+    }
+    seamMaxs.push(Number(seam.maxGap.toExponential(4)));
+    vsThreeMaxs.push(Number(vsThree.maxDiff.toExponential(4)));
+  }
+  assert.equal(
+    new Set(seamMaxs).size,
+    TEST_POSES.length,
+    `Expected per-pose LBS seam gaps to differ across all 9 poses: ${seamMaxs.join(", ")}`,
+  );
+  assert.equal(
+    new Set(vsThreeMaxs).size,
+    TEST_POSES.length,
+    `Expected per-pose LBS vs Three.js diffs to differ across all 9 poses: ${vsThreeMaxs.join(", ")}`,
+  );
 });

@@ -5,7 +5,7 @@ import type { JointAngles, JointName, PoseInput } from "./types";
 const baseUrl = import.meta.env?.BASE_URL ?? "/";
 
 export const modelPaths = {
-  prepared: `${baseUrl}assets/models/mecha-right-arm.glb?v=full-body-15`,
+  prepared: `${baseUrl}assets/models/gundam-rigged.glb?v=full-body-15`,
   original: `${baseUrl}assets/models/mecha-original.glb`,
 };
 

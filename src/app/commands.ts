@@ -1,11 +1,4 @@
-import {
-  AxesHelper,
-  MathUtils,
-  Mesh,
-  SkinnedMesh,
-  Quaternion,
-  Vector3,
-} from "three";
+import { AxesHelper, MathUtils, Mesh, Quaternion, Vector3 } from "three";
 import type { Group } from "three";
 import type { Store } from "./state";
 import { JOINTS } from "../mecha/types";
@@ -16,6 +9,7 @@ import type {
   ModelMode,
   PoseInput,
   PosePresetName,
+  SkinningMode,
 } from "../mecha/types";
 import {
   clampJointAngle,
@@ -119,6 +113,11 @@ export function createCommands(
       animator.reset();
       sync();
     },
+    setSkinningMode: (mode: SkinningMode) => {
+      rig.lbs?.setMode(mode);
+      store.set({ skinning: mode });
+      repaint();
+    },
     setWeaponVisible: (visible: boolean) => {
       equipment.setWeaponVisible(visible);
       store.set({ weapon: visible });
@@ -167,10 +166,12 @@ export function createCommands(
     rotateModel: (degrees: number) => {
       store.set({ modelYawDeg: degrees });
       rig.displayRoot.rotation.y = MathUtils.degToRad(degrees);
+      rig.lbs?.updateBoneMatrices();
       if (original) original.rotation.y = rig.displayRoot.rotation.y;
     },
     resetModelTransform: () => {
       rig.displayRoot.rotation.set(0, 0, 0);
+      rig.lbs?.updateBoneMatrices();
       if (original) original.rotation.set(0, 0, 0);
       store.set({ modelYawDeg: 0 });
       world.resetCamera();
@@ -193,58 +194,13 @@ export function createCommands(
   function update(dt: number) {
     if (store.get().mode === "prepared") {
       animator.update(dt);
+      rig.lbs?.updateBoneMatrices();
       accumulator += dt;
       if (accumulator > 0.05) {
         sync();
         accumulator = 0;
       }
     }
-  }
-
-  // Match duplicate boundary vertices in the bind pose and measure their actual skinned positions.
-  rig.displayRoot.updateMatrixWorld(true);
-  const vertices = new Map<string, { mesh: Mesh; index: number }[]>();
-  rig.displayRoot.traverse((o) => {
-    if (o instanceof SkinnedMesh) o.skeleton.update();
-  });
-  rig.displayRoot.traverse((o) => {
-    if (o instanceof Mesh) {
-      const count = o.geometry.attributes.position.count;
-      const v = new Vector3();
-      for (let i = 0; i < count; i++) {
-        o.getVertexPosition(i, v);
-        o.localToWorld(v);
-        const key = v
-          .toArray()
-          .map((n) => Math.round(n * 1e5))
-          .join(",");
-        const list = vertices.get(key) ?? [];
-        list.push({ mesh: o, index: i });
-        vertices.set(key, list);
-      }
-    }
-  });
-  const boundaries = [...vertices.values()].filter(
-    (group) => new Set(group.map((g) => g.mesh.uuid)).size > 1,
-  );
-
-  function seamError() {
-    rig.displayRoot.traverse((o) => {
-      if (o instanceof SkinnedMesh) o.skeleton.update();
-    });
-    let max = 0;
-    const reference = new Vector3(),
-      point = new Vector3();
-    for (const group of boundaries) {
-      group[0].mesh.getVertexPosition(group[0].index, reference);
-      group[0].mesh.localToWorld(reference);
-      for (const item of group.slice(1)) {
-        item.mesh.getVertexPosition(item.index, point);
-        item.mesh.localToWorld(point);
-        max = Math.max(max, reference.distanceTo(point));
-      }
-    }
-    return max;
   }
 
   function partMinPlatformY(partName: string): number {
@@ -254,20 +210,42 @@ export function createCommands(
     const v = new Vector3();
     let minY = Infinity;
     for (let i = 0; i < count; i++) {
-      part.getVertexPosition(i, v);
-      part.localToWorld(v);
+      if (rig.lbs) {
+        rig.lbs.cpuPosition(part, i, "lbs", v);
+      } else {
+        part.getVertexPosition(i, v);
+        part.localToWorld(v);
+      }
       rig.displayRoot.worldToLocal(v);
       if (v.y < minY) minY = v.y;
     }
     return Number.isFinite(minY) ? minY : 0;
   }
 
+  rig.displayRoot.updateMatrixWorld(true);
   const gripLocal = rig.parts.rifle.getWorldPosition(new Vector3());
   rig.sockets.rightHand.worldToLocal(gripLocal);
 
   function diagnostics() {
     rig.displayRoot.updateMatrixWorld(true);
-    const seam = seamError();
+    const skinningMode = store.get().skinning;
+    const lbsSeam = rig.lbs?.computeSeamStats("lbs") ?? {
+      maxGap: 0,
+      meanGap: 0,
+      boundaryGroups: 0,
+    };
+    const rigidSeam = rig.lbs?.computeSeamStats("rigid") ?? {
+      maxGap: 0,
+      meanGap: 0,
+      boundaryGroups: 0,
+    };
+    const activeSeam = skinningMode === "rigid" ? rigidSeam : lbsSeam;
+    const lbsVsThree = rig.lbs?.compareWithThreeSkinning() ?? {
+      maxDiff: 0,
+      meanDiff: 0,
+      vertexCount: 0,
+    };
+
     const expected = rig.sockets.rightHand.localToWorld(gripLocal.clone());
     const actual = rig.parts.rifle.getWorldPosition(new Vector3());
     const jointWorldPositions = Object.fromEntries(
@@ -279,8 +257,17 @@ export function createCommands(
     const leftFootMinY = partMinPlatformY("leftFoot");
     const rightFootMinY = partMinPlatformY("rightFoot");
     return {
-      skinSeamGap: seam,
-      boundaryGroups: boundaries.length,
+      skinningMode,
+      skinSeamGap: activeSeam.maxGap,
+      skinSeamMeanGap: activeSeam.meanGap,
+      lbsSeamGapMax: lbsSeam.maxGap,
+      lbsSeamGapMean: lbsSeam.meanGap,
+      rigidSeamGapMax: rigidSeam.maxGap,
+      rigidSeamGapMean: rigidSeam.meanGap,
+      lbsVsThreeMaxDiff: lbsVsThree.maxDiff,
+      lbsVsThreeMeanDiff: lbsVsThree.meanDiff,
+      skinnedVertexCount: lbsVsThree.vertexCount,
+      boundaryGroups: activeSeam.boundaryGroups,
       attachmentError: expected.distanceTo(actual),
       leftFootMinY,
       rightFootMinY,
