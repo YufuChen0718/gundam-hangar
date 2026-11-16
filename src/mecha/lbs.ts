@@ -11,7 +11,6 @@ import type {
   Group,
   Material,
   Object3D,
-  Texture,
 } from "three";
 import type {
   JointName,
@@ -116,65 +115,89 @@ void main() {
 }
 `;
 
-const LBS_FRAGMENT_SHADER = /* glsl */ `
-uniform sampler2D uMap;
-uniform bool uHasMap;
-uniform bool uUsePartColor;
-uniform vec3 uPartColor;
+// --- Surface shading -------------------------------------------------------
+// Our contribution is the skinning math (vertex stage). For the surface we reuse
+// the asset's own PBR material (base color, normal map, metal/roughness, emissive,
+// double-sided) so the rigged model looks identical to the original static model.
+// The snippets below are injected into that material's vertex shader with
+// onBeforeCompile; no Three.js skinning chunk is used (the mesh is a plain Mesh,
+// so USE_SKINNING is never defined).
+const LBS_PARS_VERTEX = /* glsl */ `
+attribute vec4 skinIndex;
+attribute vec4 skinWeight;
+uniform mat4 uBoneMatrices[15];
+uniform vec3 uPartOrigin;
+uniform int uRigidMode;
+uniform int uPrimaryBoneIndex;
 
-varying vec2 vUv;
-varying vec3 vWorldNormal;
-varying vec3 vWorldPosition;
-
-vec3 srgbToLinear(vec3 c) {
-  return pow(max(c, vec3(0.0)), vec3(2.2));
-}
-
-vec3 linearToSrgb(vec3 c) {
-  return pow(max(c, vec3(0.0)), vec3(1.0 / 2.2));
-}
-
-vec3 acesToneMap(vec3 x) {
-  const float a = 2.51;
-  const float b = 0.03;
-  const float c = 2.43;
-  const float d = 0.59;
-  const float e = 0.14;
-  return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
-}
-
-void main() {
-  vec3 baseLinear = srgbToLinear(uPartColor);
-  if (!uUsePartColor && uHasMap) {
-    vec4 texel = texture2D(uMap, vUv);
-    baseLinear = srgbToLinear(texel.rgb);
+mat4 lbsBoneMatrix(int index) {
+  for (int i = 0; i < 15; i++) {
+    if (i == index) return uBoneMatrices[i];
   }
+  return uBoneMatrices[0];
+}
 
-  vec3 N = normalize(vWorldNormal);
-  vec3 V = normalize(cameraPosition - vWorldPosition);
-
-  vec3 L1 = normalize(vec3(-3.0, 5.0, 4.0));
-  vec3 L2 = normalize(vec3(3.0, 2.0, -3.0));
-  float ndl1 = max(dot(N, L1), 0.0);
-  float ndl2 = max(dot(N, L2), 0.0);
-
-  vec3 H1 = normalize(L1 + V);
-  float spec1 = pow(max(dot(N, H1), 0.0), 36.0) * ndl1;
-
-  float hemiWeight = 0.5 * N.y + 0.5;
-  vec3 hemiColor = mix(vec3(0.10, 0.10, 0.11), vec3(0.68, 0.78, 0.95), hemiWeight);
-
-  vec3 irradiance =
-    vec3(1.0, 0.93, 0.84) * (1.25 * ndl1) +
-    vec3(0.55, 0.75, 1.0) * (0.65 * ndl2) +
-    hemiColor * 0.65 +
-    vec3(0.10);
-
-  vec3 colorLinear = baseLinear * irradiance + vec3(1.0, 0.96, 0.90) * (0.14 * spec1);
-  vec3 mapped = acesToneMap(colorLinear * 1.15);
-  gl_FragColor = vec4(linearToSrgb(mapped), 1.0);
+// M = sum_k w_k * M_{j_k}  (or the part's primary bone in rigid mode)
+mat4 lbsBlendMatrix() {
+  if (uRigidMode == 1) return lbsBoneMatrix(uPrimaryBoneIndex);
+  mat4 m = mat4(0.0);
+  for (int k = 0; k < 4; k++) {
+    float w = skinWeight[k];
+    if (w > 0.0) m += w * lbsBoneMatrix(int(skinIndex[k] + 0.5));
+  }
+  return m;
 }
 `;
+
+// n' = normalize(sum_k w_k * mat3(M_{j_k}) * n)
+const LBS_NORMAL_VERTEX = /* glsl */ `
+mat4 lbsM = lbsBlendMatrix();
+vec3 lbsN = mat3(lbsM) * objectNormal;
+float lbsNLen = length(lbsN);
+if (lbsNLen > 1e-6) objectNormal = lbsN / lbsNLen;
+`;
+
+// p' = sum_k w_k * M_{j_k} * (p - o_m)
+const LBS_POSITION_VERTEX = /* glsl */ `
+transformed = (lbsM * vec4(position - uPartOrigin, 1.0)).xyz;
+`;
+
+const LBS_PARS_FRAGMENT = /* glsl */ `
+uniform bool uUsePartColor;
+uniform vec3 uPartColor;
+`;
+
+function createLbsSurfaceMaterial(
+  source: Material | Material[],
+  uniforms: Record<string, { value: unknown }>,
+): Material {
+  const base = (Array.isArray(source) ? source[0] : source).clone();
+  base.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, uniforms);
+    shader.vertexShader = shader.vertexShader
+      .replace("#include <common>", `#include <common>\n${LBS_PARS_VERTEX}`)
+      .replace(
+        "#include <beginnormal_vertex>",
+        `#include <beginnormal_vertex>\n${LBS_NORMAL_VERTEX}`,
+      )
+      .replace(
+        "#include <begin_vertex>",
+        `#include <begin_vertex>\n${LBS_POSITION_VERTEX}`,
+      );
+    shader.fragmentShader = shader.fragmentShader
+      .replace("#include <common>", `#include <common>\n${LBS_PARS_FRAGMENT}`)
+      .replace(
+        "#include <map_fragment>",
+        `#include <map_fragment>\nif (uUsePartColor) diffuseColor.rgb = uPartColor;`,
+      )
+      .replace(
+        "#include <emissivemap_fragment>",
+        `#include <emissivemap_fragment>\nif (uUsePartColor) totalEmissiveRadiance = vec3(0.0);`,
+      );
+  };
+  base.customProgramCacheKey = () => "gundam-lbs-surface";
+  return base;
+}
 
 const LBS_DEPTH_FRAGMENT_SHADER = /* glsl */ `
 #include <packing>
@@ -187,7 +210,8 @@ interface SkinnedPartEntry {
   partName: string;
   skinnedMesh: SkinnedMesh;
   customMesh: Mesh;
-  shaderMaterial: ShaderMaterial;
+  shaderMaterial: Material;
+  lbsUniforms: Record<string, { value: unknown }>;
   depthMaterial: ShaderMaterial;
   geometry: BufferGeometry;
   bones: Object3D[];
@@ -196,14 +220,6 @@ interface SkinnedPartEntry {
   origin: Vector3;
   primaryBoneIndex: number;
   boneMatrices: Float32Array;
-}
-
-function extractBaseMap(mat: Material | Material[]): Texture | null {
-  const m = Array.isArray(mat) ? mat[0] : mat;
-  if (m && "map" in m && m.map instanceof Object) {
-    return m.map as Texture;
-  }
-  return null;
 }
 
 export class LbsManager implements LbsController {
@@ -246,7 +262,6 @@ export class LbsManager implements LbsController {
         new Matrix4().multiplyMatrices(ib, tOrigin),
       );
       const boneMatrices = new Float32Array(bones.length * 16);
-      const baseMap = extractBaseMap(obj.material);
       const partColor = new Color(PART_DEBUG_COLORS[partName] ?? 0xffffff);
 
       const uniforms = {
@@ -254,17 +269,11 @@ export class LbsManager implements LbsController {
         uPartOrigin: { value: origin.clone() },
         uRigidMode: { value: 0 },
         uPrimaryBoneIndex: { value: primaryBoneIndex },
-        uMap: { value: baseMap },
-        uHasMap: { value: Boolean(baseMap) },
         uUsePartColor: { value: false },
         uPartColor: { value: partColor },
       };
 
-      const shaderMaterial = new ShaderMaterial({
-        vertexShader: LBS_VERTEX_SHADER,
-        fragmentShader: LBS_FRAGMENT_SHADER,
-        uniforms,
-      });
+      const shaderMaterial = createLbsSurfaceMaterial(obj.material, uniforms);
 
       const depthMaterial = new ShaderMaterial({
         vertexShader: LBS_VERTEX_SHADER,
@@ -272,7 +281,8 @@ export class LbsManager implements LbsController {
         uniforms,
       });
 
-      // Plain THREE.Mesh (NOT SkinnedMesh) rendered by our custom LBS ShaderMaterial.
+      // Plain THREE.Mesh (NOT SkinnedMesh): our LBS runs in the vertex stage, the
+      // asset's own PBR material shades the surface.
       const customMesh = new Mesh(obj.geometry, shaderMaterial);
       customMesh.name = `${partName}_lbs`;
       customMesh.castShadow = true;
@@ -286,6 +296,7 @@ export class LbsManager implements LbsController {
         skinnedMesh: obj,
         customMesh,
         shaderMaterial,
+        lbsUniforms: uniforms,
         depthMaterial,
         geometry: obj.geometry,
         bones,
@@ -332,7 +343,7 @@ export class LbsManager implements LbsController {
         entry.partName === "shield" ? this.shieldVisible : true;
       entry.skinnedMesh.visible = isThree && partVisible;
       entry.customMesh.visible = !isThree && partVisible;
-      entry.shaderMaterial.uniforms.uRigidMode.value = rigidFlag;
+      entry.lbsUniforms.uRigidMode.value = rigidFlag;
     }
   }
 
@@ -353,8 +364,9 @@ export class LbsManager implements LbsController {
 
   setAppearance(parts: boolean, wireframe: boolean) {
     for (const entry of this.entries.values()) {
-      entry.shaderMaterial.uniforms.uUsePartColor.value = parts;
-      entry.shaderMaterial.wireframe = wireframe;
+      entry.lbsUniforms.uUsePartColor.value = parts;
+      (entry.shaderMaterial as Material & { wireframe: boolean }).wireframe =
+        wireframe;
     }
   }
 

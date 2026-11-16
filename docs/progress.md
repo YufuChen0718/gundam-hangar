@@ -5,6 +5,11 @@ These notes feed directly into the milestone and final reports.
 
 ---
 
+## 2026-11-16 · LBS surface shading fix
+- Problem: in "our LBS" / "rigid parts" modes the model looked dark and had holes in the armor. Cause: the custom fragment shader was single-sided (the asset is double-sided, so back faces were culled) and ignored the asset's normal, metal/roughness and emissive textures.
+- Fix: the LBS math stays ours and still runs in the vertex stage (injected with `onBeforeCompile`, no Three.js skinning chunks, plain `Mesh`); the surface is now shaded by the asset's own PBR material, so the rigged model matches the original static model.
+- Checked: original vs rigged side by side, a posed test pose, rigid mode, part-color mode; 13 tests pass; no console errors. The vertex math is unchanged, so the CPU reference and seam / LBS comparison numbers still apply.
+
 ## 2026-11-15 · T07 Animation state machine and pose transitions (M5)
 - Added whole-body action clips (`idle` looping breathing/sway, `aim` raised-rifle hold with torso twist and slight knee bend, and `swing` wind-up $\to$ downward strike $\to$ follow-through $\to$ auto-return to `idle`) in `src/animation/clips.ts` for the 15-joint `gundam-rigged.glb` model on the `our LBS` path, respecting all joint limits and keeping both feet planted on the platform.
 - Upgraded `src/animation/animator.ts` with states (`playing | transitioning | holding`), `transitionMode: 'blend' | 'cut'`, `play(action)` pose snapshotting with $0.3\text{ s}$ smoothstep quaternion slerp blending, automatic `next` clip chaining (`swing -> idle`), and `jointAngleDeg(joint)`.
