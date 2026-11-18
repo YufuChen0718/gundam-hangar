@@ -31,6 +31,9 @@ export class Appearance {
         new MeshStandardMaterial({ color, roughness: 0.75, metalness: 0.12 }),
       );
   }
+  setRig(rig: ArmPreviewRig) {
+    this.rig = rig;
+  }
   apply(parts: boolean, wireframe: boolean, original?: Group) {
     this.rig.lbs?.setAppearance(parts, wireframe);
     for (const [object, material] of this.rig.originalMaterials) {

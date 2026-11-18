@@ -13,6 +13,7 @@ import type {
   ArmPreviewRig,
   FootGroundSample,
   JointName,
+  RiggedModelVariant,
   SocketName,
 } from "./types";
 import { modelPaths, rigConfig } from "./rigConfig";
@@ -54,11 +55,16 @@ function requireNode(root: Object3D, name: string): Object3D {
   return node;
 }
 
-export async function loadPrepared(): Promise<ArmPreviewRig> {
-  const gltf = await loader.loadAsync(modelPaths.prepared);
+export async function loadPrepared(
+  variant: RiggedModelVariant = "guardian",
+): Promise<ArmPreviewRig> {
+  const path =
+    variant === "previous" ? modelPaths.previous : modelPaths.guardian;
+  const gltf = await loader.loadAsync(path);
   prepare(gltf.scene);
   const displayRoot = new Group();
-  displayRoot.name = "appDisplayRoot";
+  displayRoot.name =
+    variant === "previous" ? "previousDisplayRoot" : "appDisplayRoot";
   displayRoot.add(gltf.scene);
   const joints = Object.fromEntries(
     JOINTS.map((j) => [j, requireNode(gltf.scene, rigConfig.joints[j])]),

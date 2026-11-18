@@ -16,28 +16,18 @@ import {
   normalizePoseInput,
   TEST_POSES,
 } from "../mecha/rigConfig";
-import { loadOriginal } from "../mecha/loadMecha";
+import { loadOriginal, loadPrepared } from "../mecha/loadMecha";
 import { EquipmentManager } from "../mecha/equipment";
 import { Appearance } from "../mecha/appearance";
 import { Animator } from "../animation/animator";
 import type { ActionName, TransitionMode } from "../animation/clips";
 import type { createScene } from "../scene/createScene";
 
-export function createCommands(
-  store: Store,
-  rig: ArmPreviewRig,
-  world: ReturnType<typeof createScene>,
-) {
-  const animator = new Animator(rig),
-    equipment = new EquipmentManager(rig),
-    appearance = new Appearance(rig);
-  let original: Group | undefined;
-  let originalPromise: Promise<Group> | undefined;
-
-  const helpers = [
-    ...JOINTS.map((j) => rig.joints[j]),
-    rig.sockets.rightHand,
-    rig.sockets.leftHand,
+function attachHelpers(r: ArmPreviewRig): AxesHelper[] {
+  return [
+    ...JOINTS.map((j) => r.joints[j]),
+    r.sockets.rightHand,
+    r.sockets.leftHand,
   ].map((j) => {
     const h = new AxesHelper(0.11);
     h.visible = false;
@@ -45,6 +35,35 @@ export function createCommands(
     j.add(h);
     return h;
   });
+}
+
+function computeGripLocal(r: ArmPreviewRig): Vector3 {
+  r.displayRoot.updateMatrixWorld(true);
+  const gripLocal = r.parts.rifle.getWorldPosition(new Vector3());
+  r.sockets.rightHand.worldToLocal(gripLocal);
+  return gripLocal;
+}
+
+export function createCommands(
+  store: Store,
+  initialRig: ArmPreviewRig,
+  world: ReturnType<typeof createScene>,
+) {
+  let rig = initialRig;
+  const guardianRig = initialRig;
+  let previousRig: ArmPreviewRig | undefined;
+  let previousPromise: Promise<ArmPreviewRig> | undefined;
+  let original: Group | undefined;
+  let originalPromise: Promise<Group> | undefined;
+
+  const animator = new Animator(rig),
+    equipment = new EquipmentManager(rig),
+    appearance = new Appearance(rig);
+
+  const helperMap = new Map<ArmPreviewRig, AxesHelper[]>();
+  const gripLocalMap = new Map<ArmPreviewRig, Vector3>();
+  helperMap.set(guardianRig, attachHelpers(guardianRig));
+  gripLocalMap.set(guardianRig, computeGripLocal(guardianRig));
 
   const repaint = () =>
     appearance.apply(store.get().parts, store.get().wireframe, original);
@@ -62,7 +81,7 @@ export function createCommands(
   }
 
   function manual(angles: PoseInput) {
-    if (store.get().mode !== "prepared") return;
+    if (store.get().mode === "original") return;
     animator.manual(normalizePoseInput(angles));
     sync();
   }
@@ -102,7 +121,7 @@ export function createCommands(
       if (preset) manual(preset.angles);
     },
     play: () => {
-      if (store.get().mode !== "prepared") return;
+      if (store.get().mode === "original") return;
       if (animator.playing) animator.pause();
       else if (animator.time > 0 && animator.time < animator.duration)
         animator.resume();
@@ -110,7 +129,7 @@ export function createCommands(
       sync();
     },
     playAction: (action: ActionName) => {
-      if (store.get().mode !== "prepared") return;
+      if (store.get().mode === "original") return;
       animator.play(action);
       sync();
     },
@@ -120,7 +139,7 @@ export function createCommands(
       sync();
     },
     seek: (time: number) => {
-      if (store.get().mode !== "prepared") return;
+      if (store.get().mode === "original") return;
       animator.seek(time);
       sync();
     },
@@ -150,11 +169,16 @@ export function createCommands(
       repaint();
     },
     setJointsVisible: (v: boolean) => {
-      helpers.forEach((h) => (h.visible = v));
+      for (const list of helperMap.values()) {
+        list.forEach((h) => (h.visible = v));
+      }
       store.set({ joints: v });
     },
-    setModel: async (mode: ModelMode) => {
+    setModel: async (requestedMode: ModelMode) => {
+      const mode: ModelMode =
+        requestedMode === "prepared" ? "guardian" : requestedMode;
       if (store.get().loading || store.get().mode === mode) return;
+      const savedAngles = { ...store.get().angles };
       animator.pause();
       sync();
       store.set({ loading: true, error: null });
@@ -163,16 +187,49 @@ export function createCommands(
           originalPromise ??= loadOriginal();
           original = await originalPromise;
           world.scene.add(original);
+        } else if (mode === "previous" && !previousRig) {
+          previousPromise ??= loadPrepared("previous");
+          previousRig = await previousPromise;
+          helperMap.set(previousRig, attachHelpers(previousRig));
+          gripLocalMap.set(previousRig, computeGripLocal(previousRig));
+          world.scene.add(previousRig.displayRoot);
         }
-        rig.displayRoot.visible = mode === "prepared";
+
+        if (mode === "previous" && previousRig) {
+          rig = previousRig;
+        } else if (mode === "guardian") {
+          rig = guardianRig;
+        }
+
+        guardianRig.displayRoot.visible = mode === "guardian";
+        if (previousRig) {
+          previousRig.displayRoot.visible = mode === "previous";
+          previousRig.displayRoot.rotation.y =
+            guardianRig.displayRoot.rotation.y;
+        }
         if (original) {
           original.visible = mode === "original";
-          original.rotation.y = rig.displayRoot.rotation.y;
+          original.rotation.y = guardianRig.displayRoot.rotation.y;
+        }
+
+        if (mode !== "original") {
+          animator.setRig(rig);
+          equipment.setRig(rig);
+          appearance.setRig(rig);
+          rig.lbs?.setMode(store.get().skinning);
+          equipment.setWeaponVisible(store.get().weapon);
+          equipment.setShieldVisible(store.get().shield);
+          helperMap
+            .get(rig)
+            ?.forEach((h) => (h.visible = store.get().joints));
+          animator.manual(savedAngles);
         }
         store.set({ mode });
         repaint();
+        sync();
       } catch (e) {
-        originalPromise = undefined;
+        if (mode === "original") originalPromise = undefined;
+        if (mode === "previous") previousPromise = undefined;
         store.set({ error: e instanceof Error ? e.message : String(e) });
       } finally {
         store.set({ loading: false });
@@ -180,12 +237,15 @@ export function createCommands(
     },
     rotateModel: (degrees: number) => {
       store.set({ modelYawDeg: degrees });
-      rig.displayRoot.rotation.y = MathUtils.degToRad(degrees);
+      const rad = MathUtils.degToRad(degrees);
+      guardianRig.displayRoot.rotation.y = rad;
+      if (previousRig) previousRig.displayRoot.rotation.y = rad;
       rig.lbs?.updateBoneMatrices();
-      if (original) original.rotation.y = rig.displayRoot.rotation.y;
+      if (original) original.rotation.y = rad;
     },
     resetModelTransform: () => {
-      rig.displayRoot.rotation.set(0, 0, 0);
+      guardianRig.displayRoot.rotation.set(0, 0, 0);
+      if (previousRig) previousRig.displayRoot.rotation.set(0, 0, 0);
       rig.lbs?.updateBoneMatrices();
       if (original) original.rotation.set(0, 0, 0);
       store.set({ modelYawDeg: 0 });
@@ -211,7 +271,7 @@ export function createCommands(
 
   let accumulator = 0;
   function update(dt: number) {
-    if (store.get().mode === "prepared") {
+    if (store.get().mode !== "original") {
       animator.update(dt);
       rig.lbs?.updateBoneMatrices();
       accumulator += dt;
@@ -241,10 +301,6 @@ export function createCommands(
     return Number.isFinite(minY) ? minY : 0;
   }
 
-  rig.displayRoot.updateMatrixWorld(true);
-  const gripLocal = rig.parts.rifle.getWorldPosition(new Vector3());
-  rig.sockets.rightHand.worldToLocal(gripLocal);
-
   function diagnostics() {
     rig.displayRoot.updateMatrixWorld(true);
     const skinningMode = store.get().skinning;
@@ -265,6 +321,7 @@ export function createCommands(
       vertexCount: 0,
     };
 
+    const gripLocal = gripLocalMap.get(rig) ?? new Vector3();
     const expected = rig.sockets.rightHand.localToWorld(gripLocal.clone());
     const actual = rig.parts.rifle.getWorldPosition(new Vector3());
     const jointWorldPositions = Object.fromEntries(

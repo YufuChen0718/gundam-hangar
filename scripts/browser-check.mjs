@@ -36,15 +36,6 @@ const TEST_POSE_ORDER = [
   "maxArticulation",
 ];
 
-const GALLERY_POSES = [
-  "bind",
-  "dualArmReady",
-  "crouch",
-  "deepCrouchAim",
-  "fullBodyTwistCrouch",
-  "maxArticulation",
-];
-
 const JOINTS_15 = [
   "pelvis",
   "torso",
@@ -98,17 +89,18 @@ try {
   await page.waitForFunction(() => window.__hangar?.getState().ready, {
     timeout: 30000,
   });
-  checks.push("gundam-rigged.glb and textures loaded");
+  checks.push("gundam-guardian.glb and textures loaded by default");
   await page.waitForTimeout(500);
-  await page.screenshot({ path: "docs/results/viewer-rest.png" });
+  await page.screenshot({ path: "docs/results/guardian-bind-orbit.png" });
 
   const bindDiag = await page.evaluate(() => window.__hangar.diagnostics());
-  assert.equal(bindDiag.boundaryGroups, 367);
+  assert.equal(bindDiag.mode, "guardian");
+  assert.equal(bindDiag.boundaryGroups, 930);
   assert.equal(bindDiag.skinningMode, "lbs");
   const bindLeftFootY = bindDiag.leftFootMinY;
   const bindRightFootY = bindDiag.rightFootMinY;
 
-  // 1. Verify all 9 full-body test poses pass seam, LBS-vs-Three.js, attachment, and foot-platform checks
+  // 1. Verify all 9 full-body test poses on Guardian pass seam, LBS-vs-Three.js, attachment, and foot-platform checks
   const seamTests = [];
   const lbsSeamSet = new Set();
   const vsThreeSet = new Set();
@@ -117,7 +109,7 @@ try {
     await page.waitForTimeout(90);
     const d = await page.evaluate(() => window.__hangar.diagnostics());
     const state = await page.evaluate(() => window.__hangar.getState());
-    assert.equal(d.boundaryGroups, 367);
+    assert.equal(d.boundaryGroups, 930);
     assert.ok(
       d.lbsSeamGapMax < 1e-5,
       `Skin boundary separated in ${poseName}: ${d.lbsSeamGapMax}`,
@@ -173,24 +165,33 @@ try {
     "Expected per-pose LBS vs Three.js max diff to differ across all 9 poses",
   );
   checks.push(
-    "all 9 full-body test poses report distinct per-pose LBS seam gaps (<1e-5 m) and LBS-vs-Three.js diffs (<1e-6 m)",
+    "all 9 full-body test poses on Guardian report distinct per-pose LBS seam gaps (<1e-5 m) and LBS-vs-Three.js diffs (<1e-6 m)",
   );
 
-  // 2. Capture front and side pose gallery screenshots
-  for (const poseName of GALLERY_POSES) {
-    await page.locator(`[data-pose="${poseName}"]`).click();
-    await page.evaluate(() => window.__hangar.commands.camera("front"));
-    await page.waitForTimeout(140);
-    await page.screenshot({
-      path: `docs/results/pose-gallery-front-${poseName}.png`,
-    });
-    await page.evaluate(() => window.__hangar.commands.camera("side"));
-    await page.waitForTimeout(140);
-    await page.screenshot({
-      path: `docs/results/pose-gallery-side-${poseName}.png`,
-    });
-  }
-  checks.push("captured front and side pose gallery screenshots");
+  // 2. Capture Guardian bind + action pose screenshots (front / side / orbit)
+  await page.locator('[data-pose="bind"]').click();
+  await page.evaluate(() => window.__hangar.commands.camera("front"));
+  await page.waitForTimeout(150);
+  await page.screenshot({ path: "docs/results/guardian-bind-front.png" });
+  await page.evaluate(() => window.__hangar.commands.camera("side"));
+  await page.waitForTimeout(150);
+  await page.screenshot({ path: "docs/results/guardian-bind-side.png" });
+
+  await page.evaluate(() => window.__hangar.commands.camera("orbit"));
+  await page.locator('[data-action="aim"]').click();
+  await page.waitForTimeout(1300);
+  await page.screenshot({ path: "docs/results/guardian-action-aim.png" });
+
+  await page.locator('[data-action="swing"]').click();
+  await page.waitForTimeout(850); // Strike peak
+  await page.screenshot({ path: "docs/results/guardian-action-swing.png" });
+
+  await page.locator('[data-pose="deepCrouchAim"]').click();
+  await page.waitForTimeout(150);
+  await page.screenshot({
+    path: "docs/results/guardian-pose-deepCrouchAim.png",
+  });
+  checks.push("captured Guardian bind and action pose screenshots");
 
   // 3. Verify every one of the 15 joints can be posed from the viewer sliders and moving pelvis moves the whole body
   await page.locator("#reset-pose-panel").click();
@@ -269,7 +270,6 @@ try {
     await page.evaluate(() => window.__hangar.getState().transitionMode),
     "blend",
   );
-  // 4a. Play swing and verify it transitions automatically back to idle after 1.8 s
   await page.locator('[data-action="swing"]').click();
   assert.equal(
     await page.evaluate(() => window.__hangar.getState().action),
@@ -288,7 +288,6 @@ try {
     await page.evaluate(() => window.__hangar.getState().playing),
     true,
   );
-  // 4b. Interrupt swing mid-way with aim in blend mode vs cut mode
   await page.locator('[data-action="swing"]').click();
   await page.waitForTimeout(550);
   await page.locator('[data-action="aim"]').click();
@@ -310,7 +309,6 @@ try {
     false,
   );
 
-  // Cut mode check
   await page.locator('[data-transition="cut"]').click();
   assert.equal(
     await page.evaluate(() => window.__hangar.getState().transitionMode),
@@ -330,25 +328,10 @@ try {
   await page.locator('[data-transition="blend"]').click();
   await page.locator("#reset-pose-panel").click();
   checks.push(
-    "T07 action buttons (idle / aim / swing) and transition mode toggle (blend / cut) verified",
+    "T07 action buttons (idle / aim / swing) and transition mode toggle (blend / cut) verified on Guardian",
   );
 
-  // 5. Classic viewer screenshots & close-up views
-  await page.evaluate(() => window.__hangar.commands.camera("orbit"));
-  await page.locator('[data-pose="rightArmAim"]').click();
-  await page.waitForTimeout(200);
-  await page.screenshot({ path: "docs/results/viewer-raised.png" });
-  for (const view of ["side", "top", "back"]) {
-    await page.evaluate((view) => {
-      window.__hangar.commands.seek(1.6);
-      window.__hangar.commands.camera(view);
-      window.__hangar.commands.zoom("in");
-    }, view);
-    await page.waitForTimeout(200);
-    await page.screenshot({ path: `docs/results/seam-fix-${view}.png` });
-  }
-
-  // 6. Equipment tab checks
+  // 5. Equipment tab checks
   await page.evaluate(() => window.__hangar.commands.camera("orbit"));
   await page.getByRole("tab", { name: "装备", exact: true }).click();
   await page.locator("#weapon").uncheck();
@@ -366,16 +349,16 @@ try {
   await page.locator("#shield").check();
   checks.push("shield hide/show");
 
-  // 7. Inspect tab: T14 close-up comparison of right elbow and right knee (original texture, rigid parts vs our LBS)
+  // 6. Inspect tab: Guardian close-up comparison of right elbow and right knee (original texture, rigid parts vs our LBS)
   await page.getByRole("tab", { name: "检查", exact: true }).click();
   await page.locator("#parts").uncheck();
   await page.locator("#joints").uncheck();
   await page.locator("#wireframe").uncheck();
 
-  // 7a. Right Elbow close-up (original texture, rigid vs LBS)
+  // 6a. Right Elbow close-up on Guardian (original texture, rigid vs LBS)
   await page.evaluate(() => {
     const c = window.__hangar.commands;
-    c.setWeaponVisible(false); // Unoccluded view of right elbow joint
+    c.setWeaponVisible(false);
     c.setPoseAngles({
       rightShoulder: 25,
       rightElbow: 88,
@@ -391,13 +374,13 @@ try {
   });
   await page.locator('[data-skinning="rigid"]').click();
   await page.waitForTimeout(220);
-  await page.screenshot({ path: "docs/results/t14-elbow-rigid.png" });
+  await page.screenshot({ path: "docs/results/guardian-elbow-rigid.png" });
 
   await page.locator('[data-skinning="lbs"]').click();
   await page.waitForTimeout(220);
-  await page.screenshot({ path: "docs/results/t14-elbow-lbs.png" });
+  await page.screenshot({ path: "docs/results/guardian-elbow-lbs.png" });
 
-  // 7b. Right Knee close-up (original texture, rigid vs LBS)
+  // 6b. Right Knee close-up on Guardian (original texture, rigid vs LBS)
   await page.evaluate(() => {
     const c = window.__hangar.commands;
     c.setWeaponVisible(true);
@@ -419,13 +402,13 @@ try {
   });
   await page.locator('[data-skinning="rigid"]').click();
   await page.waitForTimeout(220);
-  await page.screenshot({ path: "docs/results/t14-knee-rigid.png" });
+  await page.screenshot({ path: "docs/results/guardian-knee-rigid.png" });
 
   await page.locator('[data-skinning="lbs"]').click();
   await page.waitForTimeout(220);
-  await page.screenshot({ path: "docs/results/t14-knee-lbs.png" });
+  await page.screenshot({ path: "docs/results/guardian-knee-lbs.png" });
 
-  // 7c. Test Three.js skinning mode, part colors, joint axes, wireframe
+  // 6c. Test Three.js skinning mode, part colors, joint axes, wireframe
   await page.locator('[data-skinning="three"]').click();
   assert.equal(
     await page.evaluate(() => window.__hangar.getState().skinning),
@@ -439,7 +422,7 @@ try {
   await page.locator("#parts").check();
   await page.locator("#joints").check();
   await page.waitForTimeout(180);
-  await page.screenshot({ path: "docs/results/viewer-parts.png" });
+  await page.screenshot({ path: "docs/results/guardian-parts.png" });
   await page.locator("#parts").uncheck();
   await page.locator("#joints").uncheck();
   await page.locator("#wireframe").check();
@@ -449,32 +432,52 @@ try {
   );
   await page.locator("#wireframe").uncheck();
   checks.push(
-    "3-way skinning toggle, close-up elbow/knee rigid vs LBS screenshots, part colors, joint axes, wireframe",
+    "3-way skinning toggle, close-up elbow/knee rigid vs LBS screenshots, part colors, joint axes, wireframe on Guardian",
   );
 
-  // 8. Frame time comparison across Three.js skinning, our LBS, and rigid parts
+  // 7. Frame time comparison across Three.js skinning, our LBS, and rigid parts on Guardian
   const frameTimeThree = await measureFrameTimes(page, "three", 90);
   const frameTimeLbs = await measureFrameTimes(page, "lbs", 90);
   const frameTimeRigid = await measureFrameTimes(page, "rigid", 90);
   await page.locator('[data-skinning="lbs"]').click();
-  checks.push("measured frame time for Three.js skinning, our LBS, and rigid parts");
+  checks.push(
+    "measured frame time for Three.js skinning, our LBS, and rigid parts on Guardian",
+  );
 
-  // 9. Original vs prepared switching
-  await page.getByRole("button", { name: "原始模型", exact: true }).click();
+  // 8. Switch between "Guardian (new)" and "Previous model" and verify both rigged models work
+  await page
+    .getByRole("button", { name: "Previous model", exact: true })
+    .click();
   await page.waitForFunction(
     () =>
-      window.__hangar.getState().mode === "original" &&
+      window.__hangar.getState().mode === "previous" &&
       !window.__hangar.getState().loading,
   );
-  assert.equal(await page.locator("#play").isDisabled(), true);
-  await page.evaluate(() => window.__hangar.commands.camera("orbit"));
-  await page.waitForTimeout(200);
-  await page.screenshot({ path: "docs/results/viewer-original.png" });
-  await page.getByRole("button", { name: "全身绑定版", exact: true }).click();
+  const prevDiag = await page.evaluate(() => window.__hangar.diagnostics());
+  assert.equal(prevDiag.boundaryGroups, 367);
+  assert.ok(prevDiag.lbsSeamGapMax < 1e-5);
   assert.equal(await page.locator("#play").isDisabled(), false);
-  checks.push("original/prepared switching, inappropriate controls disabled");
+  await page.evaluate(() => window.__hangar.commands.camera("orbit"));
+  await page.waitForTimeout(180);
+  await page.screenshot({ path: "docs/results/guardian-previous-model.png" });
 
-  // 10. Play, pause, and reset
+  await page
+    .getByRole("button", { name: "Guardian (new)", exact: true })
+    .click();
+  await page.waitForFunction(
+    () =>
+      window.__hangar.getState().mode === "guardian" &&
+      !window.__hangar.getState().loading,
+  );
+  const guardianDiagAgain = await page.evaluate(() =>
+    window.__hangar.diagnostics(),
+  );
+  assert.equal(guardianDiagAgain.boundaryGroups, 930);
+  checks.push(
+    'model switch ("Guardian (new)" / "Previous model") verified with both GLBs working',
+  );
+
+  // 9. Play, pause, and reset
   await page.getByRole("tab", { name: "姿态", exact: true }).click();
   await page.locator("#reset-pose").click();
   assert.ok(
@@ -496,7 +499,7 @@ try {
   );
   checks.push("play, pause, and reset");
 
-  // 11. Mobile 390px layout check
+  // 10. Mobile 390px layout check
   await page.setViewportSize({ width: 390, height: 844 });
   await page.waitForTimeout(250);
   assert.equal(
@@ -506,14 +509,14 @@ try {
     true,
   );
   await page.screenshot({
-    path: "docs/results/viewer-mobile.png",
+    path: "docs/results/guardian-mobile.png",
     fullPage: true,
   });
   checks.push("390px layout without horizontal overflow");
 
-  // 12. Render t07-transition-plot.svg to t07-transition-plot.png
+  // 11. Render guardian-transition-plot.svg to guardian-transition-plot.png
   const svgText = await fs.readFile(
-    "docs/results/t07-transition-plot.svg",
+    "docs/results/guardian-transition-plot.svg",
     "utf8",
   );
   const plotPage = await browser.newPage({
@@ -523,9 +526,11 @@ try {
   await plotPage.setContent(
     `<!doctype html><body style="margin:0;background:#141a21">${svgText}</body>`,
   );
-  await plotPage.screenshot({ path: "docs/results/t07-transition-plot.png" });
+  await plotPage.screenshot({
+    path: "docs/results/guardian-transition-plot.png",
+  });
   await plotPage.close();
-  checks.push("rendered docs/results/t07-transition-plot.png");
+  checks.push("rendered docs/results/guardian-transition-plot.png");
 
   assert.deepEqual(errors, []);
   assert.deepEqual(failedRequests, []);
@@ -533,6 +538,7 @@ try {
 
   const report = {
     url: base,
+    model: "gundam-guardian.glb",
     browser: await browser.version(),
     checks,
     frameTimes: {
@@ -544,10 +550,10 @@ try {
     errors,
     failedRequests,
     notes:
-      "Headless Chrome acceptance run for T13 + T14 + T07; frame times measured in headless Chromium.",
+      "Headless Chrome acceptance run for Gundam Guardian (30,043 tris, 15 joints, custom LBS, T07 transitions).",
   };
   await fs.writeFile(
-    "docs/results/browser-validation.json",
+    "docs/results/guardian-browser-validation.json",
     JSON.stringify(report, null, 2),
   );
   console.log(JSON.stringify(report, null, 2));

@@ -42,6 +42,11 @@ export class Animator {
 
   constructor(private rig: ArmPreviewRig) {}
 
+  setRig(rig: ArmPreviewRig) {
+    this.rig = rig;
+    this.apply();
+  }
+
   get duration(): number {
     return this.activeClip.duration;
   }

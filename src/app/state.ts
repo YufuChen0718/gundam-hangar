@@ -31,7 +31,7 @@ export function createStore() {
   let state: HangarState = {
     ready: false,
     error: null,
-    mode: "prepared",
+    mode: "guardian",
     skinning: "lbs",
     action: "idle",
     status: "holding",

@@ -92,4 +92,5 @@ export interface ArmPreviewRig {
   lbs?: LbsController;
 }
 
-export type ModelMode = "prepared" | "original";
+export type RiggedModelVariant = "guardian" | "previous";
+export type ModelMode = "guardian" | "previous" | "prepared" | "original";

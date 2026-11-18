@@ -1,5 +1,7 @@
 """Reproducible full-body (15-joint) asset preparation preserving continuous joint boundaries.
-Usage: Blender -b SOURCE.blend --disable-autoexec --python scripts/prepare_mecha.py -- --output PROJECT
+Usage:
+  Blender -b assets-src/gundam-guardian-source.blend --disable-autoexec --python scripts/prepare_mecha.py -- --output "$PWD" --asset guardian
+  Blender -b assets-src/mecha-original.blend --disable-autoexec --python scripts/prepare_mecha.py -- --output "$PWD" --asset sentinel
 Original geometry/UVs are preserved. Shared source vertices receive identical skin weights across parts.
 """
 import bpy, json, math, sys, argparse, collections
@@ -8,6 +10,7 @@ from mathutils import Vector, Matrix
 
 p = argparse.ArgumentParser()
 p.add_argument('--output', required=True)
+p.add_argument('--asset', choices=['auto', 'guardian', 'sentinel'], default='auto')
 a = p.parse_args(sys.argv[sys.argv.index('--') + 1:])
 out = Path(a.output)
 for folder in ['assets-src', 'public/assets/models', 'docs/results']:
@@ -21,17 +24,98 @@ faces = [list(f.vertices) for f in mesh.polygons]
 uvs = [[tuple(mesh.uv_layers.active.data[i].uv) for i in f.loop_indices] for f in mesh.polygons]
 normals = [[tuple(mesh.corner_normals[i].vector) for i in f.loop_indices] for f in mesh.polygons]
 
-grip = Vector((-.435, .110, -.015))
-left_grip = Vector((.385, -.165, .015))
+asset_key = a.asset
+if asset_key == 'auto':
+    blend_name = Path(bpy.data.filepath).name.lower() if bpy.data.filepath else ''
+    asset_key = 'guardian' if ('guardian' in blend_name or len(verts) > 8000) else 'sentinel'
 
-right_outline = [
-    (-.49, .75), (-.205, .75), (-.225, .54), (-.238, .43), (-.26, .30),
-    (-.295, .16), (-.335, .075), (-.335, -.11), (-.53, -.11), (-.53, .2), (-.45, .43),
-]
-left_outline = [
-    (.49, .73), (.205, .73), (.215, .54), (.235, .43), (.255, .30),
-    (.265, .16), (.255, .075), (.255, -.06), (.48, -.06), (.48, .2), (.45, .43),
-]
+# Per-asset configuration (joint pivot positions, sockets, and part boundary rules)
+ASSET_CONFIGS = {
+    'sentinel': {
+        'blend_out': 'assets-src/gundam-rigged.blend',
+        'glb_out': 'public/assets/models/gundam-rigged.glb',
+        'report_out': 'docs/results/preparation-report.json',
+        'grip': Vector((-.435, .110, -.015)),
+        'left_grip': Vector((.385, -.165, .015)),
+        'back_socket': Vector((0.0, .25, .45)),
+        'barrel_dir': Vector((-.29, -.46, -.81)),
+        'right_outline': [
+            (-.49, .75), (-.205, .75), (-.225, .54), (-.238, .43), (-.26, .30),
+            (-.295, .16), (-.335, .075), (-.335, -.11), (-.53, -.11), (-.53, .2), (-.45, .43),
+        ],
+        'left_outline': [
+            (.49, .73), (.205, .73), (.215, .54), (.235, .43), (.255, .30),
+            (.265, .16), (.255, .075), (.255, -.06), (.48, -.06), (.48, .2), (.45, .43),
+        ],
+        'positions': {
+            'pelvis': Vector((0.0, 0.055, 0.080)),
+            'torso': Vector((0.048, 0.055, 0.272)),
+            'head': Vector((0.012, 0.073, 0.665)),
+            'rightShoulder': Vector((-0.285, 0.235, 0.535)),
+            'rightElbow': Vector((-0.325, 0.285, 0.390)),
+            'rightWrist': Vector((-0.415, 0.180, 0.085)),
+            'leftShoulder': Vector((0.230, 0.184, 0.576)),
+            'leftElbow': Vector((0.366, -0.040, 0.406)),
+            'leftWrist': Vector((0.394, -0.149, 0.088)),
+            'rightHip': Vector((-0.161, 0.220, -0.036)),
+            'rightKnee': Vector((-0.237, 0.220, -0.378)),
+            'rightAnkle': Vector((-0.308, 0.220, -0.721)),
+            'leftHip': Vector((0.162, -0.050, -0.036)),
+            'leftKnee': Vector((0.248, -0.050, -0.378)),
+            'leftAnkle': Vector((0.364, -0.050, -0.721)),
+        },
+        'right_arm_z_splits': (0.405, 0.085),
+        'left_arm_z_splits': (0.405, 0.085),
+        'leg_x_y_slope': 0.0,
+    },
+    'guardian': {
+        'blend_out': 'assets-src/gundam-guardian-rigged.blend',
+        'glb_out': 'public/assets/models/gundam-guardian.glb',
+        'report_out': 'docs/results/guardian-preparation-report.json',
+        'grip': Vector((-.395, .110, -.015)),
+        'left_grip': Vector((.390, -.180, .015)),
+        'back_socket': Vector((0.0, .25, .45)),
+        'barrel_dir': Vector((-.29, -.46, -.81)),
+        'right_outline': [
+            (-.49, .75), (-.175, .75), (-.175, .54), (-.175, .40), (-.175, .28),
+            (-.195, .14), (-.245, .06), (-.265, -.09), (-.53, -.09), (-.53, .20), (-.45, .43),
+        ],
+        'left_outline': [
+            (.49, .73), (.205, .73), (.215, .54), (.245, .43), (.315, .34),
+            (.330, .16), (.330, .075), (.330, -.06), (.48, -.06), (.48, .20), (.45, .43),
+        ],
+        'positions': {
+            'pelvis': Vector((0.0, 0.055, 0.080)),
+            'torso': Vector((0.048, 0.055, 0.272)),
+            'head': Vector((0.018, 0.070, 0.645)),
+            'rightShoulder': Vector((-0.225, 0.235, 0.535)),
+            'rightElbow': Vector((-0.275, 0.225, 0.395)),
+            'rightWrist': Vector((-0.345, 0.155, 0.075)),
+            'leftShoulder': Vector((0.230, 0.184, 0.576)),
+            'leftElbow': Vector((0.366, -0.040, 0.405)),
+            'leftWrist': Vector((0.394, -0.165, 0.085)),
+            'rightHip': Vector((-0.161, 0.220, -0.036)),
+            'rightKnee': Vector((-0.237, 0.220, -0.378)),
+            'rightAnkle': Vector((-0.308, 0.220, -0.721)),
+            'leftHip': Vector((0.162, -0.050, -0.036)),
+            'leftKnee': Vector((0.248, -0.050, -0.378)),
+            'leftAnkle': Vector((0.364, -0.050, -0.721)),
+        },
+        'right_arm_z_splits': (0.395, 0.075),
+        'left_arm_z_splits': (0.405, 0.085),
+        'leg_x_y_slope': 0.35,
+    },
+}
+
+cfg = ASSET_CONFIGS[asset_key]
+grip = cfg['grip']
+left_grip = cfg['left_grip']
+right_outline = cfg['right_outline']
+left_outline = cfg['left_outline']
+positions = cfg['positions']
+r_z_upper, r_z_fore = cfg['right_arm_z_splits']
+l_z_upper, l_z_fore = cfg['left_arm_z_splits']
+leg_slope = cfg['leg_x_y_slope']
 
 def poly_inside(x, z, poly):
     hit = False
@@ -56,7 +140,27 @@ for e in mesh.edges:
 components = collections.defaultdict(list)
 for i in range(len(verts)):
     components[find(i)].append(i)
-shield_ids = set(next(ids for ids in components.values() if len(ids) < 1000))
+
+if asset_key == 'sentinel':
+    shield_ids = set(next(ids for ids in components.values() if len(ids) < 1000))
+else:
+    adj = collections.defaultdict(set)
+    for f in faces:
+        for u in f:
+            for w in f:
+                if u != w:
+                    adj[u].add(w)
+    seed_v = max(range(len(verts)), key=lambda i: verts[i].x)
+    shield_ids = {seed_v}
+    q_bfs = collections.deque([seed_v])
+    while q_bfs:
+        u = q_bfs.popleft()
+        for w in adj[u]:
+            v_w = verts[w]
+            in_left_fist_or_arm = (v_w.x < 0.445 and v_w.y > -0.245 and -0.065 < v_w.z < 0.43)
+            if w not in shield_ids and v_w.z > -0.32 and not in_left_fist_or_arm and (v_w.x - 0.35 * v_w.y > 0.455):
+                shield_ids.add(w)
+                q_bfs.append(w)
 
 part_names = [
     'waistPart', 'chestPart', 'headPart',
@@ -71,18 +175,20 @@ face_label = []
 for i, f in enumerate(faces):
     c = sum((verts[j] for j in f), Vector()) / len(f)
     x, y, z = c.x, c.y, c.z
-    if f[0] in shield_ids:
+    if (f[0] in shield_ids) if asset_key == 'sentinel' else any(v in shield_ids for v in f):
         label = 'shield'
-    elif x < -.27 and -.65 < z < .30 and ((z > -.11 and y < .10 - .40 * z) or (z <= -.11 and (x < -.44 or y < -.03))):
+    elif asset_key == 'sentinel' and (x < -.27 and -.65 < z < .30 and ((z > -.11 and y < .10 - .40 * z) or (z <= -.11 and (x < -.44 or y < -.03)))):
         label = 'rifle'
-    elif (x < -.17 and y > .10 and .53 < z < .75) or poly_inside(x, z, right_outline):
-        label = 'rightUpperArm' if z > .405 else 'rightForearm' if z > .085 else 'rightPalm'
-    elif not (z > .685 and y > .07 and x < .33) and ((x > .17 and y < .08 and .53 < z < .73) or poly_inside(x, z, left_outline)):
-        label = 'leftUpperArm' if z > .405 else 'leftForearm' if z > .085 else 'leftPalm'
-    elif z > .665 and abs(x) < .145 and y < .22:
+    elif asset_key == 'guardian' and (x < -.27 and -.65 < z < .30 and ((z > -.08 and y < .10 - .40 * z) or (z <= -.08 and (x < -.32 or y < .05)))):
+        label = 'rifle'
+    elif (asset_key == 'sentinel' or y > 0.05 or x < -0.28) and ((x < -.17 and y > .10 and .53 < z < .75) or poly_inside(x, z, right_outline)):
+        label = 'rightUpperArm' if z > r_z_upper else 'rightForearm' if z > r_z_fore else 'rightPalm'
+    elif not (z > .685 and y > .07 and x < .33) and (asset_key == 'sentinel' or y < 0.04 or z > 0.42) and ((x > .17 and y < .08 and .53 < z < .73) or poly_inside(x, z, left_outline)):
+        label = 'leftUpperArm' if z > l_z_upper else 'leftForearm' if z > l_z_fore else 'leftPalm'
+    elif (z > .665 and abs(x) < .145 and y < .22) if asset_key == 'sentinel' else (z > .645 and abs(x) < .155 and y < .24):
         label = 'headPart'
     elif z < -.035:
-        if x < 0:
+        if x - leg_slope * y < 0.0:
             label = 'rightThigh' if z > -.38 else 'rightShin' if z > -.72 else 'rightFoot'
         else:
             label = 'leftThigh' if z > -.38 else 'leftShin' if z > -.72 else 'leftFoot'
@@ -116,7 +222,7 @@ def face_components(ids):
     return sorted(groups, key=len, reverse=True)
 
 cleanup = []
-for _ in range(5):
+for _ in range(8):
     changed = False
     for name in part_names:
         ids = [i for i, l in enumerate(face_label) if l == name]
@@ -217,24 +323,6 @@ bpy.context.view_layer.objects.active = arm
 arm.select_set(True)
 bpy.ops.object.mode_set(mode='EDIT')
 
-positions = {
-    'pelvis': Vector((0.0, 0.055, 0.080)),
-    'torso': Vector((0.048, 0.055, 0.272)),
-    'head': Vector((0.012, 0.073, 0.665)),
-    'rightShoulder': Vector((-0.285, 0.235, 0.535)),
-    'rightElbow': Vector((-0.325, 0.285, 0.390)),
-    'rightWrist': Vector((-0.415, 0.180, 0.085)),
-    'leftShoulder': Vector((0.230, 0.184, 0.576)),
-    'leftElbow': Vector((0.366, -0.040, 0.406)),
-    'leftWrist': Vector((0.394, -0.149, 0.088)),
-    'rightHip': Vector((-0.161, 0.220, -0.036)),
-    'rightKnee': Vector((-0.237, 0.220, -0.378)),
-    'rightAnkle': Vector((-0.308, 0.220, -0.721)),
-    'leftHip': Vector((0.162, -0.050, -0.036)),
-    'leftKnee': Vector((0.248, -0.050, -0.378)),
-    'leftAnkle': Vector((0.364, -0.050, -0.721)),
-}
-
 parent_names = {
     'torso': 'pelvis',
     'head': 'torso',
@@ -275,9 +363,9 @@ def socket(name, bone, pos):
 
 right = socket('rightHand', 'rightWrist', grip)
 socket('leftHand', 'leftWrist', left_grip)
-socket('back', 'torso', Vector((0, .25, .45)))
+socket('back', 'torso', cfg['back_socket'])
 
-barrel = Vector((-.29, -.46, -.81)).normalized()
+barrel = cfg['barrel_dir'].normalized()
 q = Vector((0, -1, 0)).rotation_difference(barrel)
 right.matrix_world = Matrix.Translation(grip + root.location) @ q.to_matrix().to_4x4()
 offset = bpy.data.objects.new('rifleOffset', None)
@@ -403,17 +491,17 @@ for pose_id, pose_label, angles in test_poses:
     })
     if worst > 1e-5:
         raise RuntimeError(f'Shared boundary validation failed on {pose_id}: {worst}')
-    if abs(left_foot_min_z) > 1e-4:
-        raise RuntimeError(f'Left foot left platform on {pose_id}: {left_foot_min_z}')
+    if abs(min(left_foot_min_z, right_foot_min_z)) > 1e-4:
+        raise RuntimeError(f'Supporting foot left platform on {pose_id}: L={left_foot_min_z}, R={right_foot_min_z}')
 
 for pb in arm.pose.bones:
     pb.rotation_euler = (0.0, 0.0, 0.0)
     pb.location = (0.0, 0.0, 0.0)
 bpy.context.view_layer.update()
 
-bpy.ops.wm.save_as_mainfile(filepath=str(out / 'assets-src/gundam-rigged.blend'))
+bpy.ops.wm.save_as_mainfile(filepath=str(out / cfg['blend_out']), compress=True)
 bpy.ops.export_scene.gltf(
-    filepath=str(out / 'public/assets/models/gundam-rigged.glb'),
+    filepath=str(out / cfg['glb_out']),
     export_format='GLB',
     export_yup=True,
     export_animations=False,
@@ -423,10 +511,12 @@ limitations = [
     'Two-ring transition bands around the 15 joints stretch slightly at extreme angles near joint limits to preserve C0 surface continuity without opening seams.',
     'Self-collision avoidance is not implemented, so front/side waist skirt armor and shoulder pauldrons can intersect adjacent limbs when hips or shoulders pitch past ~35 deg.',
     'Foot grounding shifts the pelvis vertically to keep the supporting foot soles on the platform during symmetric crouches; full analytic two-bone leg IK is deferred to T16.',
-    'All 17 parts currently share the original packed 2K PBR texture atlas; custom regional shader recoloring is deferred to T05.',
+    'All 17 parts share the packed 2K PBR texture atlas; custom regional shader recoloring is deferred to T05.',
 ]
 
 report = {
+    'asset': asset_key,
+    'source_vertices': len(verts),
     'source_triangles': len(faces),
     'part_triangles': {k: len(v) for k, v in labels.items()},
     'source_faces_preserved': sum(map(len, labels.values())) == len(faces),
@@ -437,6 +527,6 @@ report = {
     'seam_checks': checks,
     'limitations': limitations,
 }
-(out / 'docs/results/preparation-report.json').write_text(json.dumps(report, indent=2))
+(out / cfg['report_out']).write_text(json.dumps(report, indent=2))
 print(json.dumps(report, indent=2))
 print('FULL_BODY_RIG_COMPLETE')

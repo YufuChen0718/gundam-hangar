@@ -1,7 +1,12 @@
 import type { Store } from "../app/state";
 import type { Commands } from "../app/commands";
 import { JOINTS } from "../mecha/types";
-import type { JointName, PosePresetName, SkinningMode } from "../mecha/types";
+import type {
+  JointName,
+  ModelMode,
+  PosePresetName,
+  SkinningMode,
+} from "../mecha/types";
 import type { ActionName, TransitionMode } from "../animation/clips";
 import { JOINT_LIMITS, TEST_POSES } from "../mecha/rigConfig";
 
@@ -64,7 +69,7 @@ export function createLayout(root: HTMLElement) {
  <div class="stage-bottom"><span><i class="live-dot"></i> <b id="stage-status">等待模型</b></span><span>拖动旋转 · 滚轮缩放 · 右键平移</span></div>
  <div class="timeline"><button id="play" class="play-button" disabled aria-label="播放全身动作">▶</button><div class="timeline-body"><div><strong>全身联动验证</strong><span id="time-label">0.00 / 6.00 s</span></div><input id="timeline" type="range" min="0" max="6" step="0.01" value="0" aria-label="动画时间" disabled/><div class="timeline-ticks"><span>静止</span><span>展开</span><span>保持</span><span>复位</span></div></div><button id="reset-pose" class="text-button" disabled>Reset pose ↺</button></div>
  </section><aside class="inspector"><div class="panel-heading"><div class="eyebrow">CONTROL DECK</div><h2>模型实验台 <span>15J</span></h2><p>骨盆为根节点的 15 关节层级 FK 与测试姿态库。</p></div>
- <div class="model-switch" role="group" aria-label="模型版本"><button data-model="prepared" class="active" disabled>全身绑定版</button><button data-model="original" disabled>原始模型</button></div>
+ <div class="model-switch" role="group" aria-label="模型版本"><button data-model="guardian" class="active" disabled>Guardian (new)</button><button data-model="previous" disabled>Previous model</button></div>
  <div class="tabs" role="tablist"><button role="tab" aria-selected="true" aria-controls="panel-pose" data-tab="pose" class="active">姿态</button><button role="tab" aria-selected="false" aria-controls="panel-equipment" data-tab="equipment">装备</button><button role="tab" aria-selected="false" aria-controls="panel-inspect" data-tab="inspect">检查</button></div>
  <div class="panel-content"><section id="panel-pose" role="tabpanel"><div class="section-caption">ACTIONS <span>idle / aim / swing</span></div><div class="presets"><button data-action="idle" disabled>Idle</button><button data-action="aim" disabled>Aim</button><button data-action="swing" disabled>Swing</button></div><div class="section-caption">TRANSITION <span>M5 切换方式</span></div><div class="model-switch" style="margin:10px 0 18px" role="group" aria-label="动作切换方式"><button data-transition="blend" class="active" disabled>Blend (0.3s)</button><button data-transition="cut" disabled>Cut</button></div><div class="section-caption">TEST POSES <span>9 组全身测试姿态</span></div><div class="presets presets-grid">${TEST_POSES.map(
    (p) =>
@@ -84,7 +89,7 @@ export function createLayout(root: HTMLElement) {
  <section id="panel-equipment" role="tabpanel" hidden><div class="section-caption">ATTACHMENTS <span>随关节运动</span></div><label class="toggle-row"><span>步枪<small>rightHand → rifleOffset</small></span><input id="weapon" type="checkbox" checked disabled/></label><label class="toggle-row"><span>盾牌<small>随左前臂（leftElbow）运动</small></span><input id="shield" type="checkbox" checked disabled/></label><div class="note"><span>挂点验证</span>步枪通过右手挂点跟随右臂，护盾随左前臂关节联动。</div></section>
  <section id="panel-inspect" role="tabpanel" hidden><div class="section-caption">SKINNING <span>M3 蒙皮方式</span></div><div class="model-switch" style="margin:10px 0 18px" role="group" aria-label="蒙皮方式"><button data-skinning="three" disabled>Three.js skinning</button><button data-skinning="lbs" class="active" disabled>our LBS</button><button data-skinning="rigid" disabled>rigid parts</button></div><div class="section-caption">DIAGNOSTICS <span>结构与外观</span></div><label class="toggle-row"><span>线框<small>观察几何密度</small></span><input id="wireframe" type="checkbox" disabled/></label><label class="toggle-row"><span>部件着色<small>显示 17 个全身切分部件</small></span><input id="parts" type="checkbox" disabled/></label><label class="toggle-row"><span>关节坐标轴<small>全部 15 个关节与手部挂点</small></span><input id="joints" type="checkbox" disabled/></label><div class="legend"><span style="--c:#68829e">骨盆</span><span style="--c:#4f7cac">胸腰</span><span style="--c:#e8c547">头部</span><span style="--c:#f2a44d">上臂</span><span style="--c:#46c9c1">前臂</span><span style="--c:#5c9ead">大腿</span><span style="--c:#82b366">小腿</span><span style="--c:#d96b6b">足部</span></div><div class="note"><span>显示说明</span>共享边界顶点权重在原始顶点索引上计算，保证全部 17 个部件在全身大角度姿态下零裂缝。</div></section>
  <div id="original-note" class="note" hidden><span>原始资产</span>这个版本没有骨架，姿态与装备控件已停用。切回全身绑定版可继续操作。</div><div id="error" class="error" role="alert" hidden></div></div>
- <div class="asset-info"><div class="section-caption">SOURCE ASSET <span>MESHY · 15 JOINTS</span></div><dl><div><dt>原始三角面</dt><dd>9,944</dd></div><div><dt>全身关节数</dt><dd>15 (Pelvis Root)</dd></div><div><dt>共享边界组</dt><dd>367</dd></div><div><dt>挂点位置误差</dt><dd id="attachment-error">—</dd></div><div><dt>运动边界误差</dt><dd id="seam-error">—</dd></div><div><dt>浏览器帧间隔</dt><dd id="frame-time">—</dd></div></dl><a href="./assets/models/gundam-rigged.glb" download>下载处理版 GLB <span>↗</span></a></div></aside></main><footer>GUNDAM HANGAR <span>原始模型保留 · 15 关节全身绑定 · 桌面优先</span></footer>`;
+ <div class="asset-info"><div class="section-caption">SOURCE ASSET <span>MESHY · 15 JOINTS</span></div><dl><div><dt>模型三角面</dt><dd id="asset-triangles">30,043</dd></div><div><dt>全身关节数</dt><dd>15 (Pelvis Root)</dd></div><div><dt>共享边界组</dt><dd id="asset-boundaries">930</dd></div><div><dt>挂点位置误差</dt><dd id="attachment-error">—</dd></div><div><dt>运动边界误差</dt><dd id="seam-error">—</dd></div><div><dt>浏览器帧间隔</dt><dd id="frame-time">—</dd></div></dl><a id="download-glb" href="./assets/models/gundam-guardian.glb" download>下载处理版 GLB <span>↗</span></a></div></aside></main><footer>GUNDAM HANGAR <span>原始模型保留 · 15 关节全身绑定 · 桌面优先</span></footer>`;
   return document.querySelector<HTMLElement>("#viewport")!;
 }
 
@@ -108,8 +113,7 @@ export function bindPanel(store: Store, c: Commands) {
     .querySelectorAll<HTMLButtonElement>("[data-model]")
     .forEach(
       (b) =>
-        (b.onclick = () =>
-          void c.setModel(b.dataset.model as "prepared" | "original")),
+        (b.onclick = () => void c.setModel(b.dataset.model as ModelMode)),
     );
   document
     .querySelectorAll<HTMLButtonElement>("[data-skinning]")
@@ -230,14 +234,28 @@ export function bindPanel(store: Store, c: Commands) {
     el("time-label").textContent =
       `${s.time.toFixed(2)} / ${s.duration.toFixed(2)} s`;
     el("stage-status").textContent = s.loading
-      ? "正在加载原始资产"
+      ? "正在切换模型资产"
       : s.mode === "original"
         ? "原始模型 · 静态"
         : s.playing
           ? "正在验证全身运动"
-          : "全身绑定版 · 就绪";
+          : s.mode === "previous"
+            ? "Previous model · 就绪"
+            : "Guardian (new) · 就绪";
     el("model-badge").textContent =
-      s.mode === "original" ? "ORIGINAL · GLB" : "FULL-BODY 15-JOINT · GLB";
+      s.mode === "original"
+        ? "ORIGINAL · GLB"
+        : s.mode === "previous"
+          ? "PREVIOUS 15-JOINT · GLB"
+          : "GUARDIAN 15-JOINT · GLB";
+    el("asset-triangles").textContent =
+      s.mode === "previous" ? "9,944" : "30,043";
+    el("asset-boundaries").textContent =
+      s.mode === "previous" ? "367" : "930";
+    el<HTMLAnchorElement>("download-glb").href =
+      s.mode === "previous"
+        ? "./assets/models/gundam-rigged.glb"
+        : "./assets/models/gundam-guardian.glb";
     el("original-note").hidden = s.mode !== "original";
     el("error").hidden = !s.error;
     el("error").textContent = s.error;
