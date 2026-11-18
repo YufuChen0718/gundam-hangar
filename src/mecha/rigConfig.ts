@@ -1,14 +1,78 @@
 import { Euler, MathUtils, Quaternion } from "three";
 import { JOINTS } from "./types";
-import type { JointAngles, JointName, PoseInput } from "./types";
+import type {
+  EquipmentItemId,
+  JointAngles,
+  JointName,
+  PoseInput,
+  SocketName,
+} from "./types";
 
 const baseUrl = import.meta.env?.BASE_URL ?? "/";
 
 export const modelPaths = {
-  guardian: `${baseUrl}assets/models/gundam-guardian.glb?v=guardian-15`,
-  previous: `${baseUrl}assets/models/gundam-rigged.glb?v=full-body-15`,
-  prepared: `${baseUrl}assets/models/gundam-guardian.glb?v=guardian-15`,
+  sentinel: `${baseUrl}assets/models/gundam-sentinel.glb?v=sentinel-15`,
+  legacy: `${baseUrl}assets/models/gundam-rigged.glb?v=full-body-15`,
+  prepared: `${baseUrl}assets/models/gundam-sentinel.glb?v=sentinel-15`,
   original: `${baseUrl}assets/models/mecha-original.glb`,
+  equipBeamSaber: `${baseUrl}assets/models/equip-beam-saber.glb?v=saber-1`,
+  equipRifle: `${baseUrl}assets/models/equip-rifle.glb?v=rifle-1`,
+  equipShield: `${baseUrl}assets/models/equip-shield.glb?v=shield-1`,
+};
+
+export interface EquipmentOffsetSpec {
+  id: EquipmentItemId;
+  label: string;
+  joint: JointName;
+  socket: SocketName;
+  url: string;
+  thumbUrl: string;
+  position: readonly [number, number, number];
+  rotationDeg: readonly [number, number, number];
+  scale: number;
+}
+
+/**
+ * Per-item attachment transform config (M6):
+ *   M_equipment^world = M_joint^world * M_socket^joint * M_equipment^socket
+ * - beam saber -> rightHandSocket: hilt along socket +Z, grip centered in the palm
+ * - rifle      -> rightHandSocket: barrel forward, grip in the palm
+ * - shield     -> leftForearmSocket: flat against the outer forearm
+ */
+export const EQUIPMENT_OFFSETS: Record<EquipmentItemId, EquipmentOffsetSpec> = {
+  saber: {
+    id: "saber",
+    label: "Beam Saber",
+    joint: "rightWrist",
+    socket: "rightHand",
+    url: modelPaths.equipBeamSaber,
+    thumbUrl: `${baseUrl}assets/thumbs/thumb-saber.png`,
+    position: [-0.012, -0.012, 0.016],
+    rotationDeg: [-12, -14, 0],
+    scale: 0.58,
+  },
+  rifle: {
+    id: "rifle",
+    label: "Rifle",
+    joint: "rightWrist",
+    socket: "rightHand",
+    url: modelPaths.equipRifle,
+    thumbUrl: `${baseUrl}assets/thumbs/thumb-rifle.png`,
+    position: [-0.022, -0.020, 0.032],
+    rotationDeg: [54, -4, 0],
+    scale: 0.42,
+  },
+  shield: {
+    id: "shield",
+    label: "Shield",
+    joint: "leftElbow",
+    socket: "leftForearm",
+    url: modelPaths.equipShield,
+    thumbUrl: `${baseUrl}assets/thumbs/thumb-shield.png`,
+    position: [0.042, -0.045, 0.015],
+    rotationDeg: [0, 8, -4],
+    scale: 0.54,
+  },
 };
 
 export const JOINT_LIMITS: Record<JointName, readonly [number, number]> = {
@@ -29,31 +93,37 @@ export const JOINT_LIMITS: Record<JointName, readonly [number, number]> = {
   leftAnkle: [-25, 35],
 } as const;
 
+export const BODY_PART_NAMES = [
+  "waistPart",
+  "chestPart",
+  "headPart",
+  "rightUpperArm",
+  "rightForearm",
+  "rightPalm",
+  "leftUpperArm",
+  "leftForearm",
+  "leftPalm",
+  "rightThigh",
+  "rightShin",
+  "rightFoot",
+  "leftThigh",
+  "leftShin",
+  "leftFoot",
+] as const;
+
 export const rigConfig = {
   joints: Object.fromEntries(JOINTS.map((j) => [j, j])) as Record<
     JointName,
     string
   >,
-  sockets: { rightHand: "rightHand", leftHand: "leftHand", back: "back" },
-  partNames: [
-    "waistPart",
-    "chestPart",
-    "headPart",
-    "rightUpperArm",
-    "rightForearm",
-    "rightPalm",
-    "leftUpperArm",
-    "leftForearm",
-    "leftPalm",
-    "rightThigh",
-    "rightShin",
-    "rightFoot",
-    "leftThigh",
-    "leftShin",
-    "leftFoot",
-    "rifle",
-    "shield",
-  ],
+  sockets: {
+    rightHand: "rightHand",
+    leftHand: "leftHand",
+    leftForearm: "leftForearm",
+    back: "back",
+  },
+  bodyPartNames: [...BODY_PART_NAMES],
+  partNames: [...BODY_PART_NAMES, "rifle", "shield"],
   limits: JOINT_LIMITS,
 };
 
@@ -261,4 +331,4 @@ export const TEST_POSES: readonly TestPoseSpec[] = [
       leftAnkle: 30,
     },
   },
-] as const;
+];

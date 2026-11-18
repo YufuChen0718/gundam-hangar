@@ -19,7 +19,9 @@ export const JOINTS = [
 ] as const;
 
 export type JointName = (typeof JOINTS)[number];
-export type SocketName = "rightHand" | "leftHand" | "back";
+export type SocketName = "rightHand" | "leftHand" | "leftForearm" | "back";
+export type RightHandItem = "none" | "saber" | "rifle";
+export type EquipmentItemId = "saber" | "rifle" | "shield";
 export type JointAngles = Record<JointName, number>;
 export type LegacyArmAngles = {
   shoulder?: number;
@@ -79,6 +81,8 @@ export interface LbsController {
 
 /** Full-body 15-joint preview rig adapter. */
 export interface ArmPreviewRig {
+  variant: RiggedModelVariant;
+  hasEmbeddedEquipment: boolean;
   displayRoot: Group;
   joints: Record<JointName, Object3D>;
   bindPose: Record<JointName, Quaternion>;
@@ -92,5 +96,5 @@ export interface ArmPreviewRig {
   lbs?: LbsController;
 }
 
-export type RiggedModelVariant = "guardian" | "previous";
-export type ModelMode = "guardian" | "previous" | "prepared" | "original";
+export type RiggedModelVariant = "sentinel" | "legacy";
+export type ModelMode = "sentinel" | "legacy" | "prepared" | "original";

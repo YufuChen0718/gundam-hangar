@@ -8,7 +8,7 @@ const browser = await chromium.launch({
   args: ["--enable-webgl", "--ignore-gpu-blocklist"],
 });
 const page = await browser.newPage({
-  viewport: { width: 1440, height: 1000 },
+  viewport: { width: 1520, height: 1000 },
   deviceScaleFactor: 1,
 });
 const errors = [],
@@ -89,18 +89,18 @@ try {
   await page.waitForFunction(() => window.__hangar?.getState().ready, {
     timeout: 30000,
   });
-  checks.push("gundam-guardian.glb and textures loaded by default");
+  checks.push("gundam-sentinel.glb and 3 external equipment GLBs loaded by default");
   await page.waitForTimeout(500);
-  await page.screenshot({ path: "docs/results/guardian-bind-orbit.png" });
+  await page.screenshot({ path: "docs/results/sentinel-bind-orbit.png" });
 
   const bindDiag = await page.evaluate(() => window.__hangar.diagnostics());
-  assert.equal(bindDiag.mode, "guardian");
-  assert.equal(bindDiag.boundaryGroups, 930);
+  assert.equal(bindDiag.mode, "sentinel");
+  assert.equal(bindDiag.boundaryGroups, 731);
   assert.equal(bindDiag.skinningMode, "lbs");
   const bindLeftFootY = bindDiag.leftFootMinY;
   const bindRightFootY = bindDiag.rightFootMinY;
 
-  // 1. Verify all 9 full-body test poses on Guardian pass seam, LBS-vs-Three.js, attachment, and foot-platform checks
+  // 1. Verify all 9 full-body test poses on Sentinel pass seam, LBS-vs-Three.js, per-item M6 attachment, and foot-platform checks
   const seamTests = [];
   const lbsSeamSet = new Set();
   const vsThreeSet = new Set();
@@ -109,7 +109,7 @@ try {
     await page.waitForTimeout(90);
     const d = await page.evaluate(() => window.__hangar.diagnostics());
     const state = await page.evaluate(() => window.__hangar.getState());
-    assert.equal(d.boundaryGroups, 930);
+    assert.equal(d.boundaryGroups, 731);
     assert.ok(
       d.lbsSeamGapMax < 1e-5,
       `Skin boundary separated in ${poseName}: ${d.lbsSeamGapMax}`,
@@ -125,8 +125,16 @@ try {
       );
     }
     assert.ok(
-      d.attachmentError < 1e-6,
-      `Attachment drifted in ${poseName}: ${d.attachmentError}`,
+      d.equipmentAttachmentErrors.saber < 1e-6,
+      `Saber attachment drifted in ${poseName}: ${d.equipmentAttachmentErrors.saber}`,
+    );
+    assert.ok(
+      d.equipmentAttachmentErrors.rifle < 1e-6,
+      `Rifle attachment drifted in ${poseName}: ${d.equipmentAttachmentErrors.rifle}`,
+    );
+    assert.ok(
+      d.equipmentAttachmentErrors.shield < 1e-6,
+      `Shield attachment drifted in ${poseName}: ${d.equipmentAttachmentErrors.shield}`,
     );
     assert.ok(
       Math.abs(d.leftFootMinY - bindLeftFootY) < 1e-4,
@@ -150,6 +158,7 @@ try {
       lbsVsThreeMaxDiff: d.lbsVsThreeMaxDiff,
       lbsVsThreeMeanDiff: d.lbsVsThreeMeanDiff,
       attachmentError: d.attachmentError,
+      equipmentAttachmentErrors: d.equipmentAttachmentErrors,
       leftFootMinY: d.leftFootMinY,
       rightFootMinY: d.rightFootMinY,
     });
@@ -165,35 +174,166 @@ try {
     "Expected per-pose LBS vs Three.js max diff to differ across all 9 poses",
   );
   checks.push(
-    "all 9 full-body test poses on Guardian report distinct per-pose LBS seam gaps (<1e-5 m) and LBS-vs-Three.js diffs (<1e-6 m)",
+    "all 9 full-body test poses on Sentinel report distinct per-pose LBS seam gaps (<1e-5 m), LBS-vs-Three.js diffs (<1e-6 m), and per-item M6 attachment errors (<1e-6 m)",
   );
 
-  // 2. Capture Guardian bind + action pose screenshots (front / side / orbit)
+  // 2. Test side Loadout panel: right-hand mutual exclusion (None / Beam Saber / Rifle), saber blade toggle, shield toggle, and collapse drawer
   await page.locator('[data-pose="bind"]').click();
+  await page.evaluate(() => window.__hangar.commands.camera("orbit"));
+  await page.waitForTimeout(150);
+
+  // Rifle loadout in bind pose (default)
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().rightHandItem),
+    "rifle",
+  );
+  assert.equal(await page.locator("#saber-blade-toggle").isDisabled(), true);
+  await page.screenshot({ path: "docs/results/sentinel-bind-rifle.png" });
+
+  // Switch to Beam Saber in bind pose
+  await page.locator('[data-right-hand="saber"]').click();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().rightHandItem),
+    "saber",
+  );
+  assert.equal(await page.locator("#saber-blade-toggle").isDisabled(), false);
+  await page.waitForTimeout(180);
+  await page.screenshot({ path: "docs/results/sentinel-bind-saber.png" });
+
+  // Toggle saber blade off and back on
+  await page.locator("#saber-blade-toggle").uncheck();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().saberBlade),
+    false,
+  );
+  await page.waitForTimeout(160);
+  await page.screenshot({
+    path: "docs/results/sentinel-bind-saber-blade-off.png",
+  });
+  await page.locator("#saber-blade-toggle").check();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().saberBlade),
+    true,
+  );
+
+  // Switch to None (unarmed right hand)
+  await page.locator('[data-right-hand="none"]').click();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().rightHandItem),
+    "none",
+  );
+  assert.equal(await page.locator("#saber-blade-toggle").isDisabled(), true);
+  await page.waitForTimeout(160);
+  await page.screenshot({ path: "docs/results/sentinel-bind-none.png" });
+
+  // Re-equip Rifle and capture front / side bind views + shield close-up
+  await page.locator('[data-right-hand="rifle"]').click();
   await page.evaluate(() => window.__hangar.commands.camera("front"));
   await page.waitForTimeout(150);
-  await page.screenshot({ path: "docs/results/guardian-bind-front.png" });
+  await page.screenshot({ path: "docs/results/sentinel-bind-front.png" });
   await page.evaluate(() => window.__hangar.commands.camera("side"));
   await page.waitForTimeout(150);
-  await page.screenshot({ path: "docs/results/guardian-bind-side.png" });
+  await page.screenshot({ path: "docs/results/sentinel-bind-side.png" });
 
-  await page.evaluate(() => window.__hangar.commands.camera("orbit"));
-  await page.locator('[data-action="aim"]').click();
-  await page.waitForTimeout(1300);
-  await page.screenshot({ path: "docs/results/guardian-action-aim.png" });
-
-  await page.locator('[data-action="swing"]').click();
-  await page.waitForTimeout(850); // Strike peak
-  await page.screenshot({ path: "docs/results/guardian-action-swing.png" });
-
-  await page.locator('[data-pose="deepCrouchAim"]').click();
-  await page.waitForTimeout(150);
-  await page.screenshot({
-    path: "docs/results/guardian-pose-deepCrouchAim.png",
+  // Shield close-up on left forearm
+  await page.evaluate(() => {
+    window.__hangar.commands.focusCamera(
+      [0.44, 1.16, 0.04],
+      [1.35, 1.22, 0.45],
+    );
   });
-  checks.push("captured Guardian bind and action pose screenshots");
+  await page.waitForTimeout(200);
+  await page.screenshot({ path: "docs/results/sentinel-shield-closeup.png" });
 
-  // 3. Verify every one of the 15 joints can be posed from the viewer sliders and moving pelvis moves the whole body
+  // Test shield toggle from Loadout panel and collapsible drawer
+  await page.locator("#loadout-shield-toggle").uncheck();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().shield),
+    false,
+  );
+  await page.locator("#loadout-shield-toggle").check();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().shield),
+    true,
+  );
+  await page.locator("#loadout-collapse-btn").click();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().loadoutCollapsed),
+    true,
+  );
+  await page.locator("#loadout-collapse-btn").click();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().loadoutCollapsed),
+    false,
+  );
+  checks.push(
+    "Loadout side panel verified: right-hand mutual exclusion (None / Beam Saber / Rifle), saber blade toggle, shield toggle, and collapse button",
+  );
+
+  // 3. Test T07 Action State Machine & Auto-Equip on Aim / Swing + attachment error during actions
+  await page.evaluate(() => window.__hangar.commands.camera("orbit"));
+  await page.locator('[data-transition="blend"]').click();
+
+  // playAction('aim') auto-equips rifle
+  await page.locator('[data-right-hand="none"]').click();
+  await page.locator('[data-action="aim"]').click();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().rightHandItem),
+    "rifle",
+  );
+  await page.waitForTimeout(1300);
+  const aimDiag = await page.evaluate(() => window.__hangar.diagnostics());
+  assert.equal(aimDiag.status, "holding");
+  assert.ok(aimDiag.equipmentAttachmentErrors.rifle < 1e-6);
+  assert.ok(aimDiag.equipmentAttachmentErrors.shield < 1e-6);
+  await page.screenshot({ path: "docs/results/sentinel-action-aim.png" });
+
+  // playAction('swing') auto-equips beam saber and returns to idle
+  await page.locator('[data-action="swing"]').click();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().rightHandItem),
+    "saber",
+  );
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().action),
+    "swing",
+  );
+  await page.waitForTimeout(820); // Mid-swing strike peak
+  const swingDiag = await page.evaluate(() => window.__hangar.diagnostics());
+  assert.ok(swingDiag.equipmentAttachmentErrors.saber < 1e-6);
+  assert.ok(swingDiag.equipmentAttachmentErrors.shield < 1e-6);
+  await page.screenshot({ path: "docs/results/sentinel-action-swing.png" });
+
+  await page.waitForTimeout(1300); // Finish swing -> auto-return to idle
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().action),
+    "idle",
+  );
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().playing),
+    true,
+  );
+
+  // Test mid-swing interrupt to aim in cut mode
+  await page.locator('[data-transition="cut"]').click();
+  await page.locator('[data-action="swing"]').click();
+  await page.waitForTimeout(450);
+  await page.locator('[data-action="aim"]').click();
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().action),
+    "aim",
+  );
+  assert.equal(
+    await page.evaluate(() => window.__hangar.getState().rightHandItem),
+    "rifle",
+  );
+  await page.locator('[data-transition="blend"]').click();
+  await page.locator("#reset-pose-panel").click();
+  checks.push(
+    "actions (idle / aim / swing), auto-equip of rifle/saber, and zero attachment drift during actions verified on Sentinel",
+  );
+
+  // 4. Verify every one of the 15 joints can be posed from the viewer sliders and moving pelvis moves the whole body
   await page.locator("#reset-pose-panel").click();
   await page.waitForTimeout(80);
   const bindPositions = (
@@ -210,13 +350,15 @@ try {
     await page.evaluate(() => window.__hangar.diagnostics())
   ).jointWorldPositions;
   for (const joint of [
-    "torso",
-    "head",
     "rightShoulder",
+    "rightElbow",
     "rightWrist",
     "leftShoulder",
+    "leftElbow",
     "leftWrist",
+    "rightHip",
     "rightKnee",
+    "leftHip",
     "leftKnee",
   ]) {
     const p0 = bindPositions[joint];
@@ -263,102 +405,15 @@ try {
     "all 15 joints poseable via viewer sliders; pelvis moves entire body hierarchy",
   );
 
-  // 4. Test T07 Action State Machine & Transitions (Idle / Aim / Swing + Blend / Cut toggle)
-  await page.evaluate(() => window.__hangar.commands.camera("orbit"));
-  await page.locator('[data-transition="blend"]').click();
-  assert.equal(
-    await page.evaluate(() => window.__hangar.getState().transitionMode),
-    "blend",
-  );
-  await page.locator('[data-action="swing"]').click();
-  assert.equal(
-    await page.evaluate(() => window.__hangar.getState().action),
-    "swing",
-  );
-  assert.equal(
-    await page.evaluate(() => window.__hangar.getState().status),
-    "transitioning",
-  );
-  await page.waitForTimeout(2000);
-  assert.equal(
-    await page.evaluate(() => window.__hangar.getState().action),
-    "idle",
-  );
-  assert.equal(
-    await page.evaluate(() => window.__hangar.getState().playing),
-    true,
-  );
-  await page.locator('[data-action="swing"]').click();
-  await page.waitForTimeout(550);
-  await page.locator('[data-action="aim"]').click();
-  assert.equal(
-    await page.evaluate(() => window.__hangar.getState().action),
-    "aim",
-  );
-  assert.equal(
-    await page.evaluate(() => window.__hangar.getState().status),
-    "transitioning",
-  );
-  await page.waitForTimeout(1400);
-  assert.equal(
-    await page.evaluate(() => window.__hangar.getState().status),
-    "holding",
-  );
-  assert.equal(
-    await page.evaluate(() => window.__hangar.getState().playing),
-    false,
-  );
-
-  await page.locator('[data-transition="cut"]').click();
-  assert.equal(
-    await page.evaluate(() => window.__hangar.getState().transitionMode),
-    "cut",
-  );
-  await page.locator('[data-action="swing"]').click();
-  assert.equal(
-    await page.evaluate(() => window.__hangar.getState().status),
-    "playing",
-  );
-  await page.waitForTimeout(450);
-  await page.locator('[data-action="aim"]').click();
-  assert.equal(
-    await page.evaluate(() => window.__hangar.getState().status),
-    "playing",
-  );
-  await page.locator('[data-transition="blend"]').click();
-  await page.locator("#reset-pose-panel").click();
-  checks.push(
-    "T07 action buttons (idle / aim / swing) and transition mode toggle (blend / cut) verified on Guardian",
-  );
-
-  // 5. Equipment tab checks
-  await page.evaluate(() => window.__hangar.commands.camera("orbit"));
-  await page.getByRole("tab", { name: "装备", exact: true }).click();
-  await page.locator("#weapon").uncheck();
-  assert.equal(
-    await page.evaluate(() => window.__hangar.diagnostics().weaponVisible),
-    false,
-  );
-  await page.locator("#weapon").check();
-  checks.push("weapon hide/show");
-  await page.locator("#shield").uncheck();
-  assert.equal(
-    await page.evaluate(() => window.__hangar.getState().shield),
-    false,
-  );
-  await page.locator("#shield").check();
-  checks.push("shield hide/show");
-
-  // 6. Inspect tab: Guardian close-up comparison of right elbow and right knee (original texture, rigid parts vs our LBS)
+  // 5. Inspect tab: Sentinel close-up comparison of right elbow and right knee (rigid parts vs our LBS)
   await page.getByRole("tab", { name: "检查", exact: true }).click();
   await page.locator("#parts").uncheck();
   await page.locator("#joints").uncheck();
   await page.locator("#wireframe").uncheck();
 
-  // 6a. Right Elbow close-up on Guardian (original texture, rigid vs LBS)
   await page.evaluate(() => {
     const c = window.__hangar.commands;
-    c.setWeaponVisible(false);
+    c.setRightHandItem("none");
     c.setPoseAngles({
       rightShoulder: 25,
       rightElbow: 88,
@@ -374,16 +429,15 @@ try {
   });
   await page.locator('[data-skinning="rigid"]').click();
   await page.waitForTimeout(220);
-  await page.screenshot({ path: "docs/results/guardian-elbow-rigid.png" });
+  await page.screenshot({ path: "docs/results/sentinel-elbow-rigid.png" });
 
   await page.locator('[data-skinning="lbs"]').click();
   await page.waitForTimeout(220);
-  await page.screenshot({ path: "docs/results/guardian-elbow-lbs.png" });
+  await page.screenshot({ path: "docs/results/sentinel-elbow-lbs.png" });
 
-  // 6b. Right Knee close-up on Guardian (original texture, rigid vs LBS)
   await page.evaluate(() => {
     const c = window.__hangar.commands;
-    c.setWeaponVisible(true);
+    c.setRightHandItem("rifle");
     c.setPoseAngles({
       rightHip: 20,
       rightKnee: 75,
@@ -402,13 +456,12 @@ try {
   });
   await page.locator('[data-skinning="rigid"]').click();
   await page.waitForTimeout(220);
-  await page.screenshot({ path: "docs/results/guardian-knee-rigid.png" });
+  await page.screenshot({ path: "docs/results/sentinel-knee-rigid.png" });
 
   await page.locator('[data-skinning="lbs"]').click();
   await page.waitForTimeout(220);
-  await page.screenshot({ path: "docs/results/guardian-knee-lbs.png" });
+  await page.screenshot({ path: "docs/results/sentinel-knee-lbs.png" });
 
-  // 6c. Test Three.js skinning mode, part colors, joint axes, wireframe
   await page.locator('[data-skinning="three"]').click();
   assert.equal(
     await page.evaluate(() => window.__hangar.getState().skinning),
@@ -422,7 +475,7 @@ try {
   await page.locator("#parts").check();
   await page.locator("#joints").check();
   await page.waitForTimeout(180);
-  await page.screenshot({ path: "docs/results/guardian-parts.png" });
+  await page.screenshot({ path: "docs/results/sentinel-parts.png" });
   await page.locator("#parts").uncheck();
   await page.locator("#joints").uncheck();
   await page.locator("#wireframe").check();
@@ -432,52 +485,50 @@ try {
   );
   await page.locator("#wireframe").uncheck();
   checks.push(
-    "3-way skinning toggle, close-up elbow/knee rigid vs LBS screenshots, part colors, joint axes, wireframe on Guardian",
+    "3-way skinning toggle, close-up elbow/knee rigid vs LBS screenshots, part colors, joint axes, wireframe on Sentinel",
   );
 
-  // 7. Frame time comparison across Three.js skinning, our LBS, and rigid parts on Guardian
+  // 6. Frame time comparison across Three.js skinning, our LBS, and rigid parts on Sentinel
   const frameTimeThree = await measureFrameTimes(page, "three", 90);
   const frameTimeLbs = await measureFrameTimes(page, "lbs", 90);
   const frameTimeRigid = await measureFrameTimes(page, "rigid", 90);
   await page.locator('[data-skinning="lbs"]').click();
   checks.push(
-    "measured frame time for Three.js skinning, our LBS, and rigid parts on Guardian",
+    "measured frame time for Three.js skinning, our LBS, and rigid parts on Sentinel",
   );
 
-  // 8. Switch between "Guardian (new)" and "Previous model" and verify both rigged models work
-  await page
-    .getByRole("button", { name: "Previous model", exact: true })
-    .click();
+  // 7. Switch between "Sentinel (new)" and "Legacy" and verify both rigged models work
+  await page.getByRole("button", { name: "Legacy", exact: true }).click();
   await page.waitForFunction(
     () =>
-      window.__hangar.getState().mode === "previous" &&
+      window.__hangar.getState().mode === "legacy" &&
       !window.__hangar.getState().loading,
   );
-  const prevDiag = await page.evaluate(() => window.__hangar.diagnostics());
-  assert.equal(prevDiag.boundaryGroups, 367);
-  assert.ok(prevDiag.lbsSeamGapMax < 1e-5);
+  const legacyDiag = await page.evaluate(() => window.__hangar.diagnostics());
+  assert.equal(legacyDiag.boundaryGroups, 367);
+  assert.ok(legacyDiag.lbsSeamGapMax < 1e-5);
   assert.equal(await page.locator("#play").isDisabled(), false);
   await page.evaluate(() => window.__hangar.commands.camera("orbit"));
   await page.waitForTimeout(180);
-  await page.screenshot({ path: "docs/results/guardian-previous-model.png" });
+  await page.screenshot({ path: "docs/results/sentinel-legacy-model.png" });
 
   await page
-    .getByRole("button", { name: "Guardian (new)", exact: true })
+    .getByRole("button", { name: "Sentinel (new)", exact: true })
     .click();
   await page.waitForFunction(
     () =>
-      window.__hangar.getState().mode === "guardian" &&
+      window.__hangar.getState().mode === "sentinel" &&
       !window.__hangar.getState().loading,
   );
-  const guardianDiagAgain = await page.evaluate(() =>
+  const sentinelDiagAgain = await page.evaluate(() =>
     window.__hangar.diagnostics(),
   );
-  assert.equal(guardianDiagAgain.boundaryGroups, 930);
+  assert.equal(sentinelDiagAgain.boundaryGroups, 731);
   checks.push(
-    'model switch ("Guardian (new)" / "Previous model") verified with both GLBs working',
+    'model switch ("Sentinel (new)" / "Legacy") verified with both GLBs working',
   );
 
-  // 9. Play, pause, and reset
+  // 8. Play, pause, and reset
   await page.getByRole("tab", { name: "姿态", exact: true }).click();
   await page.locator("#reset-pose").click();
   assert.ok(
@@ -499,7 +550,7 @@ try {
   );
   checks.push("play, pause, and reset");
 
-  // 10. Mobile 390px layout check
+  // 9. Mobile 390px layout check
   await page.setViewportSize({ width: 390, height: 844 });
   await page.waitForTimeout(250);
   assert.equal(
@@ -509,14 +560,14 @@ try {
     true,
   );
   await page.screenshot({
-    path: "docs/results/guardian-mobile.png",
+    path: "docs/results/sentinel-mobile.png",
     fullPage: true,
   });
   checks.push("390px layout without horizontal overflow");
 
-  // 11. Render guardian-transition-plot.svg to guardian-transition-plot.png
+  // 10. Render sentinel-transition-plot.svg to sentinel-transition-plot.png
   const svgText = await fs.readFile(
-    "docs/results/guardian-transition-plot.svg",
+    "docs/results/sentinel-transition-plot.svg",
     "utf8",
   );
   const plotPage = await browser.newPage({
@@ -527,10 +578,10 @@ try {
     `<!doctype html><body style="margin:0;background:#141a21">${svgText}</body>`,
   );
   await plotPage.screenshot({
-    path: "docs/results/guardian-transition-plot.png",
+    path: "docs/results/sentinel-transition-plot.png",
   });
   await plotPage.close();
-  checks.push("rendered docs/results/guardian-transition-plot.png");
+  checks.push("rendered docs/results/sentinel-transition-plot.png");
 
   assert.deepEqual(errors, []);
   assert.deepEqual(failedRequests, []);
@@ -538,7 +589,7 @@ try {
 
   const report = {
     url: base,
-    model: "gundam-guardian.glb",
+    model: "gundam-sentinel.glb",
     browser: await browser.version(),
     checks,
     frameTimes: {
@@ -546,14 +597,18 @@ try {
       lbs: frameTimeLbs,
       rigid: frameTimeRigid,
     },
+    actionAttachmentErrors: {
+      aim: aimDiag.equipmentAttachmentErrors,
+      swing: swingDiag.equipmentAttachmentErrors,
+    },
     seamTests,
     errors,
     failedRequests,
     notes:
-      "Headless Chrome acceptance run for Gundam Guardian (30,043 tris, 15 joints, custom LBS, T07 transitions).",
+      "Headless Chrome acceptance run for Gundam Sentinel (29,999 tris, 15 joints, custom LBS, M6 equipment sockets, T07 transitions).",
   };
   await fs.writeFile(
-    "docs/results/guardian-browser-validation.json",
+    "docs/results/sentinel-browser-validation.json",
     JSON.stringify(report, null, 2),
   );
   console.log(JSON.stringify(report, null, 2));

@@ -1,0 +1,383 @@
+{
+  "url": "http://127.0.0.1:5174/",
+  "model": "gundam-sentinel.glb",
+  "browser": "157.0.8103.79",
+  "checks": [
+    "gundam-sentinel.glb and 3 external equipment GLBs loaded by default",
+    "all 9 full-body test poses on Sentinel report distinct per-pose LBS seam gaps (<1e-5 m), LBS-vs-Three.js diffs (<1e-6 m), and per-item M6 attachment errors (<1e-6 m)",
+    "Loadout side panel verified: right-hand mutual exclusion (None / Beam Saber / Rifle), saber blade toggle, shield toggle, and collapse button",
+    "actions (idle / aim / swing), auto-equip of rifle/saber, and zero attachment drift during actions verified on Sentinel",
+    "all 15 joints poseable via viewer sliders; pelvis moves entire body hierarchy",
+    "3-way skinning toggle, close-up elbow/knee rigid vs LBS screenshots, part colors, joint axes, wireframe on Sentinel",
+    "measured frame time for Three.js skinning, our LBS, and rigid parts on Sentinel",
+    "model switch (\"Sentinel (new)\" / \"Legacy\") verified with both GLBs working",
+    "play, pause, and reset",
+    "390px layout without horizontal overflow",
+    "rendered docs/results/sentinel-transition-plot.png",
+    "no console errors or failed HTTP responses"
+  ],
+  "frameTimes": {
+    "three": {
+      "mode": "three",
+      "samples": 85,
+      "meanMs": 17.249,
+      "medianMs": 16.6,
+      "p95Ms": 17.7
+    },
+    "lbs": {
+      "mode": "lbs",
+      "samples": 85,
+      "meanMs": 17.259,
+      "medianMs": 16.6,
+      "p95Ms": 17.5
+    },
+    "rigid": {
+      "mode": "rigid",
+      "samples": 85,
+      "meanMs": 17.253,
+      "medianMs": 16.6,
+      "p95Ms": 17.5
+    }
+  },
+  "actionAttachmentErrors": {
+    "aim": {
+      "saber": 1.2412670766236366e-16,
+      "rifle": 1.2412670766236366e-16,
+      "shield": 4.611102534756203e-16
+    },
+    "swing": {
+      "saber": 0,
+      "rifle": 0,
+      "shield": 2.3714374201337736e-16
+    }
+  },
+  "seamTests": [
+    {
+      "pose": "bind",
+      "angles": {
+        "pelvis": 0,
+        "torso": 0,
+        "head": 0,
+        "rightShoulder": 0,
+        "rightElbow": 0,
+        "rightWrist": 0,
+        "leftShoulder": 0,
+        "leftElbow": 0,
+        "leftWrist": 0,
+        "rightHip": 0,
+        "rightKnee": 0,
+        "rightAnkle": 0,
+        "leftHip": 0,
+        "leftKnee": 0,
+        "leftAnkle": 0
+      },
+      "boundaryGroups": 731,
+      "skinnedVertexCount": 35046,
+      "skinSeamGap": 0,
+      "skinSeamMeanGap": 0,
+      "rigidSeamGapMax": 0,
+      "rigidSeamGapMean": 0,
+      "lbsVsThreeMaxDiff": 5.551115123125783e-17,
+      "lbsVsThreeMeanDiff": 1.267160902385615e-20,
+      "attachmentError": 0,
+      "equipmentAttachmentErrors": {
+        "saber": 0,
+        "rifle": 0,
+        "shield": 0
+      },
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.00013333559036254883
+    },
+    {
+      "pose": "rightArmAim",
+      "angles": {
+        "pelvis": 0,
+        "torso": 0,
+        "head": 0,
+        "rightShoulder": 29.999999999999996,
+        "rightElbow": 55,
+        "rightWrist": 10,
+        "leftShoulder": 0,
+        "leftElbow": 0,
+        "leftWrist": 0,
+        "rightHip": 0,
+        "rightKnee": 0,
+        "rightAnkle": 0,
+        "leftHip": 0,
+        "leftKnee": 0,
+        "leftAnkle": 0
+      },
+      "boundaryGroups": 731,
+      "skinnedVertexCount": 35046,
+      "skinSeamGap": 2.6656653251879504e-8,
+      "skinSeamMeanGap": 1.809098036664156e-9,
+      "rigidSeamGapMax": 0.09925746743391585,
+      "rigidSeamGapMean": 0.004478767473317291,
+      "lbsVsThreeMaxDiff": 5.106740441852304e-8,
+      "lbsVsThreeMeanDiff": 2.4860593644761353e-9,
+      "attachmentError": 5.551115123125783e-17,
+      "equipmentAttachmentErrors": {
+        "saber": 5.551115123125783e-17,
+        "rifle": 5.551115123125783e-17,
+        "shield": 0
+      },
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.00013333559036254883
+    },
+    {
+      "pose": "leftArmGuard",
+      "angles": {
+        "pelvis": 0,
+        "torso": 0,
+        "head": 0,
+        "rightShoulder": 0,
+        "rightElbow": 0,
+        "rightWrist": 0,
+        "leftShoulder": 35,
+        "leftElbow": 65.00000000000001,
+        "leftWrist": -14.999999999999998,
+        "rightHip": 0,
+        "rightKnee": 0,
+        "rightAnkle": 0,
+        "leftHip": 0,
+        "leftKnee": 0,
+        "leftAnkle": 0
+      },
+      "boundaryGroups": 731,
+      "skinnedVertexCount": 35046,
+      "skinSeamGap": 4.8443932992225305e-8,
+      "skinSeamMeanGap": 1.2021599231994814e-9,
+      "rigidSeamGapMax": 0.1145976392775161,
+      "rigidSeamGapMean": 0.002599169268186139,
+      "lbsVsThreeMaxDiff": 5.073213135152031e-8,
+      "lbsVsThreeMeanDiff": 1.2058041218137081e-9,
+      "attachmentError": 0,
+      "equipmentAttachmentErrors": {
+        "saber": 0,
+        "rifle": 0,
+        "shield": 5.551115123125783e-17
+      },
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.00013333559036254883
+    },
+    {
+      "pose": "dualArmReady",
+      "angles": {
+        "pelvis": 0,
+        "torso": 0,
+        "head": 0,
+        "rightShoulder": 45.00000000000001,
+        "rightElbow": 75,
+        "rightWrist": 14.999999999999998,
+        "leftShoulder": 40,
+        "leftElbow": 59.99999999999999,
+        "leftWrist": -14.999999999999998,
+        "rightHip": 0,
+        "rightKnee": 0,
+        "rightAnkle": 0,
+        "leftHip": 0,
+        "leftKnee": 0,
+        "leftAnkle": 0
+      },
+      "boundaryGroups": 731,
+      "skinnedVertexCount": 35046,
+      "skinSeamGap": 6.161458143351681e-8,
+      "skinSeamMeanGap": 4.389213612588968e-9,
+      "rigidSeamGapMax": 0.14675963158039354,
+      "rigidSeamGapMean": 0.009268794569079898,
+      "lbsVsThreeMaxDiff": 5.682341187451809e-8,
+      "lbsVsThreeMeanDiff": 2.281717577369753e-9,
+      "attachmentError": 3.236828524569469e-16,
+      "equipmentAttachmentErrors": {
+        "saber": 3.236828524569469e-16,
+        "rifle": 3.236828524569469e-16,
+        "shield": 0
+      },
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.00013333559036254883
+    },
+    {
+      "pose": "torsoTwist",
+      "angles": {
+        "pelvis": -14.999999999999998,
+        "torso": 29.999999999999996,
+        "head": -25,
+        "rightShoulder": 19.999999999999996,
+        "rightElbow": 40,
+        "rightWrist": 0,
+        "leftShoulder": 19.999999999999996,
+        "leftElbow": 35,
+        "leftWrist": 0,
+        "rightHip": 0,
+        "rightKnee": 0,
+        "rightAnkle": 0,
+        "leftHip": 0,
+        "leftKnee": 0,
+        "leftAnkle": 0
+      },
+      "boundaryGroups": 731,
+      "skinnedVertexCount": 35046,
+      "skinSeamGap": 6.702488013229144e-8,
+      "skinSeamMeanGap": 7.146537824568444e-9,
+      "rigidSeamGapMax": 0.1367241292146115,
+      "rigidSeamGapMean": 0.02739749712544817,
+      "lbsVsThreeMaxDiff": 4.196859386856048e-8,
+      "lbsVsThreeMeanDiff": 5.738123986241113e-9,
+      "attachmentError": 3.597533769998862e-16,
+      "equipmentAttachmentErrors": {
+        "saber": 4.0125770192081414e-16,
+        "rifle": 3.597533769998862e-16,
+        "shield": 1.3877787807814457e-16
+      },
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.00013333559036254883
+    },
+    {
+      "pose": "crouch",
+      "angles": {
+        "pelvis": 0,
+        "torso": 0,
+        "head": 0,
+        "rightShoulder": 25,
+        "rightElbow": 45.00000000000001,
+        "rightWrist": 0,
+        "leftShoulder": 19.999999999999996,
+        "leftElbow": 40,
+        "leftWrist": 0,
+        "rightHip": 22,
+        "rightKnee": 44,
+        "rightAnkle": 22,
+        "leftHip": 22,
+        "leftKnee": 44,
+        "leftAnkle": 22
+      },
+      "boundaryGroups": 731,
+      "skinnedVertexCount": 35046,
+      "skinSeamGap": 5.3522506228169285e-8,
+      "skinSeamMeanGap": 4.940134433780553e-9,
+      "rigidSeamGapMax": 0.11165162495249605,
+      "rigidSeamGapMean": 0.015581892331056673,
+      "lbsVsThreeMaxDiff": 5.470810021181595e-8,
+      "lbsVsThreeMeanDiff": 1.3848282837526911e-8,
+      "attachmentError": 2.7755575615628914e-16,
+      "equipmentAttachmentErrors": {
+        "saber": 2.7755575615628914e-16,
+        "rifle": 2.7755575615628914e-16,
+        "shield": 1.3877787807814457e-16
+      },
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.00013333559036254883
+    },
+    {
+      "pose": "deepCrouchAim",
+      "angles": {
+        "pelvis": 0,
+        "torso": 14.999999999999998,
+        "head": -14.999999999999998,
+        "rightShoulder": 50.00000000000001,
+        "rightElbow": 79.99999999999999,
+        "rightWrist": 14.999999999999998,
+        "leftShoulder": 40,
+        "leftElbow": 70,
+        "leftWrist": -10,
+        "rightHip": 32,
+        "rightKnee": 64,
+        "rightAnkle": 32,
+        "leftHip": 32,
+        "leftKnee": 64,
+        "leftAnkle": 32
+      },
+      "boundaryGroups": 731,
+      "skinnedVertexCount": 35046,
+      "skinSeamGap": 6.156529480782766e-8,
+      "skinSeamMeanGap": 2.0014486459007838e-8,
+      "rigidSeamGapMax": 0.16207469669449515,
+      "rigidSeamGapMean": 0.0366653447503499,
+      "lbsVsThreeMaxDiff": 5.378065208147973e-8,
+      "lbsVsThreeMeanDiff": 2.563140415935977e-8,
+      "attachmentError": 7.216449660063518e-16,
+      "equipmentAttachmentErrors": {
+        "saber": 7.216449660063518e-16,
+        "rifle": 7.216449660063518e-16,
+        "shield": 1.3877787807814457e-16
+      },
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.00013333559036254883
+    },
+    {
+      "pose": "fullBodyTwistCrouch",
+      "angles": {
+        "pelvis": 19.999999999999996,
+        "torso": -29.999999999999996,
+        "head": 25,
+        "rightShoulder": 40,
+        "rightElbow": 65.00000000000001,
+        "rightWrist": -10,
+        "leftShoulder": 29.999999999999996,
+        "leftElbow": 55,
+        "leftWrist": 14.999999999999998,
+        "rightHip": 18.000000000000004,
+        "rightKnee": 35.99999999999999,
+        "rightAnkle": 18.000000000000004,
+        "leftHip": 18.000000000000004,
+        "leftKnee": 35.99999999999999,
+        "leftAnkle": 18.000000000000004
+      },
+      "boundaryGroups": 731,
+      "skinnedVertexCount": 35046,
+      "skinSeamGap": 5.960464655174746e-8,
+      "skinSeamMeanGap": 1.900864171810195e-8,
+      "rigidSeamGapMax": 0.13672413260059685,
+      "rigidSeamGapMean": 0.03935927801888164,
+      "lbsVsThreeMaxDiff": 5.169064539923996e-8,
+      "lbsVsThreeMeanDiff": 2.623370642020732e-8,
+      "attachmentError": 2.482534153247273e-16,
+      "equipmentAttachmentErrors": {
+        "saber": 2.482534153247273e-16,
+        "rifle": 2.482534153247273e-16,
+        "shield": 2.3551386880256624e-16
+      },
+      "leftFootMinY": 2.7755575615628914e-17,
+      "rightFootMinY": 0.00013333559036257658
+    },
+    {
+      "pose": "maxArticulation",
+      "angles": {
+        "pelvis": -25,
+        "torso": 35,
+        "head": -35,
+        "rightShoulder": 55,
+        "rightElbow": 85,
+        "rightWrist": 19.999999999999996,
+        "leftShoulder": 55,
+        "leftElbow": 79.99999999999999,
+        "leftWrist": -19.999999999999996,
+        "rightHip": 29.999999999999996,
+        "rightKnee": 59.99999999999999,
+        "rightAnkle": 29.999999999999996,
+        "leftHip": 29.999999999999996,
+        "leftKnee": 59.99999999999999,
+        "leftAnkle": 29.999999999999996
+      },
+      "boundaryGroups": 731,
+      "skinnedVertexCount": 35046,
+      "skinSeamGap": 4.444846210040692e-8,
+      "skinSeamMeanGap": 8.685365057771899e-9,
+      "rigidSeamGapMax": 0.17708124200361777,
+      "rigidSeamGapMean": 0.052872798995775926,
+      "lbsVsThreeMaxDiff": 5.0334692690548337e-8,
+      "lbsVsThreeMeanDiff": 1.5769879098664743e-8,
+      "attachmentError": 2.830524433501838e-16,
+      "equipmentAttachmentErrors": {
+        "saber": 2.830524433501838e-16,
+        "rifle": 2.830524433501838e-16,
+        "shield": 2.618455766672135e-16
+      },
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.00013333559036254883
+    }
+  ],
+  "errors": [],
+  "failedRequests": [],
+  "notes": "Headless Chrome acceptance run for Gundam Sentinel (29,999 tris, 15 joints, custom LBS, M6 equipment sockets, T07 transitions)."
+}

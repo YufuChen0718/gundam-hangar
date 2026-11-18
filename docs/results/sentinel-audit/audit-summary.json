@@ -1,0 +1,3107 @@
+{
+  "body": {
+    "file": "Meshy_AI_Gundam_Sentinel_20261118_texture.blend",
+    "file_size_bytes": 205114814,
+    "file_size_mb": 195.61,
+    "unit_system": "METRIC",
+    "scale_length": 1.0,
+    "armatures": [],
+    "actions": [],
+    "meshes": [
+      {
+        "name": "Mesh_0",
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation_euler": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "dimensions": [
+          1.008,
+          0.5147,
+          1.9003
+        ],
+        "world_min": [
+          -0.5046,
+          -0.2523,
+          -0.9507
+        ],
+        "world_max": [
+          0.5034,
+          0.2624,
+          0.9496
+        ],
+        "vertices": 929589,
+        "edges": 2789225,
+        "polygons": 1859487,
+        "triangles": 1859487,
+        "connected_components": 2,
+        "largest_components": [
+          {
+            "vertices": 920921,
+            "world_min": [
+              -0.5046,
+              -0.2523,
+              -0.9507
+            ],
+            "world_max": [
+              0.5034,
+              0.2624,
+              0.9496
+            ],
+            "centroid": [
+              -0.0045,
+              0.0135,
+              0.0686
+            ]
+          },
+          {
+            "vertices": 8668,
+            "world_min": [
+              0.2255,
+              -0.1548,
+              -0.8658
+            ],
+            "world_max": [
+              0.4649,
+              0.0398,
+              -0.73
+            ],
+            "centroid": [
+              0.3529,
+              -0.0708,
+              -0.7915
+            ]
+          }
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "materials": [
+          "Material_0"
+        ],
+        "slice_analysis": {
+          "z_slices": [
+            {
+              "z_range": [
+                -0.951,
+                -0.875
+              ],
+              "x_min_max": [
+                -0.505,
+                0.503
+              ],
+              "y_min_max": [
+                -0.247,
+                0.181
+              ],
+              "right_x_mean_y_mean": [
+                -0.343,
+                -0.005
+              ],
+              "left_x_mean_y_mean": [
+                0.333,
+                -0.001
+              ]
+            },
+            {
+              "z_range": [
+                -0.872,
+                -0.796
+              ],
+              "x_min_max": [
+                -0.469,
+                0.469
+              ],
+              "y_min_max": [
+                -0.201,
+                0.158
+              ],
+              "right_x_mean_y_mean": [
+                -0.321,
+                0.016
+              ],
+              "left_x_mean_y_mean": [
+                0.329,
+                0.02
+              ]
+            },
+            {
+              "z_range": [
+                -0.792,
+                -0.716
+              ],
+              "x_min_max": [
+                -0.449,
+                0.449
+              ],
+              "y_min_max": [
+                -0.148,
+                0.155
+              ],
+              "right_x_mean_y_mean": [
+                -0.332,
+                0.006
+              ],
+              "left_x_mean_y_mean": [
+                0.33,
+                0.002
+              ]
+            },
+            {
+              "z_range": [
+                -0.713,
+                -0.637
+              ],
+              "x_min_max": [
+                -0.406,
+                0.406
+              ],
+              "y_min_max": [
+                -0.064,
+                0.147
+              ],
+              "right_x_mean_y_mean": [
+                -0.328,
+                0.011
+              ],
+              "left_x_mean_y_mean": [
+                0.32,
+                0.013
+              ]
+            },
+            {
+              "z_range": [
+                -0.634,
+                -0.558
+              ],
+              "x_min_max": [
+                -0.373,
+                0.373
+              ],
+              "y_min_max": [
+                -0.05,
+                0.129
+              ],
+              "right_x_mean_y_mean": [
+                -0.276,
+                0.05
+              ],
+              "left_x_mean_y_mean": [
+                0.273,
+                0.052
+              ]
+            },
+            {
+              "z_range": [
+                -0.555,
+                -0.479
+              ],
+              "x_min_max": [
+                -0.342,
+                0.342
+              ],
+              "y_min_max": [
+                -0.069,
+                0.134
+              ],
+              "right_x_mean_y_mean": [
+                -0.255,
+                0.043
+              ],
+              "left_x_mean_y_mean": [
+                0.255,
+                0.043
+              ]
+            },
+            {
+              "z_range": [
+                -0.476,
+                -0.4
+              ],
+              "x_min_max": [
+                -0.33,
+                0.328
+              ],
+              "y_min_max": [
+                -0.106,
+                0.151
+              ],
+              "right_x_mean_y_mean": [
+                -0.262,
+                -0.027
+              ],
+              "left_x_mean_y_mean": [
+                0.264,
+                -0.021
+              ]
+            },
+            {
+              "z_range": [
+                -0.396,
+                -0.32
+              ],
+              "x_min_max": [
+                -0.333,
+                0.331
+              ],
+              "y_min_max": [
+                -0.131,
+                0.151
+              ],
+              "right_x_mean_y_mean": [
+                -0.262,
+                -0.0
+              ],
+              "left_x_mean_y_mean": [
+                0.253,
+                0.005
+              ]
+            },
+            {
+              "z_range": [
+                -0.317,
+                -0.241
+              ],
+              "x_min_max": [
+                -0.33,
+                0.329
+              ],
+              "y_min_max": [
+                -0.144,
+                0.141
+              ],
+              "right_x_mean_y_mean": [
+                -0.264,
+                0.005
+              ],
+              "left_x_mean_y_mean": [
+                0.261,
+                0.011
+              ]
+            },
+            {
+              "z_range": [
+                -0.238,
+                -0.162
+              ],
+              "x_min_max": [
+                -0.317,
+                0.318
+              ],
+              "y_min_max": [
+                -0.144,
+                0.109
+              ],
+              "right_x_mean_y_mean": [
+                -0.255,
+                -0.01
+              ],
+              "left_x_mean_y_mean": [
+                0.253,
+                -0.006
+              ]
+            },
+            {
+              "z_range": [
+                -0.159,
+                -0.083
+              ],
+              "x_min_max": [
+                -0.283,
+                0.28
+              ],
+              "y_min_max": [
+                -0.136,
+                0.092
+              ],
+              "right_x_mean_y_mean": [
+                -0.223,
+                -0.04
+              ],
+              "left_x_mean_y_mean": [
+                0.223,
+                -0.04
+              ]
+            },
+            {
+              "z_range": [
+                -0.08,
+                -0.004
+              ],
+              "x_min_max": [
+                -0.252,
+                0.251
+              ],
+              "y_min_max": [
+                -0.12,
+                0.083
+              ],
+              "right_x_mean_y_mean": [
+                -0.226,
+                -0.007
+              ],
+              "left_x_mean_y_mean": [
+                0.222,
+                0.003
+              ]
+            },
+            {
+              "z_range": [
+                -0.001,
+                0.075
+              ],
+              "x_min_max": [
+                -0.443,
+                0.438
+              ],
+              "y_min_max": [
+                -0.17,
+                0.168
+              ],
+              "right_x_mean_y_mean": [
+                -0.341,
+                -0.05
+              ],
+              "left_x_mean_y_mean": [
+                0.343,
+                -0.049
+              ]
+            },
+            {
+              "z_range": [
+                0.079,
+                0.155
+              ],
+              "x_min_max": [
+                -0.457,
+                0.456
+              ],
+              "y_min_max": [
+                -0.238,
+                0.212
+              ],
+              "right_x_mean_y_mean": [
+                -0.313,
+                -0.029
+              ],
+              "left_x_mean_y_mean": [
+                0.311,
+                -0.031
+              ]
+            },
+            {
+              "z_range": [
+                0.158,
+                0.234
+              ],
+              "x_min_max": [
+                -0.471,
+                0.469
+              ],
+              "y_min_max": [
+                -0.252,
+                0.21
+              ],
+              "right_x_mean_y_mean": [
+                -0.296,
+                -0.018
+              ],
+              "left_x_mean_y_mean": [
+                0.296,
+                -0.019
+              ]
+            },
+            {
+              "z_range": [
+                0.237,
+                0.313
+              ],
+              "x_min_max": [
+                -0.462,
+                0.46
+              ],
+              "y_min_max": [
+                -0.232,
+                0.203
+              ],
+              "right_x_mean_y_mean": [
+                -0.302,
+                0.004
+              ],
+              "left_x_mean_y_mean": [
+                0.315,
+                0.004
+              ]
+            },
+            {
+              "z_range": [
+                0.316,
+                0.392
+              ],
+              "x_min_max": [
+                -0.445,
+                0.443
+              ],
+              "y_min_max": [
+                -0.189,
+                0.193
+              ],
+              "right_x_mean_y_mean": [
+                -0.351,
+                0.046
+              ],
+              "left_x_mean_y_mean": [
+                0.351,
+                0.046
+              ]
+            },
+            {
+              "z_range": [
+                0.395,
+                0.471
+              ],
+              "x_min_max": [
+                -0.439,
+                0.436
+              ],
+              "y_min_max": [
+                -0.188,
+                0.262
+              ],
+              "right_x_mean_y_mean": [
+                -0.337,
+                0.057
+              ],
+              "left_x_mean_y_mean": [
+                0.339,
+                0.056
+              ]
+            },
+            {
+              "z_range": [
+                0.474,
+                0.551
+              ],
+              "x_min_max": [
+                -0.38,
+                0.38
+              ],
+              "y_min_max": [
+                -0.216,
+                0.251
+              ],
+              "right_x_mean_y_mean": [
+                -0.299,
+                0.043
+              ],
+              "left_x_mean_y_mean": [
+                0.297,
+                0.045
+              ]
+            },
+            {
+              "z_range": [
+                0.554,
+                0.63
+              ],
+              "x_min_max": [
+                -0.369,
+                0.371
+              ],
+              "y_min_max": [
+                -0.206,
+                0.246
+              ],
+              "right_x_mean_y_mean": [
+                -0.263,
+                0.049
+              ],
+              "left_x_mean_y_mean": [
+                0.261,
+                0.047
+              ]
+            },
+            {
+              "z_range": [
+                0.633,
+                0.709
+              ],
+              "x_min_max": [
+                -0.37,
+                0.371
+              ],
+              "y_min_max": [
+                -0.135,
+                0.242
+              ],
+              "right_x_mean_y_mean": [
+                -0.262,
+                0.053
+              ],
+              "left_x_mean_y_mean": [
+                0.264,
+                0.044
+              ]
+            },
+            {
+              "z_range": [
+                0.712,
+                0.788
+              ],
+              "x_min_max": [
+                -0.378,
+                0.376
+              ],
+              "y_min_max": [
+                -0.084,
+                0.232
+              ],
+              "right_x_mean_y_mean": [
+                -0.296,
+                0.056
+              ],
+              "left_x_mean_y_mean": [
+                0.298,
+                0.051
+              ]
+            },
+            {
+              "z_range": [
+                0.791,
+                0.867
+              ],
+              "x_min_max": [
+                -0.23,
+                0.222
+              ],
+              "y_min_max": [
+                -0.102,
+                0.207
+              ],
+              "right_x_mean_y_mean": [
+                -0.21,
+                0.187
+              ],
+              "left_x_mean_y_mean": [
+                0.204,
+                0.187
+              ]
+            },
+            {
+              "z_range": [
+                0.87,
+                0.946
+              ],
+              "x_min_max": [
+                -0.248,
+                0.239
+              ],
+              "y_min_max": [
+                -0.064,
+                0.206
+              ],
+              "right_x_mean_y_mean": [
+                -0.22,
+                0.186
+              ],
+              "left_x_mean_y_mean": [
+                0.212,
+                0.186
+              ]
+            },
+            {
+              "z_range": [
+                0.95,
+                1.026
+              ],
+              "x_min_max": [
+                0.215,
+                0.215
+              ],
+              "y_min_max": [
+                0.187,
+                0.187
+              ],
+              "right_x_mean_y_mean": null,
+              "left_x_mean_y_mean": [
+                0.215,
+                0.187
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "materials": [
+      {
+        "name": "Material_0",
+        "nodes": [
+          {
+            "name": "Principled BSDF",
+            "type": "BSDF_PRINCIPLED",
+            "image": null
+          },
+          {
+            "name": "Material Output",
+            "type": "OUTPUT_MATERIAL",
+            "image": null
+          },
+          {
+            "name": "Image Texture",
+            "type": "TEX_IMAGE",
+            "image": "Image_0"
+          },
+          {
+            "name": "Separate Color",
+            "type": "SEPARATE_COLOR",
+            "image": null
+          },
+          {
+            "name": "Image Texture.001",
+            "type": "TEX_IMAGE",
+            "image": "Image_1"
+          },
+          {
+            "name": "Normal Map",
+            "type": "NORMAL_MAP",
+            "image": null
+          },
+          {
+            "name": "Image Texture.002",
+            "type": "TEX_IMAGE",
+            "image": "Image_2"
+          }
+        ],
+        "links": [
+          {
+            "from": "Principled BSDF.BSDF",
+            "to": "Material Output.Surface"
+          },
+          {
+            "from": "Image Texture.Color",
+            "to": "Principled BSDF.Base Color"
+          },
+          {
+            "from": "Separate Color.Blue",
+            "to": "Principled BSDF.Metallic"
+          },
+          {
+            "from": "Separate Color.Green",
+            "to": "Principled BSDF.Roughness"
+          },
+          {
+            "from": "Image Texture.001.Color",
+            "to": "Separate Color.Color"
+          },
+          {
+            "from": "Normal Map.Normal",
+            "to": "Principled BSDF.Normal"
+          },
+          {
+            "from": "Image Texture.002.Color",
+            "to": "Normal Map.Color"
+          }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "name": "Image_0",
+        "size": [
+          8192,
+          8192
+        ],
+        "colorspace": "sRGB",
+        "packed": true,
+        "packed_bytes": 32214816,
+        "packed_mb": 30.72
+      },
+      {
+        "name": "Image_1",
+        "size": [
+          4096,
+          4096
+        ],
+        "colorspace": "Non-Color",
+        "packed": true,
+        "packed_bytes": 4483603,
+        "packed_mb": 4.28
+      },
+      {
+        "name": "Image_2",
+        "size": [
+          4096,
+          4096
+        ],
+        "colorspace": "Non-Color",
+        "packed": true,
+        "packed_bytes": 8062457,
+        "packed_mb": 7.69
+      }
+    ]
+  },
+  "saber": {
+    "file": "Meshy_AI_Violet_Saber_Glow_20261118_texture.blend",
+    "file_size_bytes": 21570068,
+    "file_size_mb": 20.57,
+    "unit_system": "METRIC",
+    "scale_length": 1.0,
+    "armatures": [],
+    "actions": [],
+    "meshes": [
+      {
+        "name": "Mesh_0",
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation_euler": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "dimensions": [
+          0.0892,
+          0.0891,
+          1.9013
+        ],
+        "world_min": [
+          -0.0478,
+          -0.044,
+          -0.9495
+        ],
+        "world_max": [
+          0.0415,
+          0.0451,
+          0.9517
+        ],
+        "vertices": 27386,
+        "edges": 82152,
+        "polygons": 54768,
+        "triangles": 54768,
+        "connected_components": 1,
+        "largest_components": [
+          {
+            "vertices": 27386,
+            "world_min": [
+              -0.0478,
+              -0.044,
+              -0.9495
+            ],
+            "world_max": [
+              0.0415,
+              0.0451,
+              0.9517
+            ],
+            "centroid": [
+              -0.0025,
+              0.0004,
+              -0.5541
+            ]
+          }
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "materials": [
+          "Material_0"
+        ],
+        "slice_analysis": {
+          "z_slices": [
+            {
+              "z_range": [
+                -0.9495,
+                -0.8545
+              ],
+              "radius_mean": 0.0303,
+              "radius_max": 0.037,
+              "x_span": [
+                -0.0354,
+                0.03
+              ],
+              "y_span": [
+                -0.0346,
+                0.0356
+              ]
+            },
+            {
+              "z_range": [
+                -0.8495,
+                -0.7544
+              ],
+              "radius_mean": 0.0301,
+              "radius_max": 0.0364,
+              "x_span": [
+                -0.0344,
+                0.0289
+              ],
+              "y_span": [
+                -0.0344,
+                0.0352
+              ]
+            },
+            {
+              "z_range": [
+                -0.7494,
+                -0.6543
+              ],
+              "radius_mean": 0.0334,
+              "radius_max": 0.0469,
+              "x_span": [
+                -0.0468,
+                0.0407
+              ],
+              "y_span": [
+                -0.0432,
+                0.0442
+              ]
+            },
+            {
+              "z_range": [
+                -0.6493,
+                -0.5543
+              ],
+              "radius_mean": 0.0295,
+              "radius_max": 0.0479,
+              "x_span": [
+                -0.0478,
+                0.0415
+              ],
+              "y_span": [
+                -0.044,
+                0.0451
+              ]
+            },
+            {
+              "z_range": [
+                -0.5493,
+                -0.4542
+              ],
+              "radius_mean": 0.0233,
+              "radius_max": 0.0395,
+              "x_span": [
+                -0.0395,
+                0.0382
+              ],
+              "y_span": [
+                -0.023,
+                0.0246
+              ]
+            },
+            {
+              "z_range": [
+                -0.4492,
+                -0.3541
+              ],
+              "radius_mean": 0.0275,
+              "radius_max": 0.0308,
+              "x_span": [
+                -0.0299,
+                0.0289
+              ],
+              "y_span": [
+                -0.0282,
+                0.0306
+              ]
+            },
+            {
+              "z_range": [
+                -0.3491,
+                -0.2541
+              ],
+              "radius_mean": 0.0305,
+              "radius_max": 0.0323,
+              "x_span": [
+                -0.0315,
+                0.0301
+              ],
+              "y_span": [
+                -0.0296,
+                0.0319
+              ]
+            },
+            {
+              "z_range": [
+                -0.2491,
+                -0.154
+              ],
+              "radius_mean": 0.0305,
+              "radius_max": 0.0322,
+              "x_span": [
+                -0.0315,
+                0.0301
+              ],
+              "y_span": [
+                -0.0296,
+                0.0319
+              ]
+            },
+            {
+              "z_range": [
+                -0.149,
+                -0.0539
+              ],
+              "radius_mean": 0.0294,
+              "radius_max": 0.0311,
+              "x_span": [
+                -0.0305,
+                0.029
+              ],
+              "y_span": [
+                -0.0286,
+                0.0309
+              ]
+            },
+            {
+              "z_range": [
+                -0.0489,
+                0.0461
+              ],
+              "radius_mean": 0.0274,
+              "radius_max": 0.0294,
+              "x_span": [
+                -0.0288,
+                0.0272
+              ],
+              "y_span": [
+                -0.0267,
+                0.0291
+              ]
+            },
+            {
+              "z_range": [
+                0.0511,
+                0.1462
+              ],
+              "radius_mean": 0.0258,
+              "radius_max": 0.0275,
+              "x_span": [
+                -0.0269,
+                0.0256
+              ],
+              "y_span": [
+                -0.0255,
+                0.0272
+              ]
+            },
+            {
+              "z_range": [
+                0.1512,
+                0.2463
+              ],
+              "radius_mean": 0.0236,
+              "radius_max": 0.0258,
+              "x_span": [
+                -0.0253,
+                0.0234
+              ],
+              "y_span": [
+                -0.0238,
+                0.0251
+              ]
+            },
+            {
+              "z_range": [
+                0.2513,
+                0.3463
+              ],
+              "radius_mean": 0.022,
+              "radius_max": 0.0238,
+              "x_span": [
+                -0.0232,
+                0.0218
+              ],
+              "y_span": [
+                -0.022,
+                0.0233
+              ]
+            },
+            {
+              "z_range": [
+                0.3513,
+                0.4464
+              ],
+              "radius_mean": 0.0201,
+              "radius_max": 0.0219,
+              "x_span": [
+                -0.0215,
+                0.0199
+              ],
+              "y_span": [
+                -0.0204,
+                0.0216
+              ]
+            },
+            {
+              "z_range": [
+                0.4514,
+                0.5465
+              ],
+              "radius_mean": 0.0184,
+              "radius_max": 0.02,
+              "x_span": [
+                -0.0195,
+                0.0181
+              ],
+              "y_span": [
+                -0.0185,
+                0.0194
+              ]
+            },
+            {
+              "z_range": [
+                0.5515,
+                0.6465
+              ],
+              "radius_mean": 0.0163,
+              "radius_max": 0.0181,
+              "x_span": [
+                -0.0181,
+                0.0163
+              ],
+              "y_span": [
+                -0.0168,
+                0.0175
+              ]
+            },
+            {
+              "z_range": [
+                0.6515,
+                0.7466
+              ],
+              "radius_mean": 0.0147,
+              "radius_max": 0.0164,
+              "x_span": [
+                -0.0163,
+                0.0147
+              ],
+              "y_span": [
+                -0.0152,
+                0.0154
+              ]
+            },
+            {
+              "z_range": [
+                0.7516,
+                0.8467
+              ],
+              "radius_mean": 0.0131,
+              "radius_max": 0.0146,
+              "x_span": [
+                -0.0145,
+                0.0129
+              ],
+              "y_span": [
+                -0.0136,
+                0.0139
+              ]
+            },
+            {
+              "z_range": [
+                0.8517,
+                0.9467
+              ],
+              "radius_mean": 0.011,
+              "radius_max": 0.0131,
+              "x_span": [
+                -0.0129,
+                0.0113
+              ],
+              "y_span": [
+                -0.0123,
+                0.0121
+              ]
+            },
+            {
+              "z_range": [
+                0.9517,
+                1.0468
+              ],
+              "radius_mean": 0.0012,
+              "radius_max": 0.0012,
+              "x_span": [
+                -0.001,
+                -0.001
+              ],
+              "y_span": [
+                -0.0007,
+                -0.0007
+              ]
+            }
+          ],
+          "z_color_profile": [
+            {
+              "z_mid": -0.902,
+              "mean_rgb": [
+                0.778,
+                0.771,
+                0.782
+              ]
+            },
+            {
+              "z_mid": -0.8019,
+              "mean_rgb": [
+                0.776,
+                0.768,
+                0.774
+              ]
+            },
+            {
+              "z_mid": -0.7019,
+              "mean_rgb": [
+                0.779,
+                0.771,
+                0.776
+              ]
+            },
+            {
+              "z_mid": -0.6018,
+              "mean_rgb": [
+                0.817,
+                0.748,
+                0.81
+              ]
+            },
+            {
+              "z_mid": -0.5017,
+              "mean_rgb": [
+                0.962,
+                0.671,
+                0.942
+              ]
+            },
+            {
+              "z_mid": -0.4017,
+              "mean_rgb": [
+                0.862,
+                0.429,
+                0.919
+              ]
+            },
+            {
+              "z_mid": -0.3016,
+              "mean_rgb": [
+                0.839,
+                0.399,
+                0.906
+              ]
+            },
+            {
+              "z_mid": -0.2015,
+              "mean_rgb": [
+                0.827,
+                0.399,
+                0.899
+              ]
+            },
+            {
+              "z_mid": -0.1015,
+              "mean_rgb": [
+                0.82,
+                0.388,
+                0.89
+              ]
+            },
+            {
+              "z_mid": -0.0014,
+              "mean_rgb": [
+                0.816,
+                0.385,
+                0.884
+              ]
+            },
+            {
+              "z_mid": 0.0987,
+              "mean_rgb": [
+                0.804,
+                0.394,
+                0.873
+              ]
+            },
+            {
+              "z_mid": 0.1987,
+              "mean_rgb": [
+                0.802,
+                0.394,
+                0.858
+              ]
+            },
+            {
+              "z_mid": 0.2988,
+              "mean_rgb": [
+                0.792,
+                0.398,
+                0.837
+              ]
+            },
+            {
+              "z_mid": 0.3989,
+              "mean_rgb": [
+                0.785,
+                0.384,
+                0.813
+              ]
+            },
+            {
+              "z_mid": 0.4989,
+              "mean_rgb": [
+                0.785,
+                0.354,
+                0.79
+              ]
+            },
+            {
+              "z_mid": 0.599,
+              "mean_rgb": [
+                0.778,
+                0.319,
+                0.782
+              ]
+            },
+            {
+              "z_mid": 0.6991,
+              "mean_rgb": [
+                0.778,
+                0.301,
+                0.766
+              ]
+            },
+            {
+              "z_mid": 0.7991,
+              "mean_rgb": [
+                0.774,
+                0.287,
+                0.773
+              ]
+            },
+            {
+              "z_mid": 0.8992,
+              "mean_rgb": [
+                0.786,
+                0.266,
+                0.786
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "materials": [
+      {
+        "name": "Material_0",
+        "nodes": [
+          {
+            "name": "Principled BSDF",
+            "type": "BSDF_PRINCIPLED",
+            "image": null
+          },
+          {
+            "name": "Material Output",
+            "type": "OUTPUT_MATERIAL",
+            "image": null
+          },
+          {
+            "name": "Image Texture",
+            "type": "TEX_IMAGE",
+            "image": "Image_0"
+          },
+          {
+            "name": "Separate Color",
+            "type": "SEPARATE_COLOR",
+            "image": null
+          },
+          {
+            "name": "Image Texture.001",
+            "type": "TEX_IMAGE",
+            "image": "Image_1"
+          },
+          {
+            "name": "Normal Map",
+            "type": "NORMAL_MAP",
+            "image": null
+          },
+          {
+            "name": "Image Texture.002",
+            "type": "TEX_IMAGE",
+            "image": "Image_2"
+          }
+        ],
+        "links": [
+          {
+            "from": "Principled BSDF.BSDF",
+            "to": "Material Output.Surface"
+          },
+          {
+            "from": "Image Texture.Color",
+            "to": "Principled BSDF.Base Color"
+          },
+          {
+            "from": "Separate Color.Blue",
+            "to": "Principled BSDF.Metallic"
+          },
+          {
+            "from": "Separate Color.Green",
+            "to": "Principled BSDF.Roughness"
+          },
+          {
+            "from": "Image Texture.001.Color",
+            "to": "Separate Color.Color"
+          },
+          {
+            "from": "Normal Map.Normal",
+            "to": "Principled BSDF.Normal"
+          },
+          {
+            "from": "Image Texture.002.Color",
+            "to": "Normal Map.Color"
+          }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "name": "Image_0",
+        "size": [
+          8192,
+          8192
+        ],
+        "colorspace": "sRGB",
+        "packed": true,
+        "packed_bytes": 11079695,
+        "packed_mb": 10.57
+      },
+      {
+        "name": "Image_1",
+        "size": [
+          4096,
+          4096
+        ],
+        "colorspace": "Non-Color",
+        "packed": true,
+        "packed_bytes": 1908404,
+        "packed_mb": 1.82
+      },
+      {
+        "name": "Image_2",
+        "size": [
+          4096,
+          4096
+        ],
+        "colorspace": "Non-Color",
+        "packed": true,
+        "packed_bytes": 3501277,
+        "packed_mb": 3.34
+      }
+    ]
+  },
+  "shield": {
+    "file": "Meshy_AI_Crimson_Guardian_Shield_20261118_texture.blend",
+    "file_size_bytes": 115671569,
+    "file_size_mb": 110.31,
+    "unit_system": "METRIC",
+    "scale_length": 1.0,
+    "armatures": [],
+    "actions": [],
+    "meshes": [
+      {
+        "name": "Mesh_0",
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation_euler": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "dimensions": [
+          0.8332,
+          0.2238,
+          1.9065
+        ],
+        "world_min": [
+          -0.4171,
+          -0.1137,
+          -0.9565
+        ],
+        "world_max": [
+          0.4161,
+          0.1101,
+          0.9499
+        ],
+        "vertices": 488435,
+        "edges": 1466291,
+        "polygons": 977542,
+        "triangles": 977542,
+        "connected_components": 2,
+        "largest_components": [
+          {
+            "vertices": 482515,
+            "world_min": [
+              -0.4171,
+              -0.1137,
+              -0.9565
+            ],
+            "world_max": [
+              0.4161,
+              0.1101,
+              0.9499
+            ],
+            "centroid": [
+              0.0099,
+              0.0059,
+              -0.0053
+            ]
+          },
+          {
+            "vertices": 5920,
+            "world_min": [
+              -0.336,
+              -0.0103,
+              -0.4713
+            ],
+            "world_max": [
+              -0.2417,
+              0.0286,
+              -0.0094
+            ],
+            "centroid": [
+              -0.2851,
+              0.0085,
+              -0.2374
+            ]
+          }
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "materials": [
+          "Material_0"
+        ],
+        "slice_analysis": {
+          "x_slices": [
+            {
+              "range": [
+                -0.417,
+                -0.348
+              ],
+              "x_span": [
+                -0.417,
+                -0.348
+              ],
+              "y_span": [
+                0.009,
+                0.104
+              ],
+              "z_span": [
+                -0.109,
+                0.511
+              ]
+            },
+            {
+              "range": [
+                -0.341,
+                -0.272
+              ],
+              "x_span": [
+                -0.341,
+                -0.272
+              ],
+              "y_span": [
+                -0.061,
+                0.109
+              ],
+              "z_span": [
+                -0.568,
+                0.884
+              ]
+            },
+            {
+              "range": [
+                -0.266,
+                -0.196
+              ],
+              "x_span": [
+                -0.266,
+                -0.196
+              ],
+              "y_span": [
+                -0.076,
+                0.11
+              ],
+              "z_span": [
+                -0.927,
+                0.949
+              ]
+            },
+            {
+              "range": [
+                -0.19,
+                -0.12
+              ],
+              "x_span": [
+                -0.19,
+                -0.12
+              ],
+              "y_span": [
+                -0.09,
+                0.06
+              ],
+              "z_span": [
+                -0.957,
+                0.95
+              ]
+            },
+            {
+              "range": [
+                -0.114,
+                -0.045
+              ],
+              "x_span": [
+                -0.114,
+                -0.045
+              ],
+              "y_span": [
+                -0.104,
+                0.091
+              ],
+              "z_span": [
+                -0.956,
+                0.95
+              ]
+            },
+            {
+              "range": [
+                -0.038,
+                0.031
+              ],
+              "x_span": [
+                -0.038,
+                0.031
+              ],
+              "y_span": [
+                -0.114,
+                0.091
+              ],
+              "z_span": [
+                -0.956,
+                0.95
+              ]
+            },
+            {
+              "range": [
+                0.037,
+                0.107
+              ],
+              "x_span": [
+                0.037,
+                0.107
+              ],
+              "y_span": [
+                -0.106,
+                0.092
+              ],
+              "z_span": [
+                -0.956,
+                0.95
+              ]
+            },
+            {
+              "range": [
+                0.113,
+                0.183
+              ],
+              "x_span": [
+                0.113,
+                0.183
+              ],
+              "y_span": [
+                -0.091,
+                0.091
+              ],
+              "z_span": [
+                -0.957,
+                0.95
+              ]
+            },
+            {
+              "range": [
+                0.189,
+                0.258
+              ],
+              "x_span": [
+                0.189,
+                0.258
+              ],
+              "y_span": [
+                -0.08,
+                0.109
+              ],
+              "z_span": [
+                -0.928,
+                0.95
+              ]
+            },
+            {
+              "range": [
+                0.265,
+                0.334
+              ],
+              "x_span": [
+                0.265,
+                0.334
+              ],
+              "y_span": [
+                -0.068,
+                0.11
+              ],
+              "z_span": [
+                -0.605,
+                0.89
+              ]
+            },
+            {
+              "range": [
+                0.34,
+                0.41
+              ],
+              "x_span": [
+                0.34,
+                0.41
+              ],
+              "y_span": [
+                0.008,
+                0.106
+              ],
+              "z_span": [
+                -0.15,
+                0.531
+              ]
+            },
+            {
+              "range": [
+                0.416,
+                0.486
+              ],
+              "x_span": [
+                0.416,
+                0.416
+              ],
+              "y_span": [
+                0.057,
+                0.057
+              ],
+              "z_span": [
+                0.216,
+                0.216
+              ]
+            }
+          ],
+          "y_slices": [
+            {
+              "range": [
+                -0.114,
+                -0.095
+              ],
+              "x_span": [
+                -0.082,
+                0.089
+              ],
+              "y_span": [
+                -0.114,
+                -0.095
+              ],
+              "z_span": [
+                -0.506,
+                -0.009
+              ]
+            },
+            {
+              "range": [
+                -0.093,
+                -0.075
+              ],
+              "x_span": [
+                -0.256,
+                0.255
+              ],
+              "y_span": [
+                -0.093,
+                -0.075
+              ],
+              "z_span": [
+                -0.837,
+                0.221
+              ]
+            },
+            {
+              "range": [
+                -0.073,
+                -0.054
+              ],
+              "x_span": [
+                -0.278,
+                0.277
+              ],
+              "y_span": [
+                -0.073,
+                -0.054
+              ],
+              "z_span": [
+                -0.841,
+                0.705
+              ]
+            },
+            {
+              "range": [
+                -0.053,
+                -0.034
+              ],
+              "x_span": [
+                -0.296,
+                0.296
+              ],
+              "y_span": [
+                -0.053,
+                -0.034
+              ],
+              "z_span": [
+                -0.957,
+                0.811
+              ]
+            },
+            {
+              "range": [
+                -0.032,
+                -0.014
+              ],
+              "x_span": [
+                -0.316,
+                0.315
+              ],
+              "y_span": [
+                -0.032,
+                -0.014
+              ],
+              "z_span": [
+                -0.952,
+                0.931
+              ]
+            },
+            {
+              "range": [
+                -0.012,
+                0.007
+              ],
+              "x_span": [
+                -0.338,
+                0.336
+              ],
+              "y_span": [
+                -0.012,
+                0.007
+              ],
+              "z_span": [
+                -0.941,
+                0.95
+              ]
+            },
+            {
+              "range": [
+                0.008,
+                0.027
+              ],
+              "x_span": [
+                -0.37,
+                0.368
+              ],
+              "y_span": [
+                0.008,
+                0.027
+              ],
+              "z_span": [
+                -0.932,
+                0.945
+              ]
+            },
+            {
+              "range": [
+                0.029,
+                0.047
+              ],
+              "x_span": [
+                -0.397,
+                0.396
+              ],
+              "y_span": [
+                0.029,
+                0.047
+              ],
+              "z_span": [
+                -0.883,
+                0.943
+              ]
+            },
+            {
+              "range": [
+                0.049,
+                0.068
+              ],
+              "x_span": [
+                -0.417,
+                0.416
+              ],
+              "y_span": [
+                0.049,
+                0.068
+              ],
+              "z_span": [
+                -0.79,
+                0.929
+              ]
+            },
+            {
+              "range": [
+                0.069,
+                0.088
+              ],
+              "x_span": [
+                -0.415,
+                0.414
+              ],
+              "y_span": [
+                0.069,
+                0.088
+              ],
+              "z_span": [
+                -0.39,
+                0.916
+              ]
+            },
+            {
+              "range": [
+                0.09,
+                0.108
+              ],
+              "x_span": [
+                -0.411,
+                0.409
+              ],
+              "y_span": [
+                0.09,
+                0.108
+              ],
+              "z_span": [
+                -0.376,
+                0.903
+              ]
+            },
+            {
+              "range": [
+                0.11,
+                0.129
+              ],
+              "x_span": [
+                -0.264,
+                -0.264
+              ],
+              "y_span": [
+                0.11,
+                0.11
+              ],
+              "z_span": [
+                0.85,
+                0.85
+              ]
+            }
+          ],
+          "z_slices": [
+            {
+              "range": [
+                -0.957,
+                -0.798
+              ],
+              "x_span": [
+                -0.231,
+                0.231
+              ],
+              "y_span": [
+                -0.08,
+                0.037
+              ],
+              "z_span": [
+                -0.957,
+                -0.798
+              ]
+            },
+            {
+              "range": [
+                -0.783,
+                -0.624
+              ],
+              "x_span": [
+                -0.263,
+                0.262
+              ],
+              "y_span": [
+                -0.088,
+                0.06
+              ],
+              "z_span": [
+                -0.783,
+                -0.624
+              ]
+            },
+            {
+              "range": [
+                -0.61,
+                -0.451
+              ],
+              "x_span": [
+                -0.292,
+                0.291
+              ],
+              "y_span": [
+                -0.097,
+                0.058
+              ],
+              "z_span": [
+                -0.61,
+                -0.451
+              ]
+            },
+            {
+              "range": [
+                -0.437,
+                -0.278
+              ],
+              "x_span": [
+                -0.32,
+                0.319
+              ],
+              "y_span": [
+                -0.105,
+                0.092
+              ],
+              "z_span": [
+                -0.437,
+                -0.278
+              ]
+            },
+            {
+              "range": [
+                -0.263,
+                -0.104
+              ],
+              "x_span": [
+                -0.348,
+                0.348
+              ],
+              "y_span": [
+                -0.114,
+                0.081
+              ],
+              "z_span": [
+                -0.263,
+                -0.104
+              ]
+            },
+            {
+              "range": [
+                -0.09,
+                0.069
+              ],
+              "x_span": [
+                -0.392,
+                0.391
+              ],
+              "y_span": [
+                -0.107,
+                0.093
+              ],
+              "z_span": [
+                -0.09,
+                0.069
+              ]
+            },
+            {
+              "range": [
+                0.083,
+                0.242
+              ],
+              "x_span": [
+                -0.417,
+                0.416
+              ],
+              "y_span": [
+                -0.083,
+                0.104
+              ],
+              "z_span": [
+                0.083,
+                0.242
+              ]
+            },
+            {
+              "range": [
+                0.257,
+                0.416
+              ],
+              "x_span": [
+                -0.409,
+                0.408
+              ],
+              "y_span": [
+                -0.071,
+                0.104
+              ],
+              "z_span": [
+                0.257,
+                0.416
+              ]
+            },
+            {
+              "range": [
+                0.43,
+                0.589
+              ],
+              "x_span": [
+                -0.375,
+                0.374
+              ],
+              "y_span": [
+                -0.053,
+                0.107
+              ],
+              "z_span": [
+                0.43,
+                0.589
+              ]
+            },
+            {
+              "range": [
+                0.603,
+                0.762
+              ],
+              "x_span": [
+                -0.33,
+                0.33
+              ],
+              "y_span": [
+                -0.056,
+                0.109
+              ],
+              "z_span": [
+                0.603,
+                0.762
+              ]
+            },
+            {
+              "range": [
+                0.777,
+                0.935
+              ],
+              "x_span": [
+                -0.296,
+                0.295
+              ],
+              "y_span": [
+                -0.05,
+                0.11
+              ],
+              "z_span": [
+                0.777,
+                0.935
+              ]
+            },
+            {
+              "range": [
+                0.95,
+                1.109
+              ],
+              "x_span": [
+                0.057,
+                0.057
+              ],
+              "y_span": [
+                -0.006,
+                -0.006
+              ],
+              "z_span": [
+                0.95,
+                0.95
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "materials": [
+      {
+        "name": "Material_0",
+        "nodes": [
+          {
+            "name": "Principled BSDF",
+            "type": "BSDF_PRINCIPLED",
+            "image": null
+          },
+          {
+            "name": "Material Output",
+            "type": "OUTPUT_MATERIAL",
+            "image": null
+          },
+          {
+            "name": "Image Texture",
+            "type": "TEX_IMAGE",
+            "image": "Image_0"
+          },
+          {
+            "name": "Separate Color",
+            "type": "SEPARATE_COLOR",
+            "image": null
+          },
+          {
+            "name": "Image Texture.001",
+            "type": "TEX_IMAGE",
+            "image": "Image_1"
+          },
+          {
+            "name": "Normal Map",
+            "type": "NORMAL_MAP",
+            "image": null
+          },
+          {
+            "name": "Image Texture.002",
+            "type": "TEX_IMAGE",
+            "image": "Image_2"
+          }
+        ],
+        "links": [
+          {
+            "from": "Principled BSDF.BSDF",
+            "to": "Material Output.Surface"
+          },
+          {
+            "from": "Image Texture.Color",
+            "to": "Principled BSDF.Base Color"
+          },
+          {
+            "from": "Separate Color.Blue",
+            "to": "Principled BSDF.Metallic"
+          },
+          {
+            "from": "Separate Color.Green",
+            "to": "Principled BSDF.Roughness"
+          },
+          {
+            "from": "Image Texture.001.Color",
+            "to": "Separate Color.Color"
+          },
+          {
+            "from": "Normal Map.Normal",
+            "to": "Principled BSDF.Normal"
+          },
+          {
+            "from": "Image Texture.002.Color",
+            "to": "Normal Map.Color"
+          }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "name": "Image_0",
+        "size": [
+          8192,
+          8192
+        ],
+        "colorspace": "sRGB",
+        "packed": true,
+        "packed_bytes": 20339134,
+        "packed_mb": 19.4
+      },
+      {
+        "name": "Image_1",
+        "size": [
+          4096,
+          4096
+        ],
+        "colorspace": "Non-Color",
+        "packed": true,
+        "packed_bytes": 4763162,
+        "packed_mb": 4.54
+      },
+      {
+        "name": "Image_2",
+        "size": [
+          4096,
+          4096
+        ],
+        "colorspace": "Non-Color",
+        "packed": true,
+        "packed_bytes": 6079697,
+        "packed_mb": 5.8
+      }
+    ]
+  },
+  "rifle": {
+    "file": "Meshy_AI_Futuristic_Toy_Blaster_20261118_texture.blend",
+    "file_size_bytes": 40858799,
+    "file_size_mb": 38.97,
+    "unit_system": "METRIC",
+    "scale_length": 1.0,
+    "armatures": [],
+    "actions": [],
+    "meshes": [
+      {
+        "name": "Mesh_0",
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation_euler": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "dimensions": [
+          1.8982,
+          0.2381,
+          0.985
+        ],
+        "world_min": [
+          -0.9506,
+          -0.1184,
+          -0.4934
+        ],
+        "world_max": [
+          0.9477,
+          0.1196,
+          0.4916
+        ],
+        "vertices": 130025,
+        "edges": 390075,
+        "polygons": 260050,
+        "triangles": 260050,
+        "connected_components": 1,
+        "largest_components": [
+          {
+            "vertices": 130025,
+            "world_min": [
+              -0.9506,
+              -0.1184,
+              -0.4934
+            ],
+            "world_max": [
+              0.9477,
+              0.1196,
+              0.4916
+            ],
+            "centroid": [
+              0.1324,
+              0.0002,
+              0.0337
+            ]
+          }
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "materials": [
+          "Material_0"
+        ],
+        "slice_analysis": {
+          "x_slices": [
+            {
+              "range": [
+                -0.951,
+                -0.792
+              ],
+              "x_span": [
+                -0.951,
+                -0.793
+              ],
+              "y_span": [
+                -0.055,
+                0.056
+              ],
+              "z_span": [
+                0.032,
+                0.143
+              ]
+            },
+            {
+              "range": [
+                -0.778,
+                -0.62
+              ],
+              "x_span": [
+                -0.777,
+                -0.62
+              ],
+              "y_span": [
+                -0.061,
+                0.063
+              ],
+              "z_span": [
+                0.025,
+                0.149
+              ]
+            },
+            {
+              "range": [
+                -0.605,
+                -0.447
+              ],
+              "x_span": [
+                -0.605,
+                -0.447
+              ],
+              "y_span": [
+                -0.071,
+                0.072
+              ],
+              "z_span": [
+                0.016,
+                0.155
+              ]
+            },
+            {
+              "range": [
+                -0.433,
+                -0.275
+              ],
+              "x_span": [
+                -0.433,
+                -0.275
+              ],
+              "y_span": [
+                -0.078,
+                0.078
+              ],
+              "z_span": [
+                -0.075,
+                0.161
+              ]
+            },
+            {
+              "range": [
+                -0.26,
+                -0.102
+              ],
+              "x_span": [
+                -0.26,
+                -0.102
+              ],
+              "y_span": [
+                -0.118,
+                0.12
+              ],
+              "z_span": [
+                -0.48,
+                0.492
+              ]
+            },
+            {
+              "range": [
+                -0.088,
+                0.07
+              ],
+              "x_span": [
+                -0.088,
+                0.07
+              ],
+              "y_span": [
+                -0.115,
+                0.116
+              ],
+              "z_span": [
+                -0.493,
+                0.49
+              ]
+            },
+            {
+              "range": [
+                0.085,
+                0.243
+              ],
+              "x_span": [
+                0.085,
+                0.243
+              ],
+              "y_span": [
+                -0.1,
+                0.102
+              ],
+              "z_span": [
+                -0.167,
+                0.25
+              ]
+            },
+            {
+              "range": [
+                0.257,
+                0.416
+              ],
+              "x_span": [
+                0.257,
+                0.416
+              ],
+              "y_span": [
+                -0.094,
+                0.095
+              ],
+              "z_span": [
+                -0.492,
+                0.249
+              ]
+            },
+            {
+              "range": [
+                0.43,
+                0.588
+              ],
+              "x_span": [
+                0.43,
+                0.588
+              ],
+              "y_span": [
+                -0.093,
+                0.095
+              ],
+              "z_span": [
+                -0.49,
+                0.276
+              ]
+            },
+            {
+              "range": [
+                0.603,
+                0.761
+              ],
+              "x_span": [
+                0.603,
+                0.761
+              ],
+              "y_span": [
+                -0.093,
+                0.094
+              ],
+              "z_span": [
+                -0.038,
+                0.266
+              ]
+            },
+            {
+              "range": [
+                0.775,
+                0.933
+              ],
+              "x_span": [
+                0.775,
+                0.933
+              ],
+              "y_span": [
+                -0.086,
+                0.087
+              ],
+              "z_span": [
+                -0.035,
+                0.216
+              ]
+            },
+            {
+              "range": [
+                0.948,
+                1.106
+              ],
+              "x_span": [
+                0.948,
+                0.948
+              ],
+              "y_span": [
+                -0.006,
+                -0.006
+              ],
+              "z_span": [
+                0.181,
+                0.181
+              ]
+            }
+          ],
+          "y_slices": [
+            {
+              "range": [
+                -0.118,
+                -0.099
+              ],
+              "x_span": [
+                -0.197,
+                0.137
+              ],
+              "y_span": [
+                -0.118,
+                -0.099
+              ],
+              "z_span": [
+                -0.004,
+                0.436
+              ]
+            },
+            {
+              "range": [
+                -0.097,
+                -0.077
+              ],
+              "x_span": [
+                -0.312,
+                0.812
+              ],
+              "y_span": [
+                -0.097,
+                -0.077
+              ],
+              "z_span": [
+                -0.063,
+                0.462
+              ]
+            },
+            {
+              "range": [
+                -0.075,
+                -0.055
+              ],
+              "x_span": [
+                -0.791,
+                0.821
+              ],
+              "y_span": [
+                -0.075,
+                -0.055
+              ],
+              "z_span": [
+                -0.48,
+                0.477
+              ]
+            },
+            {
+              "range": [
+                -0.054,
+                -0.034
+              ],
+              "x_span": [
+                -0.948,
+                0.946
+              ],
+              "y_span": [
+                -0.054,
+                -0.034
+              ],
+              "z_span": [
+                -0.491,
+                0.485
+              ]
+            },
+            {
+              "range": [
+                -0.032,
+                -0.012
+              ],
+              "x_span": [
+                -0.951,
+                0.948
+              ],
+              "y_span": [
+                -0.032,
+                -0.012
+              ],
+              "z_span": [
+                -0.493,
+                0.491
+              ]
+            },
+            {
+              "range": [
+                -0.01,
+                0.01
+              ],
+              "x_span": [
+                -0.951,
+                0.948
+              ],
+              "y_span": [
+                -0.01,
+                0.01
+              ],
+              "z_span": [
+                -0.493,
+                0.492
+              ]
+            },
+            {
+              "range": [
+                0.011,
+                0.031
+              ],
+              "x_span": [
+                -0.951,
+                0.948
+              ],
+              "y_span": [
+                0.011,
+                0.031
+              ],
+              "z_span": [
+                -0.493,
+                0.491
+              ]
+            },
+            {
+              "range": [
+                0.033,
+                0.053
+              ],
+              "x_span": [
+                -0.95,
+                0.946
+              ],
+              "y_span": [
+                0.033,
+                0.053
+              ],
+              "z_span": [
+                -0.491,
+                0.487
+              ]
+            },
+            {
+              "range": [
+                0.055,
+                0.075
+              ],
+              "x_span": [
+                -0.815,
+                0.915
+              ],
+              "y_span": [
+                0.055,
+                0.075
+              ],
+              "z_span": [
+                -0.482,
+                0.478
+              ]
+            },
+            {
+              "range": [
+                0.076,
+                0.096
+              ],
+              "x_span": [
+                -0.355,
+                0.814
+              ],
+              "y_span": [
+                0.076,
+                0.096
+              ],
+              "z_span": [
+                -0.067,
+                0.463
+              ]
+            },
+            {
+              "range": [
+                0.098,
+                0.118
+              ],
+              "x_span": [
+                -0.197,
+                0.138
+              ],
+              "y_span": [
+                0.098,
+                0.118
+              ],
+              "z_span": [
+                -0.01,
+                0.439
+              ]
+            },
+            {
+              "range": [
+                0.12,
+                0.139
+              ],
+              "x_span": [
+                -0.106,
+                -0.106
+              ],
+              "y_span": [
+                0.12,
+                0.12
+              ],
+              "z_span": [
+                0.072,
+                0.072
+              ]
+            }
+          ],
+          "z_slices": [
+            {
+              "range": [
+                -0.493,
+                -0.411
+              ],
+              "x_span": [
+                -0.164,
+                0.572
+              ],
+              "y_span": [
+                -0.064,
+                0.066
+              ],
+              "z_span": [
+                -0.493,
+                -0.411
+              ]
+            },
+            {
+              "range": [
+                -0.404,
+                -0.322
+              ],
+              "x_span": [
+                -0.137,
+                0.57
+              ],
+              "y_span": [
+                -0.064,
+                0.066
+              ],
+              "z_span": [
+                -0.404,
+                -0.322
+              ]
+            },
+            {
+              "range": [
+                -0.314,
+                -0.232
+              ],
+              "x_span": [
+                -0.106,
+                0.545
+              ],
+              "y_span": [
+                -0.064,
+                0.066
+              ],
+              "z_span": [
+                -0.314,
+                -0.232
+              ]
+            },
+            {
+              "range": [
+                -0.225,
+                -0.143
+              ],
+              "x_span": [
+                -0.084,
+                0.531
+              ],
+              "y_span": [
+                -0.064,
+                0.066
+              ],
+              "z_span": [
+                -0.225,
+                -0.143
+              ]
+            },
+            {
+              "range": [
+                -0.135,
+                -0.053
+              ],
+              "x_span": [
+                -0.401,
+                0.55
+              ],
+              "y_span": [
+                -0.08,
+                0.082
+              ],
+              "z_span": [
+                -0.135,
+                -0.053
+              ]
+            },
+            {
+              "range": [
+                -0.046,
+                0.036
+              ],
+              "x_span": [
+                -0.833,
+                0.81
+              ],
+              "y_span": [
+                -0.113,
+                0.115
+              ],
+              "z_span": [
+                -0.046,
+                0.036
+              ]
+            },
+            {
+              "range": [
+                0.044,
+                0.126
+              ],
+              "x_span": [
+                -0.951,
+                0.948
+              ],
+              "y_span": [
+                -0.118,
+                0.12
+              ],
+              "z_span": [
+                0.044,
+                0.126
+              ]
+            },
+            {
+              "range": [
+                0.133,
+                0.215
+              ],
+              "x_span": [
+                -0.889,
+                0.948
+              ],
+              "y_span": [
+                -0.099,
+                0.1
+              ],
+              "z_span": [
+                0.133,
+                0.215
+              ]
+            },
+            {
+              "range": [
+                0.223,
+                0.305
+              ],
+              "x_span": [
+                -0.186,
+                0.724
+              ],
+              "y_span": [
+                -0.093,
+                0.095
+              ],
+              "z_span": [
+                0.223,
+                0.305
+              ]
+            },
+            {
+              "range": [
+                0.312,
+                0.395
+              ],
+              "x_span": [
+                -0.19,
+                -0.073
+              ],
+              "y_span": [
+                -0.117,
+                0.118
+              ],
+              "z_span": [
+                0.312,
+                0.395
+              ]
+            },
+            {
+              "range": [
+                0.402,
+                0.484
+              ],
+              "x_span": [
+                -0.188,
+                -0.073
+              ],
+              "y_span": [
+                -0.113,
+                0.114
+              ],
+              "z_span": [
+                0.402,
+                0.484
+              ]
+            },
+            {
+              "range": [
+                0.492,
+                0.574
+              ],
+              "x_span": [
+                -0.167,
+                -0.167
+              ],
+              "y_span": [
+                -0.002,
+                -0.002
+              ],
+              "z_span": [
+                0.492,
+                0.492
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "materials": [
+      {
+        "name": "Material_0",
+        "nodes": [
+          {
+            "name": "Principled BSDF",
+            "type": "BSDF_PRINCIPLED",
+            "image": null
+          },
+          {
+            "name": "Material Output",
+            "type": "OUTPUT_MATERIAL",
+            "image": null
+          },
+          {
+            "name": "Image Texture",
+            "type": "TEX_IMAGE",
+            "image": "Image_0"
+          },
+          {
+            "name": "Separate Color",
+            "type": "SEPARATE_COLOR",
+            "image": null
+          },
+          {
+            "name": "Image Texture.001",
+            "type": "TEX_IMAGE",
+            "image": "Image_1"
+          },
+          {
+            "name": "Normal Map",
+            "type": "NORMAL_MAP",
+            "image": null
+          },
+          {
+            "name": "Image Texture.002",
+            "type": "TEX_IMAGE",
+            "image": "Image_2"
+          }
+        ],
+        "links": [
+          {
+            "from": "Principled BSDF.BSDF",
+            "to": "Material Output.Surface"
+          },
+          {
+            "from": "Image Texture.Color",
+            "to": "Principled BSDF.Base Color"
+          },
+          {
+            "from": "Separate Color.Blue",
+            "to": "Principled BSDF.Metallic"
+          },
+          {
+            "from": "Separate Color.Green",
+            "to": "Principled BSDF.Roughness"
+          },
+          {
+            "from": "Image Texture.001.Color",
+            "to": "Separate Color.Color"
+          },
+          {
+            "from": "Normal Map.Normal",
+            "to": "Principled BSDF.Normal"
+          },
+          {
+            "from": "Image Texture.002.Color",
+            "to": "Normal Map.Color"
+          }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "name": "Image_0",
+        "size": [
+          8192,
+          8192
+        ],
+        "colorspace": "sRGB",
+        "packed": true,
+        "packed_bytes": 10773029,
+        "packed_mb": 10.27
+      },
+      {
+        "name": "Image_1",
+        "size": [
+          4096,
+          4096
+        ],
+        "colorspace": "Non-Color",
+        "packed": true,
+        "packed_bytes": 3726885,
+        "packed_mb": 3.55
+      },
+      {
+        "name": "Image_2",
+        "size": [
+          4096,
+          4096
+        ],
+        "colorspace": "Non-Color",
+        "packed": true,
+        "packed_bytes": 3829249,
+        "packed_mb": 3.65
+      }
+    ]
+  }
+}

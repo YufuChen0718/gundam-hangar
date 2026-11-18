@@ -19,17 +19,15 @@ import type {
 import { modelPaths, rigConfig } from "./rigConfig";
 import { LbsManager } from "./lbs";
 
-const loader = new GLTFLoader();
+export const gltfLoader = new GLTFLoader();
 
-function prepare(root: Object3D) {
+export function prepareMeshMaterials(root: Object3D) {
   root.traverse((o) => {
     if (o instanceof Mesh) {
       o.castShadow = true;
       o.receiveShadow = true;
       for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
         if ("map" in m && m.map) m.map.colorSpace = SRGBColorSpace;
-        // Sharper textures at grazing angles, and a gentler normal map: the
-        // generated normal map carries baked dither noise that reads as grain.
         for (const key of [
           "map",
           "normalMap",
@@ -56,15 +54,16 @@ function requireNode(root: Object3D, name: string): Object3D {
 }
 
 export async function loadPrepared(
-  variant: RiggedModelVariant = "guardian",
+  variant: RiggedModelVariant = "sentinel",
 ): Promise<ArmPreviewRig> {
   const path =
-    variant === "previous" ? modelPaths.previous : modelPaths.guardian;
-  const gltf = await loader.loadAsync(path);
-  prepare(gltf.scene);
+    variant === "legacy" ? modelPaths.legacy : modelPaths.sentinel;
+  const hasEmbeddedEquipment = variant === "legacy";
+  const gltf = await gltfLoader.loadAsync(path);
+  prepareMeshMaterials(gltf.scene);
   const displayRoot = new Group();
   displayRoot.name =
-    variant === "previous" ? "previousDisplayRoot" : "appDisplayRoot";
+    variant === "legacy" ? "legacyDisplayRoot" : "appDisplayRoot";
   displayRoot.add(gltf.scene);
   const joints = Object.fromEntries(
     JOINTS.map((j) => [j, requireNode(gltf.scene, rigConfig.joints[j])]),
@@ -72,18 +71,23 @@ export async function loadPrepared(
   const bindPose = Object.fromEntries(
     JOINTS.map((j) => [j, joints[j].quaternion.clone()]),
   ) as Record<JointName, Quaternion>;
-  const sockets = Object.fromEntries(
-    Object.entries(rigConfig.sockets).map(([s, n]) => [
-      s,
-      requireNode(gltf.scene, n),
-    ]),
-  ) as Record<SocketName, Object3D>;
+  const sockets: Record<SocketName, Object3D> = {
+    rightHand: requireNode(gltf.scene, rigConfig.sockets.rightHand),
+    leftHand: requireNode(gltf.scene, rigConfig.sockets.leftHand),
+    leftForearm:
+      gltf.scene.getObjectByName(rigConfig.sockets.leftForearm) ??
+      joints.leftElbow,
+    back: requireNode(gltf.scene, rigConfig.sockets.back),
+  };
   const rifleOffset = gltf.scene.getObjectByName("rifleOffset");
   if (rifleOffset) {
     rifleOffset.quaternion.copy(sockets.rightHand.quaternion).invert();
   }
+  const activePartNames = hasEmbeddedEquipment
+    ? rigConfig.partNames
+    : rigConfig.bodyPartNames;
   const parts = Object.fromEntries(
-    rigConfig.partNames.map((n) => [n, requireNode(gltf.scene, n)]),
+    activePartNames.map((n) => [n, requireNode(gltf.scene, n)]),
   );
   const originalMaterials = new Map<Object3D, Material | Material[]>();
   displayRoot.traverse((o) => {
@@ -132,6 +136,8 @@ export async function loadPrepared(
   if (!Number.isFinite(bindFootMinY)) bindFootMinY = 0;
 
   return {
+    variant,
+    hasEmbeddedEquipment,
     displayRoot,
     joints,
     bindPose,
@@ -147,8 +153,8 @@ export async function loadPrepared(
 }
 
 export async function loadOriginal(): Promise<Group> {
-  const gltf = await loader.loadAsync(modelPaths.original);
-  prepare(gltf.scene);
+  const gltf = await gltfLoader.loadAsync(modelPaths.original);
+  prepareMeshMaterials(gltf.scene);
   const root = new Group();
   root.add(gltf.scene);
   root.updateMatrixWorld(true);

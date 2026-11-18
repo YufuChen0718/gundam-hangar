@@ -63,6 +63,8 @@ function rig(): ArmPreviewRig {
     joints.rightAnkle.getWorldPosition(new Vector3()).y,
   );
   return {
+    variant: "sentinel",
+    hasEmbeddedEquipment: false,
     displayRoot: root,
     joints,
     bindPose: Object.fromEntries(
@@ -71,6 +73,7 @@ function rig(): ArmPreviewRig {
     sockets: {
       rightHand: new Object3D(),
       leftHand: new Object3D(),
+      leftForearm: new Object3D(),
       back: new Object3D(),
     },
     parts: {},
@@ -259,12 +262,13 @@ test("custom LBS CPU reference matches Three.js skinning and reports distinct pe
   const bindPose = Object.fromEntries(
     JOINTS.map((j) => [j, joints[j].quaternion.clone()]),
   ) as Record<JointName, Quaternion>;
-  const sockets = Object.fromEntries(
-    Object.entries(rigConfig.sockets).map(([s, n]) => [
-      s,
-      gltf.scene.getObjectByName(n)!,
-    ]),
-  ) as Record<SocketName, Object3D>;
+  const sockets: Record<SocketName, Object3D> = {
+    rightHand: gltf.scene.getObjectByName("rightHand")!,
+    leftHand: gltf.scene.getObjectByName("leftHand")!,
+    leftForearm:
+      gltf.scene.getObjectByName("leftForearm") ?? joints.leftElbow,
+    back: gltf.scene.getObjectByName("back")!,
+  };
   const rifleOffset = gltf.scene.getObjectByName("rifleOffset");
   if (rifleOffset) {
     rifleOffset.quaternion.copy(sockets.rightHand.quaternion).invert();
@@ -282,6 +286,8 @@ test("custom LBS CPU reference matches Three.js skinning and reports distinct pe
       .y,
   );
   const fullRig: ArmPreviewRig = {
+    variant: "legacy",
+    hasEmbeddedEquipment: true,
     displayRoot,
     joints,
     bindPose,
@@ -332,12 +338,12 @@ test("custom LBS CPU reference matches Three.js skinning and reports distinct pe
   );
 });
 
-test("custom LBS CPU reference matches Three.js skinning and reports distinct per-pose seam gaps on gundam-guardian.glb", async () => {
+test("custom LBS CPU reference matches Three.js skinning and reports distinct per-pose seam gaps on gundam-sentinel.glb", async () => {
   Object.assign(globalThis, {
     self: globalThis,
     createImageBitmap: async () => ({ width: 1, height: 1, close() {} }),
   });
-  const buf = fs.readFileSync("public/assets/models/gundam-guardian.glb");
+  const buf = fs.readFileSync("public/assets/models/gundam-sentinel.glb");
   const loader = new GLTFLoader();
   const gltf = await loader.parseAsync(
     buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength),
@@ -351,18 +357,15 @@ test("custom LBS CPU reference matches Three.js skinning and reports distinct pe
   const bindPose = Object.fromEntries(
     JOINTS.map((j) => [j, joints[j].quaternion.clone()]),
   ) as Record<JointName, Quaternion>;
-  const sockets = Object.fromEntries(
-    Object.entries(rigConfig.sockets).map(([s, n]) => [
-      s,
-      gltf.scene.getObjectByName(n)!,
-    ]),
-  ) as Record<SocketName, Object3D>;
-  const rifleOffset = gltf.scene.getObjectByName("rifleOffset");
-  if (rifleOffset) {
-    rifleOffset.quaternion.copy(sockets.rightHand.quaternion).invert();
-  }
+  const sockets: Record<SocketName, Object3D> = {
+    rightHand: gltf.scene.getObjectByName("rightHand")!,
+    leftHand: gltf.scene.getObjectByName("leftHand")!,
+    leftForearm:
+      gltf.scene.getObjectByName("leftForearm") ?? joints.leftElbow,
+    back: gltf.scene.getObjectByName("back")!,
+  };
   const parts = Object.fromEntries(
-    rigConfig.partNames.map((n) => [n, gltf.scene.getObjectByName(n)!]),
+    rigConfig.bodyPartNames.map((n) => [n, gltf.scene.getObjectByName(n)!]),
   );
   displayRoot.updateMatrixWorld(true);
   const lbs = new LbsManager(displayRoot, parts);
@@ -374,6 +377,8 @@ test("custom LBS CPU reference matches Three.js skinning and reports distinct pe
       .y,
   );
   const fullRig: ArmPreviewRig = {
+    variant: "sentinel",
+    hasEmbeddedEquipment: false,
     displayRoot,
     joints,
     bindPose,
@@ -394,19 +399,19 @@ test("custom LBS CPU reference matches Three.js skinning and reports distinct pe
     const seam = lbs.computeSeamStats("lbs");
     const rigidSeam = lbs.computeSeamStats("rigid");
     const vsThree = lbs.compareWithThreeSkinning();
-    assert.equal(seam.boundaryGroups, 930);
+    assert.equal(seam.boundaryGroups, 731);
     assert.ok(
       seam.maxGap < 1e-5,
-      `Guardian LBS seam gap exceeded threshold on ${preset.id}: ${seam.maxGap}`,
+      `Sentinel LBS seam gap exceeded threshold on ${preset.id}: ${seam.maxGap}`,
     );
     assert.ok(
       vsThree.maxDiff < 1e-6,
-      `Guardian LBS vs Three.js max diff exceeded threshold on ${preset.id}: ${vsThree.maxDiff}`,
+      `Sentinel LBS vs Three.js max diff exceeded threshold on ${preset.id}: ${vsThree.maxDiff}`,
     );
     if (preset.id !== "bind") {
       assert.ok(
         rigidSeam.maxGap > 0.01,
-        `Expected Guardian rigid-parts mode to show visible seam crack (>10 mm) on ${preset.id}, got ${rigidSeam.maxGap}`,
+        `Expected Sentinel rigid-parts mode to show visible seam crack (>10 mm) on ${preset.id}, got ${rigidSeam.maxGap}`,
       );
     }
     seamMaxs.push(Number(seam.maxGap.toExponential(4)));
@@ -415,12 +420,12 @@ test("custom LBS CPU reference matches Three.js skinning and reports distinct pe
   assert.equal(
     new Set(seamMaxs).size,
     TEST_POSES.length,
-    `Expected Guardian per-pose LBS seam gaps to differ across all 9 poses: ${seamMaxs.join(", ")}`,
+    `Expected Sentinel per-pose LBS seam gaps to differ across all 9 poses: ${seamMaxs.join(", ")}`,
   );
   assert.equal(
     new Set(vsThreeMaxs).size,
     TEST_POSES.length,
-    `Expected Guardian per-pose LBS vs Three.js diffs to differ across all 9 poses: ${vsThreeMaxs.join(", ")}`,
+    `Expected Sentinel per-pose LBS vs Three.js diffs to differ across all 9 poses: ${vsThreeMaxs.join(", ")}`,
   );
 });
 
@@ -440,9 +445,9 @@ test("swing automatically returns to idle while aim holds its final pose", () =>
   assert.equal(a.action, "aim");
   assert.equal(a.status, "holding");
   assert.equal(a.playing, false);
-  assert.ok(Math.abs(a.jointAngleDeg("rightShoulder") - 36) < 0.5);
-  assert.ok(Math.abs(a.jointAngleDeg("torso") - 22) < 0.5);
-  assert.ok(Math.abs(a.jointAngleDeg("rightKnee") - 32) < 0.5);
+  assert.ok(Math.abs(a.jointAngleDeg("rightShoulder") - 22) < 0.5);
+  assert.ok(Math.abs(a.jointAngleDeg("torso") - 18) < 0.5);
+  assert.ok(Math.abs(a.jointAngleDeg("rightKnee") - 28) < 0.5);
 });
 
 test("switching idle -> swing -> aim mid-swing blends smoothly in blend mode and jumps in cut mode", () => {
