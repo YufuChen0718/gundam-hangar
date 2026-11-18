@@ -1,39 +1,61 @@
-# Gundam Guardian Asset Audit, Decimation, 15-Joint Full-Body Rig & Validation Report
+# Gundam Guardian Asset Audit, Decimation, High-to-Low Texture Baking, 15-Joint Rig & Validation Report
 
 **Date:** 2026-11-17  
 **Raw Source Asset:** `assets-src/Meshy_AI_Gundam_Guardian_20261118_texture.blend` (git-ignored, `225,158,540` bytes / `214.73 MiB`)  
-**Reduced Working Source:** [assets-src/gundam-guardian-source.blend](../../assets-src/gundam-guardian-source.blend) (`19,240,688` bytes / `18.35 MiB`)  
-**Rigged Blender Output:** `assets-src/gundam-guardian-rigged.blend` (`18,988,284` bytes / `18.11 MiB`)  
-**Exported Runtime GLB:** [public/assets/models/gundam-guardian.glb](../../public/assets/models/gundam-guardian.glb) (`7,090,692` bytes / `6.76 MiB`)  
-**Preparation Script:** [scripts/prepare_mecha.py](../../scripts/prepare_mecha.py) (`--asset guardian`)  
-**Texture Compression Script:** [scripts/clean_textures.py](../../scripts/clean_textures.py)
+**Raw Part-Split Reference STL:** `assets-src/Meshy_AI_Gundam_Guardian_20261118_part-segmentation_split.stl` (git-ignored, `101,887,184` bytes / `97.17 MiB`, `2,037,742` tris across 9 exploded print-bed parts)  
+**Reduced & Baked Working Source:** [assets-src/gundam-guardian-source.blend](../../assets-src/gundam-guardian-source.blend) (`18,697,849` bytes / `17.83 MiB`)  
+**Rigged Blender Output:** `assets-src/gundam-guardian-rigged.blend` (`18,716,768` bytes / `17.85 MiB`)  
+**Exported Runtime GLB:** [public/assets/models/gundam-guardian.glb](../../public/assets/models/gundam-guardian.glb) (`19,342,260` bytes / `18.45 MiB`)  
+**Preparation Script:** [scripts/prepare_mecha.py](../../scripts/prepare_mecha.py) (`--asset guardian`)
 
 ---
 
 ## 1. Phase 1 — Raw Source Audit (`docs/results/guardian-audit/`)
 
-We inspected `assets-src/Meshy_AI_Gundam_Guardian_20261118_texture.blend` in Blender 5.0.1 background mode without modifying the original file. Full raw metadata is archived in [source-inspection.json](guardian-audit/source-inspection.json) with orthographic/perspective audit renders in [source-front.png](guardian-audit/source-front.png), [source-side.png](guardian-audit/source-side.png), and [source-back.png](guardian-audit/source-back.png).
+We inspected `assets-src/Meshy_AI_Gundam_Guardian_20261118_texture.blend` in Blender 5.2.0 LTS background mode without modifying the original file. Full raw metadata is archived in [source-inspection.json](guardian-audit/source-inspection.json) with renders in [source-front.png](guardian-audit/source-front.png), [source-side.png](guardian-audit/source-side.png), and [source-back.png](guardian-audit/source-back.png).
 
-| Property | Raw Source (`Meshy_AI_Gundam_Guardian_20261118_texture.blend`) | Web-Ready Working Copy (`gundam-guardian-source.blend`) | Final Rigged GLB (`gundam-guardian.glb`) |
+| Property | Raw Source (`Meshy_AI_Gundam_Guardian_20261118_texture.blend`) | Baked Working Copy (`gundam-guardian-source.blend`) | Final Rigged GLB (`gundam-guardian.glb`) |
 | --- | --- | --- | --- |
-| **File Size** | `225,158,540 B` (`214.73 MiB` / `225.16 MB`) | `19,240,688 B` (`18.35 MiB`) | `7,090,692 B` (`6.76 MiB`) |
+| **File Size** | `225,158,540 B` (`214.73 MiB` / `225.16 MB`) | `18,697,849 B` (`17.83 MiB`) | `19,342,260 B` (`18.45 MiB`) |
 | **Mesh Objects** | `1` (`Mesh_0`) | `1` (`Mesh_0`) | `17` (`15` skinned armor parts + `rifle` + `shield`) |
-| **Vertices** | `1,001,106` | `14,632` | `26,623` GPU vertices across 15 skinned parts (`14,632` source topology) |
+| **Vertices** | `1,001,106` | `14,632` | `36,097` GPU vertices across 15 skinned parts (`14,632` source topology) |
 | **Edges** | `3,004,470` | `44,655` | Preserved across 17 parts |
 | **Triangles (Faces)** | `2,002,991` | `30,043` (`ratio = 0.015`) | `30,043` (`100%` preserved) |
 | **Connected Components** | `1` single fused shell (rifle & shield welded at grip/forearm) | `1` single shell | `17` topologically cleaned components |
 | **Armatures / Vertex Groups** | `0` armatures, `0` vertex groups, `0` actions | `0` armatures | `1` (`MechaRig`, 15 joints + 3 sockets) |
-| **Materials** | `1` (`Material_0`, Principled BSDF) | `1` (`Material_0`) | `1` (`Material_0`, double-sided PBR) |
-| **Textures** | `Image_0` Base Color ($8192\times8192$, `36.56 MiB`)<br>`Image_1` Metallic/Roughness ($4096\times4096$, `6.23 MiB`)<br>`Image_2` Normal Map ($4096\times4096$, `9.17 MiB`) | All 3 resized to $2048\times2048$ | Cleaned & quantized $2048\times2048$ PNGs (`1814 KB` color, `602 KB` MR, `2937 KB` normal) |
+| **Materials** | `1` (`Material_0`, Principled BSDF) | `1` (`Material_0`, baked PBR) | `1` (`Material_0`, double-sided PBR) |
+| **Textures** | `Image_0` Base Color ($8192\times8192$, `36.56 MiB`)<br>`Image_1` Metallic/Roughness ($4096\times4096$, `6.23 MiB`)<br>`Image_2` Normal Map ($4096\times4096$, `9.17 MiB`) | Cycles high-to-low baked $4096\to2048$ (`6.52 MB` color, `4.22 MB` MR, `6.42 MB` normal) | Lossless embedded $2048\times2048$ PNGs (no `clean_textures.py` quantization) |
 | **Dimensions & Frame** | $1.369\text{ m (X)} \times 1.078\text{ m (Y)} \times 1.901\text{ m (Z)}$, metric `1.0`, feet on $z=0$ ($y=0$ in glTF) | Same metric frame | $+Y$ up, faces $+Z$, feet on $y = 0$, arms hanging down |
 
 ---
 
-## 2. Phase 2 & 3 — Decimation, Segmentation, and 15-Joint Full-Body Rig
+## 2. High-to-Low Cycles Texture Baking (`docs/results/guardian-bake/`)
 
-1. **Decimation & Texture Downscaling:** Applying Blender's `DECIMATE` (`COLLAPSE`, `ratio = 0.015`) reduced the dense Meshy surface from **2,002,991 triangles (`1,001,106` vertices)** to **30,043 triangles (`14,632` vertices)** while preserving sharp armor silhouettes, head crest details, shoulder pauldrons, rifle barrel, and shield face. Downscaling textures from 8K/4K to 2K reduced the working `.blend` to **18.35 MiB** (`< 50 MB`) and the final quantized GLB to **6.76 MiB** (`< 25 MB`).
-2. **Weapon & Shield Separation:** Because the raw Meshy mesh is a single connected component (`1` shell), `scripts/prepare_mecha.py --asset guardian` separates the right-hand beam rifle (`2,419` triangles) and left-forearm shield (`2,756` triangles) via calibrated bounding planes around the right grip and left forearm mount, Followed by topological connected-component cleanup so no floating fragments remain. The rifle is parented to `rightHandSocket` (`rightWrist`) and the shield is parented to `leftForearmSocket` (`leftElbow`).
-3. **Shared-Vertex Skin Weights & 15-Joint Hierarchy:** Before splitting the body into 15 armor parts, smooth skin weights are computed on the original vertex indices (`0..14631`) with narrow 2-ring joint blend bands (`BLEND_RING_WEIGHTS = {1: 0.38, 2: 0.16}`) and rigid `1.0` interior weights. Both `Guardian (new)` and `Previous model` share the exact same 15 joint names, joint limits, and socket names (`rightHandSocket`, `leftHandSocket`, `leftForearmSocket`).
+### Cause of Initial Texture Smearing
+When `Mesh_0` was decimated from `2,002,991` triangles to `30,043` triangles (`ratio = 0.015`), Blender's collapse decimator merged vertices across disjoint UV island boundaries in the original Meshy atlas. Triangles straddling those collapsed seams interpolated UV coordinates across unrelated texture islands, causing jagged comb-teeth streaks on the shield star cross, diagonal black smears across the yellow chest vents, and white waist triangles bleeding into the red abdomen.
+
+### High-to-Low Bake Method & Settings ([bake-summary.json](guardian-bake/bake-summary.json))
+1. **Preserved Low-Poly Geometry & New Smart UV Layout:** Kept the exact `14,632` vertices and `30,043` triangles in `assets-src/gundam-guardian-source.blend`, removed the collapsed UV layer, and generated a fresh single-atlas **Smart UV Project** (`angle_limit = 66°`, `correct_aspect = True`, packed with `margin_method = 'FRACTION'`, `margin = 0.0008` so all islands pack without overlap at **80.48% atlas coverage** across `38,367` unique UV coordinates).
+2. **Cycles GPU (`METAL`, Apple M4 Pro) Selected-to-Active Baking at $4096 \times 4096$:**
+   - **Two-Pass Cage Extrusion + Pinhole Healing:** A single large extrusion (`0.012–0.02 m`) pushes rays inside overhanging $90^\circ$ steps (such as the top edge of the yellow chest vents and the recessed left shield border), while a small extrusion (`0.005 m`) can miss deep decimation chord bridges (`~10–14 mm`). We therefore run a tight pass (`cage_extrusion = 0.005 m`, `max_ray_distance = 0.016 m`, `margin = 4 px`) for crisp crevice/overhang hits and a wide pass (`cage_extrusion = 0.015 m`, `max_ray_distance = 0.035 m`, `margin = 8 px`) as a fallback wherever the tight pass misses or hits a back-face, followed by 3-step interior pinhole healing (`0.000000` inverted normals).
+   - **Base Color (`DIFFUSE`, color only):** `use_pass_direct = False`, `use_pass_indirect = False`, `use_pass_color = True` with high-poly `Metallic` temporarily set to `0.0` and `Normal` disconnected so metallic or grazing surfaces never attenuate the diffuse color pass.
+   - **Normal (`NORMAL`, tangent space):** `+X / +Y / +Z` tangent-space normal bake capturing both the 2M-triangle geometric bevels/panel lines and the high-poly 4K normal map (`Image_2`).
+   - **Metallic & Roughness (`EMIT`):** Baked `Separate Color.Green` (Roughness) and `Separate Color.Blue` (Metallic) separately via an `Emission` shader (`Strength = 1.0`) in `Non-Color` space and packed them into a glTF `metallicRoughness` map (`R = 1.0`, `G = roughness`, `B = metallic`).
+   - **Resolution & GLB Size:** Baked at $4096 \times 4096$ (`24.04 MB` color, `20.54 MB` normal, `13.50 MB` MR — `58.08 MB` total, which would exceed the 25 MB GLB limit) and box-filter downscaled ($2\times2$ with tangent-normal renormalization) to $2048 \times 2048$ (`6.52 MB` color, `6.42 MB` normal, `4.22 MB` MR). Using the unquantized $2048 \times 2048$ baked maps (without running `clean_textures.py`), `public/assets/models/gundam-guardian.glb` is **`19.34 MB` (`18.45 MiB`)**, well under the 25 MB limit.
+
+### Bake Comparisons & Before/After Close-Ups
+- **High-Poly (2M tris, left) vs. Baked Low-Poly (30k tris, right):** [compare-front.png](guardian-bake/compare-front.png), [compare-side.png](guardian-bake/compare-side.png), [compare-back.png](guardian-bake/compare-back.png)
+- **Shield Front (Before vs. After):** [shield-before.png](guardian-bake/shield-before.png) $\to$ [shield-after.png](guardian-bake/shield-after.png)
+- **Chest & Vents (Before vs. After):** [chest-before.png](guardian-bake/chest-before.png) $\to$ [chest-after.png](guardian-bake/chest-after.png)
+- **Right Arm & Rifle (Before vs. After):** [arm-before.png](guardian-bake/arm-before.png) $\to$ [arm-after.png](guardian-bake/arm-after.png)
+
+---
+
+## 3. Meshy STL Part-Segmentation Comparison (Step 6 Reference)
+
+We inspected `assets-src/Meshy_AI_Gundam_Guardian_20261118_part-segmentation_split.stl` (`101,887,184` bytes, `2,037,742` triangles, git-ignored) and compared its connected components against `ASSET_CONFIGS['guardian']`:
+1. **Exploded Print-Bed Layout vs. In-Place Rigging Frame:** Meshy's `part-segmentation_split.stl` translates and rotates each split piece onto a flat $120 \times 120$ print bed (`Z >= 0.002`), losing the assembled character coordinate frame and adding `34,751` planar cap triangles across cut planes (`2,037,742` vs. `2,002,991` tris).
+2. **Coarse 9-Piece Split vs. 17-Part Articulated Hierarchy:** Meshy's automatic splitter only separates the model into **9 coarse connected components** (`340,910` to `55,440` tris each), leaving whole limbs (thigh + shin + foot, or upper arm + forearm + hand) fused as single rigid blocks. By contrast, `ASSET_CONFIGS['guardian']` segments the mesh in-place into **17 articulated parts** matching all **15 joints** (`pelvis`, `torso`, `head`, bilateral `shoulder`/`elbow`/`wrist`, bilateral `hip`/`knee`/`ankle`) plus detachable `rifle` and `shield` while preserving shared boundary vertices for watertight LBS.
 
 ### Triangle Count per Mesh Part (`30,043` Total)
 
@@ -60,50 +82,34 @@ We inspected `assets-src/Meshy_AI_Gundam_Guardian_20261118_texture.blend` in Ble
 
 ---
 
-## 3. Phase 4 — Per-Pose Seam Continuity, Custom LBS vs. Three.js, and Rigid Cracks
+## 4. Phase 4 — Per-Pose Seam Continuity, Custom LBS vs. Three.js, and Rigid Cracks
 
-Across all 15 skinned body parts, there are **932 shared boundary vertices** in Blender (**930 spatial boundary groups** at $10^{-5}\text{ m}$ quantization in the browser) and **26,623 skinned vertices**. All 9 full-body test poses pass the $< 10^{-5}\text{ m}$ ($0.01\text{ mm}$) seam threshold by two orders of magnitude:
+Across all 15 skinned body parts, there are **932 shared boundary vertices** in Blender (**930 spatial boundary groups** at $10^{-5}\text{ m}$ quantization in the browser) and **36,097 GPU vertices** (after UV-seam splitting from the new Smart UV layout). All 9 full-body test poses pass the $< 10^{-5}\text{ m}$ ($0.01\text{ mm}$) seam threshold by two orders of magnitude:
 
 | Pose ID | Blender Max Seam (m) | Browser Our-LBS Max Seam (m) | Browser Our-LBS Mean Seam (m) | Rigid-Parts Max Crack (m) | Rigid-Parts Max Crack (mm) | Our LBS vs. Three.js Max Diff (m) | Our LBS vs. Three.js Mean Diff (m) | Rifle Socket Error (m) | Foot Min Y (L / R, m) |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `bind` | `0.0000e+0` | `7.1726e-8` | `3.0694e-9` | `7.1726e-8` | `0.0001` | `1.0537e-8` | `4.1491e-9` | `1.36e-16` | `0.0028 / 0.0000` |
-| `rightArmAim` | `1.1921e-7` | `1.0412e-7` | `9.2062e-9` | `0.272622` | `272.62` | `6.2848e-8` | `7.6048e-9` | `1.11e-16` | `0.0028 / 0.0000` |
-| `leftArmGuard` | `1.1921e-7` | `8.3772e-8` | `8.1804e-9` | `0.228329` | `228.33` | `6.2884e-8` | `9.9021e-9` | `1.36e-16` | `0.0028 / 0.0000` |
-| `dualArmReady` | `1.3411e-7` | `9.2056e-8` | `1.0624e-8` | `0.360140` | `360.14` | `6.0978e-8` | `7.6491e-9` | `5.55e-17` | `0.0028 / 0.0000` |
-| `torsoTwist` | `1.3411e-7` | `8.0302e-8` | `1.4543e-8` | `0.197328` | `197.33` | `5.8850e-8` | `1.2030e-8` | `1.11e-16` | `0.0028 / 0.0000` |
-| `crouch` | `1.2288e-7` | `1.1194e-7` | `1.4131e-8` | `0.231065` | `231.07` | `6.3971e-8` | `1.8375e-8` | `1.24e-16` | `0.0028 / 0.0000` |
-| `deepCrouchAim` | `2.4440e-7` | `1.0612e-7` | `1.7949e-8` | `0.381579` | `381.58` | `5.5038e-8` | `2.7404e-8` | `5.55e-17` | `0.0028 / 0.0000` |
-| `fullBodyTwistCrouch` | `2.4646e-7` | `9.8748e-8` | `1.3714e-8` | `0.329426` | `329.43` | `5.6975e-8` | `1.7412e-8` | `7.85e-17` | `0.0028 / -0.0000` |
-| `maxArticulation` | `2.4074e-7` | `1.1206e-7` | `2.0210e-8` | `0.400402` | `400.40` | `6.0478e-8` | `2.5130e-8` | `2.78e-17` | `0.0028 / 0.0000` |
+| `bind` | `0.0000e+0` | `7.1726e-8` | `3.0197e-9` | `7.1726e-8` | `0.0001` | `1.0537e-8` | `4.2001e-9` | `1.36e-16` | `0.0028 / 0.0000` |
+| `rightArmAim` | `1.1921e-7` | `1.0412e-7` | `9.3448e-9` | `0.272622` | `272.62` | `6.2848e-8` | `7.8818e-9` | `1.11e-16` | `0.0028 / 0.0000` |
+| `leftArmGuard` | `1.1921e-7` | `8.3772e-8` | `8.0215e-9` | `0.228329` | `228.33` | `6.2884e-8` | `1.0154e-8` | `1.36e-16` | `0.0028 / 0.0000` |
+| `dualArmReady` | `1.3411e-7` | `9.2056e-8` | `1.0332e-8` | `0.360140` | `360.14` | `6.0978e-8` | `7.9409e-9` | `5.55e-17` | `0.0028 / 0.0000` |
+| `torsoTwist` | `1.3411e-7` | `8.0302e-8` | `1.4073e-8` | `0.197328` | `197.33` | `5.8850e-8` | `1.2194e-8` | `1.11e-16` | `0.0028 / 0.0000` |
+| `crouch` | `1.2288e-7` | `1.1194e-7` | `1.3642e-8` | `0.231065` | `231.07` | `6.3971e-8` | `1.8913e-8` | `1.24e-16` | `0.0028 / 0.0000` |
+| `deepCrouchAim` | `2.4440e-7` | `1.0612e-7` | `1.7692e-8` | `0.381579` | `381.58` | `5.5038e-8` | `2.7252e-8` | `5.55e-17` | `0.0028 / 0.0000` |
+| `fullBodyTwistCrouch` | `2.4646e-7` | `9.8748e-8` | `1.3215e-8` | `0.329426` | `329.43` | `5.6975e-8` | `1.7783e-8` | `7.85e-17` | `0.0028 / -0.0000` |
+| `maxArticulation` | `2.4074e-7` | `1.1206e-7` | `1.9546e-8` | `0.400402` | `400.40` | `6.0478e-8` | `2.4786e-8` | `2.78e-17` | `0.0028 / 0.0000` |
 
 ### Frame-Time Benchmark on Guardian (85-frame window, 60 Hz display)
 
 | Skinning Mode | Mean Frame Time (ms) | Median Frame Time (ms) | p95 Frame Time (ms) |
 | --- | ---: | ---: | ---: |
-| `Three.js skinning` | `17.267` | `16.7` | `18.0` |
-| `our LBS` | `16.924` | `16.7` | `17.9` |
-| `rigid parts` | `17.419` | `16.7` | `18.2` |
-
----
-
-## 4. T07 Blend vs. Cut Transition Evaluation on Guardian
-
-We re-ran the T07 mid-swing interrupt recording (`idle` $\to$ `swing` at $t = 1.00\text{ s}$ $\to$ `aim` at $t = 1.45\text{ s}$, $\Delta t = 1/120\text{ s}$) on the 15-joint `gundam-guardian.glb` model:
-
-- **CSV Data:** [guardian-transition-curves.csv](guardian-transition-curves.csv)
-- **Vector Plot:** [guardian-transition-plot.svg](guardian-transition-plot.svg)
-- **Raster Plot:** [guardian-transition-plot.png](guardian-transition-plot.png)
-
-| Joint | Peak $\omega$ at `swing -> aim` (`cut`, deg/s) | Peak $\omega$ at `swing -> aim` (`blend`, deg/s) | Reduction Factor |
-| --- | ---: | ---: | ---: |
-| `rightShoulder` | `1562.59` | `168.47` | **9.3×** |
-| `torso` | `1678.22` | `120.99` | **13.9×** |
-| `rightKnee` | `2398.38` | `181.39` | **13.2×** |
+| `Three.js skinning` | `16.673` | `16.7` | `17.3` |
+| `our LBS` | `16.425` | `16.6` | `17.2` |
+| `rigid parts` | `16.672` | `16.6` | `17.6` |
 
 ---
 
 ## 5. Known Limitations
 
-1. **Joint Band Deformation:** The 2-ring shared-weight transition bands around the 15 joints preserve $C^0$ watertight continuity ($\le 1.12 \times 10^{-7}\text{ m}$ gap), which introduces mild local triangle stretching at extreme joint angles ($>75^\circ$ elbow/knee flexion) compared to rigid sub-assemblies with separate internal mechanical joint geometry.
-2. **Armor Interpenetration:** Because no self-collision solver is used, large shoulder pitch ($>45^\circ$) or deep hip flexion ($>30^\circ$) causes the prominent Guardian shoulder pauldrons and front/side waist skirt plates to partially interpenetrate adjacent upper-arm or thigh armor.
-3. **AI-Generated Fused Topology & Texture Baking:** In the raw single-component Meshy scan, the inner right wrist/forearm and the right waist side-skirt were topologically bridged across a narrow contact strip, and ambient occlusion shadows under the pauldrons, shield mount, and rifle grip are baked into the base-color texture (`Image_0`). When the right arm swings away from the hip or when the rifle/shield are hidden, those contact regions show minor stretched bridge triangles and baked shadow patches.
+1. **Decimated Silhouette Faceting at Extreme Close-Up:** While the tangent-space normal bake recovers internal panel lines, vents, and bevel shading from the 2M-triangle sculpt, physical silhouette edges (such as the curved edge of the yellow shield star or circular knee caps) are still bounded by the 30,043-triangle polygon edges when viewed at extreme close-up.
+2. **Joint Band Deformation & Armor Interpenetration:** The 2-ring shared-weight transition bands preserve $C^0$ watertight continuity ($\le 1.12 \times 10^{-7}\text{ m}$ gap) with mild local stretching past $75^\circ$ flexion, and shoulder pauldrons / waist skirts can intersect adjacent limbs at large pitch angles.
+3. **AI-Generated Contact Bridges & Baked Occlusion:** In the raw single-shell Meshy model, the inner right wrist/forearm and right waist skirt were topologically fused across a narrow contact strip, and ambient shadows under the rifle grip and shield mount are baked into the raw high-poly albedo (`Image_0`), remaining visible when weapons are hidden or limbs move away from bind contact.

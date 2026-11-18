@@ -22,23 +22,23 @@
     "three": {
       "mode": "three",
       "samples": 85,
-      "meanMs": 17.267,
+      "meanMs": 16.673,
       "medianMs": 16.7,
-      "p95Ms": 18
+      "p95Ms": 17.3
     },
     "lbs": {
       "mode": "lbs",
       "samples": 85,
-      "meanMs": 16.924,
-      "medianMs": 16.7,
-      "p95Ms": 17.9
+      "meanMs": 16.425,
+      "medianMs": 16.6,
+      "p95Ms": 17.2
     },
     "rigid": {
       "mode": "rigid",
       "samples": 85,
-      "meanMs": 17.419,
-      "medianMs": 16.7,
-      "p95Ms": 18.2
+      "meanMs": 16.672,
+      "medianMs": 16.6,
+      "p95Ms": 17.6
     }
   },
   "seamTests": [
@@ -62,13 +62,13 @@
         "leftAnkle": 0
       },
       "boundaryGroups": 930,
-      "skinnedVertexCount": 26623,
+      "skinnedVertexCount": 36097,
       "skinSeamGap": 7.172582841082186e-8,
-      "skinSeamMeanGap": 3.0693891712951507e-9,
+      "skinSeamMeanGap": 3.0196624863842525e-9,
       "rigidSeamGapMax": 7.172582841082186e-8,
-      "rigidSeamGapMean": 2.5810437770332327e-9,
+      "rigidSeamGapMean": 2.5937035297595147e-9,
       "lbsVsThreeMaxDiff": 1.0536712441742e-8,
-      "lbsVsThreeMeanDiff": 4.149063586008427e-9,
+      "lbsVsThreeMeanDiff": 4.200144759062988e-9,
       "attachmentError": 1.3597399555105182e-16,
       "leftFootMinY": 0.002798616886138916,
       "rightFootMinY": 0
@@ -93,13 +93,13 @@
         "leftAnkle": 0
       },
       "boundaryGroups": 930,
-      "skinnedVertexCount": 26623,
+      "skinnedVertexCount": 36097,
       "skinSeamGap": 1.0412089319665416e-7,
-      "skinSeamMeanGap": 9.206217693753631e-9,
+      "skinSeamMeanGap": 9.344767440474342e-9,
       "rigidSeamGapMax": 0.27262179480390947,
-      "rigidSeamGapMean": 0.007168993807123403,
+      "rigidSeamGapMean": 0.007336817045691126,
       "lbsVsThreeMaxDiff": 6.28484902078938e-8,
-      "lbsVsThreeMeanDiff": 7.604792824281873e-9,
+      "lbsVsThreeMeanDiff": 7.881795916066427e-9,
       "attachmentError": 1.1102230246251565e-16,
       "leftFootMinY": 0.002798616886138916,
       "rightFootMinY": 0
@@ -124,13 +124,13 @@
         "leftAnkle": 0
       },
       "boundaryGroups": 930,
-      "skinnedVertexCount": 26623,
+      "skinnedVertexCount": 36097,
       "skinSeamGap": 8.377209679094458e-8,
-      "skinSeamMeanGap": 8.180420597089209e-9,
+      "skinSeamMeanGap": 8.021490910122347e-9,
       "rigidSeamGapMax": 0.2283287001568084,
-      "rigidSeamGapMean": 0.01037412143404788,
+      "rigidSeamGapMean": 0.009809643563114968,
       "lbsVsThreeMaxDiff": 6.288363850236934e-8,
-      "lbsVsThreeMeanDiff": 9.902050656840394e-9,
+      "lbsVsThreeMeanDiff": 1.015373975966913e-8,
       "attachmentError": 1.3597399555105182e-16,
       "leftFootMinY": 0.002798616886138916,
       "rightFootMinY": 0
@@ -155,13 +155,13 @@
         "leftAnkle": 0
       },
       "boundaryGroups": 930,
-      "skinnedVertexCount": 26623,
+      "skinnedVertexCount": 36097,
       "skinSeamGap": 9.205598458366815e-8,
-      "skinSeamMeanGap": 1.0623931883007569e-8,
+      "skinSeamMeanGap": 1.0507675656324405e-8,
       "rigidSeamGapMax": 0.3601403793170082,
-      "rigidSeamGapMean": 0.021474019776240156,
+      "rigidSeamGapMean": 0.02099662300314964,
       "lbsVsThreeMaxDiff": 6.097840907279198e-8,
-      "lbsVsThreeMeanDiff": 7.649149855346401e-9,
+      "lbsVsThreeMeanDiff": 7.755877375895154e-9,
       "attachmentError": 5.551115123125783e-17,
       "leftFootMinY": 0.002798616886138916,
       "rightFootMinY": 0
@@ -186,13 +186,13 @@
         "leftAnkle": 0
       },
       "boundaryGroups": 930,
-      "skinnedVertexCount": 26623,
+      "skinnedVertexCount": 36097,
       "skinSeamGap": 8.030231183261383e-8,
-      "skinSeamMeanGap": 1.4543243949269523e-8,
+      "skinSeamMeanGap": 1.4073184326522993e-8,
       "rigidSeamGapMax": 0.19732792603090032,
-      "rigidSeamGapMean": 0.025430198347909917,
+      "rigidSeamGapMean": 0.02514959685194185,
       "lbsVsThreeMaxDiff": 5.88495296831484e-8,
-      "lbsVsThreeMeanDiff": 1.2029936783443802e-8,
+      "lbsVsThreeMeanDiff": 1.2194032640171471e-8,
       "attachmentError": 1.1102230246251565e-16,
       "leftFootMinY": 0.002798616886138916,
       "rightFootMinY": 0
@@ -217,13 +217,13 @@
         "leftAnkle": 22
       },
       "boundaryGroups": 930,
-      "skinnedVertexCount": 26623,
+      "skinnedVertexCount": 36097,
       "skinSeamGap": 1.1194305928091108e-7,
-      "skinSeamMeanGap": 1.4131415267490642e-8,
+      "skinSeamMeanGap": 1.364242928816907e-8,
       "rigidSeamGapMax": 0.23106538251482894,
-      "rigidSeamGapMean": 0.021121913047262093,
+      "rigidSeamGapMean": 0.02035175791826889,
       "lbsVsThreeMaxDiff": 6.397131898773143e-8,
-      "lbsVsThreeMeanDiff": 1.8375297294154683e-8,
+      "lbsVsThreeMeanDiff": 1.891288990011779e-8,
       "attachmentError": 1.2412670766236366e-16,
       "leftFootMinY": 0.002798616886138916,
       "rightFootMinY": 0
@@ -248,13 +248,13 @@
         "leftAnkle": 32
       },
       "boundaryGroups": 930,
-      "skinnedVertexCount": 26623,
+      "skinnedVertexCount": 36097,
       "skinSeamGap": 1.0611918584111786e-7,
-      "skinSeamMeanGap": 1.7948881044502452e-8,
+      "skinSeamMeanGap": 1.7692162061875617e-8,
       "rigidSeamGapMax": 0.3815794887227612,
-      "rigidSeamGapMean": 0.04480843918801757,
+      "rigidSeamGapMean": 0.043363068858056845,
       "lbsVsThreeMaxDiff": 5.50382004459578e-8,
-      "lbsVsThreeMeanDiff": 2.7404277302392748e-8,
+      "lbsVsThreeMeanDiff": 2.7251843210338498e-8,
       "attachmentError": 5.551115123125783e-17,
       "leftFootMinY": 0.002798616886138916,
       "rightFootMinY": 0
@@ -279,13 +279,13 @@
         "leftAnkle": 18.000000000000004
       },
       "boundaryGroups": 930,
-      "skinnedVertexCount": 26623,
+      "skinnedVertexCount": 36097,
       "skinSeamGap": 9.874782787073563e-8,
-      "skinSeamMeanGap": 1.3714125035597785e-8,
+      "skinSeamMeanGap": 1.321516143504125e-8,
       "rigidSeamGapMax": 0.3294258833081582,
-      "rigidSeamGapMean": 0.04173496524760492,
+      "rigidSeamGapMean": 0.04076877491712197,
       "lbsVsThreeMaxDiff": 5.697461776663987e-8,
-      "lbsVsThreeMeanDiff": 1.741160665789875e-8,
+      "lbsVsThreeMeanDiff": 1.778334996283343e-8,
       "attachmentError": 7.850462293418876e-17,
       "leftFootMinY": 0.002798616886138916,
       "rightFootMinY": -2.7755575615628914e-17
@@ -310,13 +310,13 @@
         "leftAnkle": 29.999999999999996
       },
       "boundaryGroups": 930,
-      "skinnedVertexCount": 26623,
+      "skinnedVertexCount": 36097,
       "skinSeamGap": 1.1206427408596472e-7,
-      "skinSeamMeanGap": 2.0209829897200378e-8,
+      "skinSeamMeanGap": 1.9546323910736488e-8,
       "rigidSeamGapMax": 0.40040212852672213,
-      "rigidSeamGapMean": 0.05979040571247038,
+      "rigidSeamGapMean": 0.05799718629070242,
       "lbsVsThreeMaxDiff": 6.047765365945798e-8,
-      "lbsVsThreeMeanDiff": 2.5129946522376564e-8,
+      "lbsVsThreeMeanDiff": 2.478639925228492e-8,
       "attachmentError": 2.7755575615628914e-17,
       "leftFootMinY": 0.002798616886138916,
       "rightFootMinY": 0
