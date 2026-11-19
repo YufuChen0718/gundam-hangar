@@ -11,9 +11,9 @@ import type {
 const baseUrl = import.meta.env?.BASE_URL ?? "/";
 
 export const modelPaths = {
-  sentinel: `${baseUrl}assets/models/gundam-sentinel.glb?v=sentinel-rigid-1`,
+  sentinel: `${baseUrl}assets/models/gundam-sentinel.glb?v=sentinel-rigid-2`,
   legacy: `${baseUrl}assets/models/gundam-rigged.glb?v=full-body-15`,
-  prepared: `${baseUrl}assets/models/gundam-sentinel.glb?v=sentinel-rigid-1`,
+  prepared: `${baseUrl}assets/models/gundam-sentinel.glb?v=sentinel-rigid-2`,
   original: `${baseUrl}assets/models/mecha-original.glb`,
   equipBeamSaber: `${baseUrl}assets/models/equip-beam-saber.glb?v=saber-1`,
   equipRifle: `${baseUrl}assets/models/equip-rifle.glb?v=rifle-1`,
@@ -24,12 +24,15 @@ export const modelPaths = {
  * Secondary skirt armor FK coupling (Requirement 6):
  *   frontSkirtAngle = clamp(frontK * hipAngle, 0, frontMaxDeg)
  *   sideSkirtAngle  = clamp(sideK * hipAngle, 0, sideMaxDeg)
+ *   rearSkirtAngle  = clamp(rearK * max(0, -hipAngle), 0, rearMaxDeg)
  */
 export const SKIRT_FK_CONFIG = {
   frontK: 0.5,
   frontMaxDeg: 40,
   sideK: 0.3,
   sideMaxDeg: 25,
+  rearK: 0.45,
+  rearMaxDeg: 30,
 } as const;
 
 export interface EquipmentOffsetSpec {
@@ -128,6 +131,8 @@ export const SKIRT_PART_NAMES = [
   "frontLeftSkirtPart",
   "sideRightSkirtPart",
   "sideLeftSkirtPart",
+  "rearRightSkirtPart",
+  "rearLeftSkirtPart",
 ] as const;
 
 export const rigConfig = {

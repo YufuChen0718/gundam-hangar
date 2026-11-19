@@ -22,6 +22,8 @@ const colors: Record<string, number> = {
   frontLeftSkirtPart: 0xe8be32,
   sideRightSkirtPart: 0xe6659e,
   sideLeftSkirtPart: 0xd957b2,
+  rearRightSkirtPart: 0x62b6cb,
+  rearLeftSkirtPart: 0x4ca1b8,
   rifle: 0xea6676,
   shield: 0x7b9ec2,
 };

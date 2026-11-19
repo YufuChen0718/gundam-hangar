@@ -24,6 +24,8 @@ export const SECONDARY_SKIRT_JOINTS = [
   "frontLeftSkirt",
   "sideRightSkirt",
   "sideLeftSkirt",
+  "rearRightSkirt",
+  "rearLeftSkirt",
 ] as const;
 export type SkirtJointName = (typeof SECONDARY_SKIRT_JOINTS)[number];
 export type SocketName = "rightHand" | "leftHand" | "leftForearm" | "back";
@@ -77,6 +79,13 @@ export interface StrainStats {
   strainedTrianglesOver1Pct: number;
 }
 
+export interface SliverStats {
+  totalSliverTriangles: number;
+  visibleSliverTriangles: number;
+  maxAspectRatio: number;
+  checkedTriangles: number;
+}
+
 export interface LbsController {
   getMode(): SkinningMode;
   setMode(mode: SkinningMode): void;
@@ -94,9 +103,15 @@ export interface LbsController {
   computeSeamStats(mode?: "lbs" | "rigid"): SeamStats;
   computeEdgeStrain(mode?: "lbs" | "rigid"): StrainStats;
   compareWithThreeSkinning(): LbsComparisonStats;
+  countVisibleWaistSlivers(
+    mode: "lbs" | "rigid",
+    waistCenterY: number,
+    cameraPositions: readonly [number, number, number][],
+    aspectThreshold?: number,
+  ): SliverStats;
 }
 
-/** Full-body 15-joint preview rig adapter (+ optional secondary skirt joints, caps, and fillers). */
+/** Full-body 15-joint preview rig adapter (+ optional secondary skirt joints, caps, overlaps, and fillers). */
 export interface ArmPreviewRig {
   variant: RiggedModelVariant;
   hasEmbeddedEquipment: boolean;
@@ -108,6 +123,7 @@ export interface ArmPreviewRig {
   sockets: Record<SocketName, Object3D>;
   parts: Record<string, Object3D>;
   rigidCaps?: Object3D[];
+  rigidOverlaps?: Object3D[];
   jointFillers?: Object3D[];
   originalMaterials: Map<Object3D, Material | Material[]>;
   pelvisBindPosition?: Vector3;

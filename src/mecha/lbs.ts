@@ -22,6 +22,7 @@ import type {
   SeamStats,
   SkinningMode,
   SkirtJointName,
+  SliverStats,
   StrainStats,
 } from "./types";
 
@@ -47,6 +48,8 @@ export const PART_PRIMARY_BONE: Record<string, JointName | SkirtJointName> = {
   frontLeftSkirtPart: "frontLeftSkirt",
   sideRightSkirtPart: "sideRightSkirt",
   sideLeftSkirtPart: "sideLeftSkirt",
+  rearRightSkirtPart: "rearRightSkirt",
+  rearLeftSkirtPart: "rearLeftSkirt",
   shield: "leftElbow",
 };
 
@@ -70,13 +73,20 @@ export const PART_DEBUG_COLORS: Record<string, number> = {
   frontLeftSkirtPart: 0xe8be32,
   sideRightSkirtPart: 0xe6659e,
   sideLeftSkirtPart: 0xd957b2,
+  rearRightSkirtPart: 0x62b6cb,
+  rearLeftSkirtPart: 0x4ca1b8,
   rifle: 0xea6676,
   shield: 0x7b9ec2,
 };
 
+function stripPartSuffix(partName: string): string {
+  if (partName.endsWith("_cap")) return partName.slice(0, -4);
+  if (partName.endsWith("_overlap")) return partName.slice(0, -8);
+  return partName;
+}
+
 function resolvePrimaryBone(partName: string): JointName | SkirtJointName | undefined {
-  const baseName = partName.endsWith("_cap") ? partName.slice(0, -4) : partName;
-  return PART_PRIMARY_BONE[baseName];
+  return PART_PRIMARY_BONE[stripPartSuffix(partName)];
 }
 
 const LBS_VERTEX_SHADER = /* glsl */ `
@@ -235,6 +245,7 @@ void main() {
 interface SkinnedPartEntry {
   partName: string;
   isCap: boolean;
+  isOverlap: boolean;
   skinnedMesh: SkinnedMesh;
   customMesh: Mesh;
   shaderMaterial: Material;
@@ -278,19 +289,23 @@ export class LbsManager implements LbsController {
     private parts: Record<string, Object3D>,
     private rigidCaps: Object3D[] = [],
     private jointFillers: Object3D[] = [],
+    private rigidOverlaps: Object3D[] = [],
   ) {
     this.displayRoot.updateMatrixWorld(true);
 
-    const allCandidates: [string, Object3D, boolean][] = [
+    const allCandidates: [string, Object3D, boolean, boolean][] = [
       ...Object.entries(this.parts).map(
-        ([n, o]) => [n, o, false] as [string, Object3D, boolean],
+        ([n, o]) => [n, o, false, false] as [string, Object3D, boolean, boolean],
       ),
       ...this.rigidCaps.map(
-        (o) => [o.name, o, true] as [string, Object3D, boolean],
+        (o) => [o.name, o, true, false] as [string, Object3D, boolean, boolean],
+      ),
+      ...this.rigidOverlaps.map(
+        (o) => [o.name, o, false, true] as [string, Object3D, boolean, boolean],
       ),
     ];
 
-    for (const [partName, obj, isCap] of allCandidates) {
+    for (const [partName, obj, isCap, isOverlap] of allCandidates) {
       if (!(obj instanceof SkinnedMesh)) continue;
       const primaryBoneName = resolvePrimaryBone(partName);
       if (!primaryBoneName) continue;
@@ -348,7 +363,9 @@ export class LbsManager implements LbsController {
       customGeometry.setAttribute("aVertexStrain", strainAttr);
 
       const partColor = new Color(
-        isCap ? 0x1a1d22 : (PART_DEBUG_COLORS[partName] ?? 0xffffff),
+        isCap
+          ? 0x1a1d22
+          : (PART_DEBUG_COLORS[stripPartSuffix(partName)] ?? 0xffffff),
       );
 
       const uniforms = {
@@ -384,6 +401,7 @@ export class LbsManager implements LbsController {
       this.entries.set(partName, {
         partName,
         isCap,
+        isOverlap,
         skinnedMesh: obj,
         customMesh,
         shaderMaterial,
@@ -436,24 +454,27 @@ export class LbsManager implements LbsController {
     const isThree = this.mode === "three";
     const isRigid = this.mode === "rigid";
     for (const entry of this.entries.values()) {
+      const rigidOnly = entry.isCap || entry.isOverlap;
       const partVisible = entry.isCap
         ? isRigid && !this.showStrain && this.innerFrameVisible
-        : entry.partName === "shield"
-          ? this.shieldVisible
-          : true;
+        : entry.isOverlap
+          ? isRigid && !this.showStrain
+          : entry.partName === "shield"
+            ? this.shieldVisible
+            : true;
 
-      entry.skinnedMesh.visible = !entry.isCap && isThree && partVisible;
+      entry.skinnedMesh.visible = !rigidOnly && isThree && partVisible;
       entry.customMesh.visible = !isThree && partVisible;
 
       // Swap skinIndex / skinWeight attributes so Rigid armor runs the exact same LBS shader with weight 1.0
       if (!isThree) {
         entry.customGeometry.setAttribute(
           "skinIndex",
-          isRigid || entry.isCap ? entry.rigidSkinIndex : entry.smoothSkinIndex,
+          isRigid || rigidOnly ? entry.rigidSkinIndex : entry.smoothSkinIndex,
         );
         entry.customGeometry.setAttribute(
           "skinWeight",
-          isRigid || entry.isCap
+          isRigid || rigidOnly
             ? entry.rigidSkinWeight
             : entry.smoothSkinWeight,
         );
@@ -513,7 +534,7 @@ export class LbsManager implements LbsController {
           .multiply(relInvBinds[j]);
         this.tmpMat.toArray(boneMatrices, j * 16);
       }
-      if (this.mode === "three" && !entry.isCap) {
+      if (this.mode === "three" && !entry.isCap && !entry.isOverlap) {
         entry.skinnedMesh.skeleton.update();
       }
     }
@@ -548,11 +569,11 @@ export class LbsManager implements LbsController {
     const bm = entry.boneMatrices;
 
     const skinIndex =
-      mode === "rigid" || entry.isCap
+      mode === "rigid" || entry.isCap || entry.isOverlap
         ? entry.rigidSkinIndex
         : entry.smoothSkinIndex;
     const skinWeight =
-      mode === "rigid" || entry.isCap
+      mode === "rigid" || entry.isCap || entry.isOverlap
         ? entry.rigidSkinWeight
         : entry.smoothSkinWeight;
 
@@ -591,7 +612,7 @@ export class LbsManager implements LbsController {
   private refreshStrainAttributes() {
     const evalMode: "lbs" | "rigid" = this.mode === "rigid" ? "rigid" : "lbs";
     for (const entry of this.entries.values()) {
-      if (entry.isCap) continue;
+      if (entry.isCap || entry.isOverlap) continue;
       const arr = entry.strainAttr.array as Float32Array;
       arr.fill(0);
       const pos = entry.geometry.attributes.position;
@@ -636,7 +657,7 @@ export class LbsManager implements LbsController {
     let strainedTrianglesOver1Pct = 0;
 
     for (const entry of this.entries.values()) {
-      if (entry.isCap) continue;
+      if (entry.isCap || entry.isOverlap) continue;
       const pos = entry.geometry.attributes.position;
       const index = entry.geometry.index;
       const triCount = index ? Math.floor(index.count / 3) : Math.floor(pos.count / 3);
@@ -706,7 +727,7 @@ export class LbsManager implements LbsController {
     let sumDiff = 0;
     let vertexCount = 0;
     for (const entry of this.entries.values()) {
-      if (entry.isCap) continue;
+      if (entry.isCap || entry.isOverlap) continue;
       const count = entry.geometry.attributes.position.count;
       for (let i = 0; i < count; i++) {
         this.cpuPosition(entry.skinnedMesh, i, "lbs", this.tmpRef);
@@ -722,6 +743,197 @@ export class LbsManager implements LbsController {
       maxDiff,
       meanDiff: vertexCount > 0 ? sumDiff / vertexCount : 0,
       vertexCount,
+    };
+  }
+
+  /**
+   * Count waist-region triangles whose aspect ratio (longestEdge / shortestAltitude) exceeds
+   * `aspectThreshold` (default 15) and are visible (front-facing and unoccluded) from at least
+   * one of the given exterior camera positions, using exact posed CPU triangle geometry.
+   */
+  countVisibleWaistSlivers(
+    mode: "lbs" | "rigid",
+    waistCenterY: number,
+    cameraPositions: readonly [number, number, number][],
+    aspectThreshold = 15,
+  ): SliverStats {
+    this.updateBoneMatrices();
+    type TriRec = {
+      ax: number; ay: number; az: number;
+      bx: number; by: number; bz: number;
+      cx: number; cy: number; cz: number;
+      nx: number; ny: number; nz: number;
+      px: number; py: number; pz: number;
+      aspect: number;
+      checkSliver: boolean;
+    };
+    const tris: TriRec[] = [];
+    const e1 = new Vector3();
+    const e2 = new Vector3();
+    const nVec = new Vector3();
+
+    const pushTriangle = (
+      a: Vector3,
+      b: Vector3,
+      c: Vector3,
+      checkSliver: boolean,
+    ) => {
+      const px = (a.x + b.x + c.x) / 3;
+      const py = (a.y + b.y + c.y) / 3;
+      const pz = (a.z + b.z + c.z) / 3;
+      if (Math.abs(py - waistCenterY) > 0.24 || Math.abs(px) > 0.28 || Math.abs(pz) > 0.28) {
+        return;
+      }
+      e1.subVectors(b, a);
+      e2.subVectors(c, a);
+      const l01 = e1.length();
+      const l20 = e2.length();
+      const l12 = b.distanceTo(c);
+      const maxEdge = Math.max(l01, l12, l20);
+      nVec.crossVectors(e1, e2);
+      const area2 = nVec.length();
+      if (area2 < 1e-12) return;
+      const aspect = (maxEdge * maxEdge) / area2;
+      const invLen = 1 / area2;
+      tris.push({
+        ax: a.x, ay: a.y, az: a.z,
+        bx: b.x, by: b.y, bz: b.z,
+        cx: c.x, cy: c.y, cz: c.z,
+        nx: nVec.x * invLen, ny: nVec.y * invLen, nz: nVec.z * invLen,
+        px, py, pz,
+        aspect,
+        checkSliver,
+      });
+    };
+
+    const WAIST_SLIVER_PARTS = new Set([
+      "chestPart",
+      "chestPart_overlap",
+      "chestPart_cap",
+      "waistPart",
+      "waistPart_cap",
+      "frontRightSkirtPart",
+      "frontRightSkirtPart_cap",
+      "frontLeftSkirtPart",
+      "frontLeftSkirtPart_cap",
+      "sideRightSkirtPart",
+      "sideRightSkirtPart_cap",
+      "sideLeftSkirtPart",
+      "sideLeftSkirtPart_cap",
+      "rearRightSkirtPart",
+      "rearRightSkirtPart_cap",
+      "rearLeftSkirtPart",
+      "rearLeftSkirtPart_cap",
+    ]);
+
+    for (const entry of this.entries.values()) {
+      if (mode === "lbs" && (entry.isCap || entry.isOverlap)) continue;
+      if (entry.partName === "shield" && !this.shieldVisible) continue;
+      const isWaistPart = WAIST_SLIVER_PARTS.has(entry.partName);
+      const pos = entry.geometry.attributes.position;
+      const index = entry.geometry.index;
+      const triCount = index ? Math.floor(index.count / 3) : Math.floor(pos.count / 3);
+      for (let t = 0; t < triCount; t++) {
+        const i0 = index ? index.getX(t * 3 + 0) : t * 3 + 0;
+        const i1 = index ? index.getX(t * 3 + 1) : t * 3 + 1;
+        const i2 = index ? index.getX(t * 3 + 2) : t * 3 + 2;
+        this.cpuPosition(entry.skinnedMesh, i0, mode, this.tmpA);
+        this.cpuPosition(entry.skinnedMesh, i1, mode, this.tmpB);
+        this.cpuPosition(entry.skinnedMesh, i2, mode, this.tmpC);
+        pushTriangle(this.tmpA, this.tmpB, this.tmpC, isWaistPart);
+      }
+    }
+
+    // Include posed joint fillers as occluders in rigid mode
+    if (mode === "rigid" && this.innerFrameVisible) {
+      for (const filler of this.jointFillers) {
+        if (!(filler instanceof Mesh)) continue;
+        filler.updateWorldMatrix(true, false);
+        const pos = filler.geometry.attributes.position;
+        const index = filler.geometry.index;
+        const triCount = index ? Math.floor(index.count / 3) : Math.floor(pos.count / 3);
+        for (let t = 0; t < triCount; t++) {
+          const i0 = index ? index.getX(t * 3 + 0) : t * 3 + 0;
+          const i1 = index ? index.getX(t * 3 + 1) : t * 3 + 1;
+          const i2 = index ? index.getX(t * 3 + 2) : t * 3 + 2;
+          this.tmpA.fromBufferAttribute(pos, i0).applyMatrix4(filler.matrixWorld);
+          this.tmpB.fromBufferAttribute(pos, i1).applyMatrix4(filler.matrixWorld);
+          this.tmpC.fromBufferAttribute(pos, i2).applyMatrix4(filler.matrixWorld);
+          pushTriangle(this.tmpA, this.tmpB, this.tmpC, false);
+        }
+      }
+    }
+
+    // Exact Möller-Trumbore ray-triangle occlusion test
+    const rayOccluded = (
+      ox: number, oy: number, oz: number,
+      dx: number, dy: number, dz: number,
+      maxT: number,
+      skipIdx: number,
+    ): boolean => {
+      for (let j = 0; j < tris.length; j++) {
+        if (j === skipIdx) continue;
+        const tr = tris[j];
+        const e1x = tr.bx - tr.ax, e1y = tr.by - tr.ay, e1z = tr.bz - tr.az;
+        const e2x = tr.cx - tr.ax, e2y = tr.cy - tr.ay, e2z = tr.cz - tr.az;
+        const hx = dy * e2z - dz * e2y;
+        const hy = dz * e2x - dx * e2z;
+        const hz = dx * e2y - dy * e2x;
+        const det = e1x * hx + e1y * hy + e1z * hz;
+        if (Math.abs(det) < 1e-10) continue;
+        const invDet = 1 / det;
+        const sx = ox - tr.ax, sy = oy - tr.ay, sz = oz - tr.az;
+        const u = invDet * (sx * hx + sy * hy + sz * hz);
+        if (u < 0 || u > 1) continue;
+        const qx = sy * e1z - sz * e1y;
+        const qy = sz * e1x - sx * e1z;
+        const qz = sx * e1y - sy * e1x;
+        const v = invDet * (dx * qx + dy * qy + dz * qz);
+        if (v < 0 || u + v > 1) continue;
+        const t = invDet * (e2x * qx + e2y * qy + e2z * qz);
+        if (t > 1e-4 && t < maxT) return true;
+      }
+      return false;
+    };
+
+    let totalSliverTriangles = 0;
+    let visibleSliverTriangles = 0;
+    let maxAspectRatio = 0;
+    let checkedTriangles = 0;
+
+    for (let i = 0; i < tris.length; i++) {
+      const tr = tris[i];
+      if (!tr.checkSliver) continue;
+      checkedTriangles++;
+      if (tr.aspect > maxAspectRatio) maxAspectRatio = tr.aspect;
+      if (tr.aspect <= aspectThreshold) continue;
+      totalSliverTriangles++;
+
+      let visible = false;
+      for (const [camX, camY, camZ] of cameraPositions) {
+        const vx = tr.px - camX;
+        const vy = tr.py - camY;
+        const vz = tr.pz - camZ;
+        const dist = Math.hypot(vx, vy, vz);
+        if (dist < 1e-6) continue;
+        const invD = 1 / dist;
+        const dx = vx * invD, dy = vy * invD, dz = vz * invD;
+        // Front-facing toward exterior camera: (-dir) . normal > 0.05
+        const facing = -(dx * tr.nx + dy * tr.ny + dz * tr.nz);
+        if (facing <= 0.05) continue;
+        if (!rayOccluded(camX, camY, camZ, dx, dy, dz, dist - 0.0015, i)) {
+          visible = true;
+          break;
+        }
+      }
+      if (visible) visibleSliverTriangles++;
+    }
+
+    return {
+      totalSliverTriangles,
+      visibleSliverTriangles,
+      maxAspectRatio,
+      checkedTriangles,
     };
   }
 }

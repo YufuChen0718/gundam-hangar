@@ -26,13 +26,17 @@ if asset_key == 'auto':
     blend_name = Path(bpy.data.filepath).name.lower() if bpy.data.filepath else ''
     asset_key = 'sentinel' if ('sentinel' in blend_name or len(mesh.vertices) > 8000) else 'legacy'
 
-# For Sentinel, bisect the right and left knees with a single clean slanted plane along the
-# natural diagonal kneecap-to-thigh seam so the cut rim is razor-straight (zero sawtooth)
-# while preserving the entire kneecap plate + circular hinge disc on the shin.
+# For Sentinel, bisect:
+# 1) Both knees with a single slanted plane along the natural diagonal kneecap-to-thigh seam.
+# 2) The waist with a single horizontal plane inside the red abdomen just above all white skirt rims.
 KNEE_PLANE_Z0 = -0.158
 KNEE_PLANE_SLOPE_Y = 0.52
 KNEE_PLANE_NO = Vector((0.0, KNEE_PLANE_SLOPE_Y, 1.0)).normalized()
+WAIST_PLANE_Z = 0.331
+WAIST_OVERLAP_DEPTH_M = 0.016
+WAIST_CAP_RECESS_M = 0.007
 knee_bisect_stats = None
+waist_bisect_stats = None
 if asset_key == 'sentinel':
     bm_bi = bmesh.new()
     bm_bi.from_mesh(mesh)
@@ -59,11 +63,141 @@ if asset_key == 'sentinel':
             clear_inner=False,
             clear_outer=False,
         )
+    after_knee_tri_count = len(bm_bi.faces)
+    # Horizontal waist bisect plane strictly inside the red abdomen (excluding arms |x| >= 0.23).
+    # Snap existing vertices already within 2.5 mm of WAIST_PLANE_Z onto the plane BEFORE bisecting
+    # so bisection never creates sub-2.5mm grazing sliver triangles along the cut rim!
+    waist_faces = [
+        f for f in bm_bi.faces
+        if abs(f.calc_center_median().x) < 0.23 and 0.295 < f.calc_center_median().z < 0.380
+    ]
+    waist_verts = list({v for f in waist_faces for v in f.verts})
+    for v in waist_verts:
+        if abs(v.co.z - WAIST_PLANE_Z) < 0.0040:
+            v.co.z = WAIST_PLANE_Z
+    waist_edges = list({e for f in waist_faces for e in f.edges})
+    bmesh.ops.bisect_plane(
+        bm_bi,
+        geom=waist_faces + waist_edges + waist_verts,
+        dist=1e-5,
+        plane_co=Vector((0.0, 0.0, WAIST_PLANE_Z)),
+        plane_no=Vector((0.0, 0.0, 1.0)),
+        use_snap_center=False,
+        clear_inner=False,
+        clear_outer=False,
+    )
     ngons = [f for f in bm_bi.faces if len(f.verts) > 3]
     if ngons:
         bmesh.ops.triangulate(bm_bi, faces=ngons)
-    # Collapse any degenerate sub-0.2mm micro-slivers where the bisect plane grazed an existing vertex
+    # Collapse any degenerate sub-0.2mm micro-slivers where a bisect plane grazed an existing vertex
     bmesh.ops.remove_doubles(bm_bi, verts=bm_bi.verts, dist=2e-4)
+    # Improve triangle aspect ratios in the waist band (keeping exact waist cut edges AND UV-seam edges locked
+    # so flipping diagonals never crosses a UV island boundary).
+    uv_lay_bi = bm_bi.loops.layers.uv.active
+    def is_uv_continuous_edge(e):
+        if len(e.link_faces) != 2 or uv_lay_bi is None:
+            return False
+        f0, f1 = e.link_faces[0], e.link_faces[1]
+        for v in e.verts:
+            u0 = next((lp[uv_lay_bi].uv for lp in f0.loops if lp.vert == v), None)
+            u1 = next((lp[uv_lay_bi].uv for lp in f1.loops if lp.vert == v), None)
+            if u0 is None or u1 is None or (u0 - u1).length > 1e-4:
+                return False
+        return True
+
+    waist_band_faces = [
+        f for f in bm_bi.faces
+        if len(f.verts) == 3
+        and abs(f.calc_center_median().x) < 0.23
+        and 0.300 < f.calc_center_median().z < 0.375
+    ]
+    waist_cut_edges = {
+        e for e in bm_bi.edges
+        if abs(e.verts[0].co.z - WAIST_PLANE_Z) < 1e-4 and abs(e.verts[1].co.z - WAIST_PLANE_Z) < 1e-4
+    }
+    waist_band_edges = [
+        e for e in {e for f in waist_band_faces for e in f.edges}
+        if e not in waist_cut_edges and is_uv_continuous_edge(e)
+    ]
+    if waist_band_faces and waist_band_edges:
+        bmesh.ops.beautify_fill(
+            bm_bi,
+            faces=waist_band_faces,
+            edges=waist_band_edges,
+            use_restrict_tag=False,
+            method='ANGLE',
+        )
+    # Collapse short non-seam edges of remaining >14 aspect-ratio decimation slivers in the 2-ring waist band
+    # so both Rigid and Smooth LBS start from clean waist triangulation.
+    # If one endpoint lies on WAIST_PLANE_Z, weld the off-plane vertex onto the waist-plane vertex so z = WAIST_PLANE_Z stays exact.
+    for _ in range(4):
+        bm_bi.faces.ensure_lookup_table()
+        bm_bi.edges.ensure_lookup_table()
+        short_edges = set()
+        weld_map = {}
+        used_verts = set()
+        for f in bm_bi.faces:
+            if len(f.verts) != 3:
+                continue
+            c = f.calc_center_median()
+            if abs(c.x) >= 0.23 or not (0.300 < c.z < 0.375):
+                continue
+            v0, v1, v2 = f.verts[0].co, f.verts[1].co, f.verts[2].co
+            area2 = (v1 - v0).cross(v2 - v0).length
+            if area2 < 1e-10:
+                continue
+            max_l = max(e.calc_length() for e in f.edges)
+            if (max_l * max_l) / area2 <= 14.0:
+                continue
+            shortest_e = min(f.edges, key=lambda e: e.calc_length())
+            if shortest_e.calc_length() >= 0.015:
+                continue
+            if not is_uv_continuous_edge(shortest_e):
+                continue
+            va, vb = shortest_e.verts[0], shortest_e.verts[1]
+            if va in used_verts or vb in used_verts:
+                continue
+            a_on = abs(va.co.z - WAIST_PLANE_Z) < 1e-4
+            b_on = abs(vb.co.z - WAIST_PLANE_Z) < 1e-4
+            if a_on and b_on:
+                # Both on waist cut loop: collapse to midpoint (stays on WAIST_PLANE_Z!)
+                short_edges.add(shortest_e)
+            elif a_on and not b_on:
+                weld_map[vb] = va
+            elif b_on and not a_on:
+                weld_map[va] = vb
+            else:
+                short_edges.add(shortest_e)
+            used_verts.add(va)
+            used_verts.add(vb)
+        if not short_edges and not weld_map:
+            break
+        if weld_map:
+            bmesh.ops.weld_verts(bm_bi, targetmap=weld_map)
+        if short_edges:
+            live_edges = [e for e in short_edges if e.is_valid]
+            if live_edges:
+                bmesh.ops.collapse(bm_bi, edges=live_edges, uvs=True)
+        ngons2 = [f for f in bm_bi.faces if len(f.verts) > 3]
+        if ngons2:
+            bmesh.ops.triangulate(bm_bi, faces=ngons2)
+    # One final UV-safe beautify pass after short-edge collapse
+    bm_bi.faces.ensure_lookup_table()
+    bm_bi.edges.ensure_lookup_table()
+    wb_faces2 = [
+        f for f in bm_bi.faces
+        if len(f.verts) == 3 and abs(f.calc_center_median().x) < 0.23 and 0.300 < f.calc_center_median().z < 0.375
+    ]
+    wcut2 = {
+        e for e in bm_bi.edges
+        if abs(e.verts[0].co.z - WAIST_PLANE_Z) < 1e-4 and abs(e.verts[1].co.z - WAIST_PLANE_Z) < 1e-4
+    }
+    wb_edges2 = [
+        e for e in {e for f in wb_faces2 for e in f.edges}
+        if e not in wcut2 and is_uv_continuous_edge(e)
+    ]
+    if wb_faces2 and wb_edges2:
+        bmesh.ops.beautify_fill(bm_bi, faces=wb_faces2, edges=wb_edges2, use_restrict_tag=False, method='ANGLE')
     bm_bi.to_mesh(mesh)
     bm_bi.free()
     for poly in mesh.polygons:
@@ -75,6 +209,12 @@ if asset_key == 'sentinel':
         'triangles_before': orig_tri_count,
         'triangles_after': len(mesh.polygons),
         'added_triangles': len(mesh.polygons) - orig_tri_count,
+    }
+    waist_bisect_stats = {
+        'plane_equation': f'z = {WAIST_PLANE_Z:.3f}',
+        'plane_normal': [0.0, 0.0, 1.0],
+        'triangles_before_waist_bisect': after_knee_tri_count,
+        'triangles_after_total': len(mesh.polygons),
     }
 
 verts = [v.co.copy() for v in mesh.vertices]
@@ -147,7 +287,7 @@ ASSET_CONFIGS = {
         # Refined mechanical hinge/ball pivots measured from orthographic Sentinel geometry
         'positions': {
             'pelvis': Vector((0.0, 0.010, 0.180)),
-            'torso': Vector((0.0, 0.010, 0.345)),
+            'torso': Vector((0.0, 0.004, 0.342)),
             'head': Vector((0.0, 0.025, 0.735)),
             'rightShoulder': Vector((-0.255, 0.045, 0.655)),
             'rightElbow': Vector((-0.355, 0.055, 0.415)),
@@ -166,14 +306,17 @@ ASSET_CONFIGS = {
             'frontLeftSkirt': Vector((0.120, -0.140, 0.312)),
             'sideRightSkirt': Vector((-0.195, 0.005, 0.310)),
             'sideLeftSkirt': Vector((0.195, 0.005, 0.310)),
+            'rearRightSkirt': Vector((-0.125, 0.115, 0.305)),
+            'rearLeftSkirt': Vector((0.125, 0.115, 0.305)),
         },
         'right_arm_z_splits': (0.452, 0.134),
         'left_arm_z_splits': (0.452, 0.134),
         'leg_z_splits': (0.118, -0.175, -0.742),
-        'torso_z_split': 0.332,
-        # Dark-gray inner-frame joint fillers (parent_bone, shape, center, radius, depth, axis)
+        'torso_z_split': WAIST_PLANE_Z,
+        # Dark-gray / satin-gunmetal inner-frame joint fillers (parent_bone, shape, center, radius, depth, axis)
         'joint_fillers': [
-            {'name': 'filler_torso', 'parent': 'pelvis', 'shape': 'cylinder', 'center': (0.0, -0.005, 0.332), 'radius': 0.078, 'depth': 0.092, 'axis': 'Z'},
+            # filler_torso is dynamically fitted as an elliptical cylinder (95% of waist cut loop bounding ellipse)
+            {'name': 'filler_torso', 'parent': 'pelvis', 'shape': 'elliptical_waist', 'center': (0.0, -0.012, 0.258), 'radius': 0.137, 'radius_y': 0.096, 'depth': 0.124, 'axis': 'Z', 'material': 'knee_frame'},
             {'name': 'filler_head', 'parent': 'torso', 'shape': 'cylinder', 'center': (0.0, 0.025, 0.728), 'radius': 0.046, 'depth': 0.068, 'axis': 'Z'},
             {'name': 'filler_rightShoulder', 'parent': 'torso', 'shape': 'sphere', 'center': (-0.228, 0.045, 0.642), 'radius': 0.072},
             {'name': 'filler_leftShoulder', 'parent': 'torso', 'shape': 'sphere', 'center': (0.228, 0.045, 0.642), 'radius': 0.072},
@@ -183,7 +326,7 @@ ASSET_CONFIGS = {
             {'name': 'filler_leftWrist', 'parent': 'leftElbow', 'shape': 'sphere', 'center': (0.375, -0.038, 0.134), 'radius': 0.036},
             {'name': 'filler_rightHip', 'parent': 'pelvis', 'shape': 'sphere', 'center': (-0.145, 0.010, 0.135), 'radius': 0.076},
             {'name': 'filler_leftHip', 'parent': 'pelvis', 'shape': 'sphere', 'center': (0.145, 0.010, 0.135), 'radius': 0.076},
-            {'name': 'filler_pelvisCore', 'parent': 'pelvis', 'shape': 'cylinder', 'center': (0.0, 0.005, 0.215), 'radius': 0.122, 'depth': 0.185, 'axis': 'Z'},
+            {'name': 'filler_pelvisCore', 'parent': 'pelvis', 'shape': 'cylinder', 'center': (0.0, -0.013, 0.200), 'radius': 0.140, 'depth': 0.215, 'axis': 'Z', 'material': 'knee_frame'},
             {'name': 'filler_rightKnee', 'parent': 'rightHip', 'shape': 'cylinder', 'center': (-0.200, 0.012, -0.194), 'radius': 0.062, 'depth': 0.118, 'axis': 'X', 'material': 'knee_frame'},
             {'name': 'filler_leftKnee', 'parent': 'leftHip', 'shape': 'cylinder', 'center': (0.200, 0.012, -0.194), 'radius': 0.062, 'depth': 0.118, 'axis': 'X', 'material': 'knee_frame'},
             {'name': 'filler_rightAnkle', 'parent': 'rightKnee', 'shape': 'cylinder', 'center': (-0.320, 0.010, -0.752), 'radius': 0.058, 'depth': 0.118, 'axis': 'X'},
@@ -242,7 +385,11 @@ part_names = [
     'leftThigh', 'leftShin', 'leftFoot',
 ]
 if rigid_features:
-    part_names.extend(['frontRightSkirtPart', 'frontLeftSkirtPart', 'sideRightSkirtPart', 'sideLeftSkirtPart'])
+    part_names.extend([
+        'frontRightSkirtPart', 'frontLeftSkirtPart',
+        'sideRightSkirtPart', 'sideLeftSkirtPart',
+        'rearRightSkirtPart', 'rearLeftSkirtPart',
+    ])
 if has_embedded_equip:
     part_names.extend(['rifle', 'shield'])
 
@@ -409,15 +556,20 @@ for i, f in enumerate(faces):
         elif z > z_torso_split:
             label = 'chestPart'
         elif z >= z_hip_split or (abs(x) < 0.052 and z > 0.005):
-            # Pelvis & skirt region: separate front L/R skirts and side L/R skirts from center crotch + back skirt
-            if -0.200 <= x <= -0.049 and y < -0.092 and 0.124 <= z <= 0.322:
+            # Pelvis & skirt region (strictly below WAIST_PLANE_Z):
+            # separate front L/R, side L/R, and rear L/R skirt plates from center crotch & lower waist ring
+            if -0.200 <= x <= -0.049 and y < -0.092 and 0.124 <= z <= 0.324:
                 label = 'frontRightSkirtPart'
-            elif 0.049 <= x <= 0.200 and y < -0.092 and 0.124 <= z <= 0.322:
+            elif 0.049 <= x <= 0.200 and y < -0.092 and 0.124 <= z <= 0.324:
                 label = 'frontLeftSkirtPart'
-            elif x < -0.190 and -0.140 <= y <= 0.095 and 0.090 <= z <= 0.322:
+            elif x < -0.190 and -0.140 <= y <= 0.095 and 0.090 <= z <= 0.324:
                 label = 'sideRightSkirtPart'
-            elif x > 0.190 and -0.140 <= y <= 0.095 and 0.090 <= z <= 0.322:
+            elif x > 0.190 and -0.140 <= y <= 0.095 and 0.090 <= z <= 0.324:
                 label = 'sideLeftSkirtPart'
+            elif -0.215 <= x <= -0.050 and y > 0.095 and 0.100 <= z <= 0.314:
+                label = 'rearRightSkirtPart'
+            elif 0.050 <= x <= 0.215 and y > 0.095 and 0.100 <= z <= 0.314:
+                label = 'rearLeftSkirtPart'
             else:
                 label = 'waistPart'
         else:
@@ -455,10 +607,10 @@ for i, f in enumerate(faces):
             label = 'chestPart'
     face_label.append(label)
 
-# Apply concavity-guided dual-graph min-cut refinement along every joint boundary on Sentinel
+# Apply concavity-guided dual-graph min-cut refinement along non-planar joint boundaries on Sentinel
 if rigid_features:
-    # 1. Waist seam (waistPart <-> chestPart): narrow red abdomen above white skirts
-    refine_cut_with_mincut(face_label, 'waistPart', 'chestPart', lambda c: c.z - 0.334, 0.024, 0.05)
+    # 1. Waist seam is already cleanly bisected along the exact horizontal plane z = WAIST_PLANE_Z
+    #    inside the red abdomen (no min-cut across the waist, keeping every white skirt 100% on pelvis/skirts).
     # 2. Neck seam (chestPart <-> headPart): black neck column above yellow collar
     refine_cut_with_mincut(face_label, 'chestPart', 'headPart', lambda c: c.z - 0.728, 0.022, 0.06)
     # 3. Shoulder seams (chestPart <-> rightUpperArm / leftUpperArm): deep vertical groove between blue chest & white pauldron
@@ -473,28 +625,49 @@ if rigid_features:
     # 6. Hip seams (waistPart <-> rightThigh / leftThigh): black inner hip cavity below skirts
     refine_cut_with_mincut(face_label, 'waistPart', 'rightThigh', lambda c: 0.118 - c.z, 0.024, 0.05)
     refine_cut_with_mincut(face_label, 'waistPart', 'leftThigh', lambda c: 0.118 - c.z, 0.024, 0.05)
-    # 7. Front skirts vs chestPart, waistPart, and thighs
-    refine_cut_with_mincut(face_label, 'frontRightSkirtPart', 'chestPart', lambda c: max(c.z - 0.320, c.y - (-0.095)), 0.028, 0.08)
-    refine_cut_with_mincut(face_label, 'frontLeftSkirtPart', 'chestPart', lambda c: max(c.z - 0.320, c.y - (-0.095)), 0.028, 0.08)
+    # 7. Front skirts vs waistPart and thighs (never crossing WAIST_PLANE_Z into chestPart)
     refine_cut_with_mincut(face_label, 'waistPart', 'frontRightSkirtPart', lambda c: (-0.050 - c.x) if c.x > -0.12 else (c.x - (-0.200)), 0.018, 0.08)
     refine_cut_with_mincut(face_label, 'waistPart', 'frontLeftSkirtPart', lambda c: (c.x - 0.050) if c.x < 0.12 else (0.200 - c.x), 0.018, 0.08)
     refine_cut_with_mincut(face_label, 'rightThigh', 'frontRightSkirtPart', lambda c: c.z - 0.128, 0.020, 0.08)
     refine_cut_with_mincut(face_label, 'leftThigh', 'frontLeftSkirtPart', lambda c: c.z - 0.128, 0.020, 0.08)
-    # 8. Side skirts vs front skirts & rear waistPart
+    # 8. Side skirts vs front skirts, rear skirts, and waistPart
     refine_cut_with_mincut(face_label, 'frontRightSkirtPart', 'sideRightSkirtPart', lambda c: -0.196 - c.x, 0.016, 0.08)
     refine_cut_with_mincut(face_label, 'frontLeftSkirtPart', 'sideLeftSkirtPart', lambda c: c.x - 0.196, 0.016, 0.08)
-    refine_cut_with_mincut(face_label, 'waistPart', 'sideRightSkirtPart', lambda c: 0.095 - c.y, 0.024, 0.08)
-    refine_cut_with_mincut(face_label, 'waistPart', 'sideLeftSkirtPart', lambda c: 0.095 - c.y, 0.024, 0.08)
+    refine_cut_with_mincut(face_label, 'rearRightSkirtPart', 'sideRightSkirtPart', lambda c: 0.095 - c.y, 0.020, 0.08)
+    refine_cut_with_mincut(face_label, 'rearLeftSkirtPart', 'sideLeftSkirtPart', lambda c: 0.095 - c.y, 0.020, 0.08)
+    # 8b. Rear skirts vs center rear crotch (waistPart) and thighs
+    refine_cut_with_mincut(face_label, 'waistPart', 'rearRightSkirtPart', lambda c: (-0.050 - c.x) if c.x > -0.12 else (c.x - (-0.215)), 0.018, 0.08)
+    refine_cut_with_mincut(face_label, 'waistPart', 'rearLeftSkirtPart', lambda c: (c.x - 0.050) if c.x < 0.12 else (0.215 - c.x), 0.018, 0.08)
+    refine_cut_with_mincut(face_label, 'rightThigh', 'rearRightSkirtPart', lambda c: c.z - 0.108, 0.020, 0.08)
+    refine_cut_with_mincut(face_label, 'leftThigh', 'rearLeftSkirtPart', lambda c: c.z - 0.108, 0.020, 0.08)
     # 9. Knee seams already cleanly bisected along the exact slanted kneecap plane (no sawtooth min-cut)
     # 10. Ankle seams (rightShin <-> rightFoot, left): black ankle opening between white shin cuff & white ankle collar
     refine_cut_with_mincut(face_label, 'rightShin', 'rightFoot', lambda c: -0.742 - c.z, 0.024, 0.06)
     refine_cut_with_mincut(face_label, 'leftShin', 'leftFoot', lambda c: -0.742 - c.z, 0.024, 0.06)
 
-# Connected-component cleanup across all parts so no disconnected fragments remain.
+# Global sliver & outlier cleanup across ALL parts:
+# (a) Any connected component under 50 triangles (or secondary disconnected island), OR
+# (b) Any boundary triangle whose centroid is > 2 cm from its part's main interior body
+#     (measured to the nearest interior vertex of the part's main component)
+# is reassigned to the neighboring part sharing the most edges with it.
+edge_faces = collections.defaultdict(list)
+for fi, f in enumerate(faces):
+    for j in range(len(f)):
+        a, b = f[j], f[(j + 1) % len(f)]
+        edge_faces[(a, b) if a < b else (b, a)].append(fi)
+
+all_edge_adj = collections.defaultdict(set)
+for flist in edge_faces.values():
+    if len(flist) >= 2:
+        for fi in flist:
+            for fj in flist:
+                if fi != fj:
+                    all_edge_adj[fi].add(fj)
+
 vert_faces = collections.defaultdict(list)
-for i, f in enumerate(faces):
+for fi, f in enumerate(faces):
     for v in f:
-        vert_faces[v].append(i)
+        vert_faces[v].append(fi)
 
 def face_components(ids):
     todo = set(ids)
@@ -513,30 +686,116 @@ def face_components(ids):
         groups.append(part)
     return sorted(groups, key=len, reverse=True)
 
+def most_shared_edge_neighbor(face_set, current_label):
+    edge_counts = collections.Counter()
+    for fi in face_set:
+        for nb in all_edge_adj[fi]:
+            if nb not in face_set and face_label[nb] != current_label:
+                edge_counts[face_label[nb]] += 1
+    if not edge_counts:
+        # Vertex fallback if an isolated face shares only vertices with neighbors
+        for fi in face_set:
+            for v in faces[fi]:
+                for nb in vert_faces[v]:
+                    if nb not in face_set and face_label[nb] != current_label:
+                        edge_counts[face_label[nb]] += 1
+    if not edge_counts:
+        return None
+    return edge_counts.most_common(1)[0][0]
+
+SLIVER_MIN_COMPONENT_TRIS = 50
+SLIVER_MAX_CENTROID_DIST_M = 0.02
+PELVIS_SKIRT_PARTS = {
+    'waistPart',
+    'frontRightSkirtPart', 'frontLeftSkirtPart',
+    'sideRightSkirtPart', 'sideLeftSkirtPart',
+    'rearRightSkirtPart', 'rearLeftSkirtPart',
+}
+def crosses_exact_bisect_plane(src_label, dst_label):
+    if (src_label == 'chestPart' and dst_label in PELVIS_SKIRT_PARTS) or (dst_label == 'chestPart' and src_label in PELVIS_SKIRT_PARTS):
+        return True
+    if (src_label, dst_label) in (('rightThigh', 'rightShin'), ('rightShin', 'rightThigh'), ('leftThigh', 'leftShin'), ('leftShin', 'leftThigh')):
+        return True
+    return False
+
 cleanup = []
-for _ in range(10):
+reassigned_per_part = {
+    name: {'small_components': 0, 'distance_outliers': 0, 'total': 0, 'to': collections.Counter()}
+    for name in part_names
+}
+moved_in_pass_b = set()
+for _ in range(15):
     changed = False
+    # Pass A: connected components under 50 triangles (and any secondary disconnected components)
     for name in part_names:
         ids = [i for i, l in enumerate(face_label) if l == name]
         groups = face_components(ids)
         if len(groups) <= 1:
             continue
         for g in groups[1:]:
-            g_set = set(g)
-            neighbor_counts = collections.Counter()
-            for fi in g:
-                for v in faces[fi]:
-                    for nfi in vert_faces[v]:
-                        if nfi not in g_set and face_label[nfi] != name:
-                            neighbor_counts[face_label[nfi]] += 1
-            if neighbor_counts:
-                dest = neighbor_counts.most_common(1)[0][0]
+            dest = most_shared_edge_neighbor(set(g), name)
+            if dest:
                 for fi in g:
                     face_label[fi] = dest
-                cleanup.append({'from': name, 'to': dest, 'faces': len(g)})
+                cleanup.append({'reason': 'component<50' if len(g) < SLIVER_MIN_COMPONENT_TRIS else 'disconnected', 'from': name, 'to': dest, 'faces': len(g)})
+                reassigned_per_part[name]['small_components'] += len(g)
+                reassigned_per_part[name]['total'] += len(g)
+                reassigned_per_part[name]['to'][dest] += len(g)
+                changed = True
+
+    # Pass B: sliver / peninsula triangles (no interior vertices of their part) whose centroid is > 2 cm
+    # from their part's main interior body (nearest interior vertex of the part's main component)
+    if rigid_features:
+        for name in part_names:
+            ids = [i for i, l in enumerate(face_label) if l == name]
+            if len(ids) < SLIVER_MIN_COMPONENT_TRIS:
+                continue
+            part_verts = {v for fi in ids for v in faces[fi]}
+            core_vert_set = {
+                v for v in part_verts
+                if all(face_label[nfi] == name for nfi in vert_faces[v])
+            }
+            if not core_vert_set:
+                continue
+            core_vert_pts = [verts[v] for v in core_vert_set]
+            outliers = []
+            for fi in ids:
+                if fi in moved_in_pass_b:
+                    continue
+                # Only consider triangles with no interior vertex (ear / sliver / peninsula faces touching boundaries)
+                if any(v in core_vert_set for v in faces[fi]):
+                    continue
+                if not any(face_label[nb] != name for nb in all_edge_adj[fi]):
+                    continue
+                cf = face_centroids[fi]
+                min_dist = min((cf - vp).length for vp in core_vert_pts)
+                if min_dist > SLIVER_MAX_CENTROID_DIST_M:
+                    dest = most_shared_edge_neighbor({fi}, name)
+                    if dest and not crosses_exact_bisect_plane(name, dest):
+                        outliers.append((fi, dest))
+            if outliers:
+                for fi, dest in outliers:
+                    face_label[fi] = dest
+                    moved_in_pass_b.add(fi)
+                    reassigned_per_part[name]['distance_outliers'] += 1
+                    reassigned_per_part[name]['total'] += 1
+                    reassigned_per_part[name]['to'][dest] += 1
+                by_dest = collections.Counter(dest for _, dest in outliers)
+                for dest, cnt in by_dest.items():
+                    cleanup.append({'reason': 'centroid>2cm', 'from': name, 'to': dest, 'faces': cnt})
                 changed = True
     if not changed:
         break
+
+reassigned_report = {
+    name: {
+        'small_components': st['small_components'],
+        'distance_outliers': st['distance_outliers'],
+        'total': st['total'],
+        'to': dict(st['to']),
+    }
+    for name, st in reassigned_per_part.items()
+}
 
 labels = {name: [i for i, l in enumerate(face_label) if l == name] for name in part_names}
 
@@ -573,6 +832,8 @@ lbs_bone_for = {
     'frontLeftSkirtPart': 'pelvis',
     'sideRightSkirtPart': 'pelvis',
     'sideLeftSkirtPart': 'pelvis',
+    'rearRightSkirtPart': 'pelvis',
+    'rearLeftSkirtPart': 'pelvis',
     'chestPart': 'torso',
     'headPart': 'head',
     'rightUpperArm': 'rightShoulder',
@@ -591,13 +852,15 @@ lbs_bone_for = {
     'shield': 'leftElbow',
 }
 
-# Rigid armor primary bone per part (includes the 4 secondary skirt bones)
+# Rigid armor primary bone per part (includes the 6 secondary skirt bones: front/side/rear L/R)
 rigid_bone_for = dict(lbs_bone_for)
 if rigid_features:
     rigid_bone_for['frontRightSkirtPart'] = 'frontRightSkirt'
     rigid_bone_for['frontLeftSkirtPart'] = 'frontLeftSkirt'
     rigid_bone_for['sideRightSkirtPart'] = 'sideRightSkirt'
     rigid_bone_for['sideLeftSkirtPart'] = 'sideLeftSkirt'
+    rigid_bone_for['rearRightSkirtPart'] = 'rearRightSkirt'
+    rigid_bone_for['rearLeftSkirtPart'] = 'rearLeftSkirt'
 
 scores = [collections.defaultdict(float) for _ in verts]
 for label, ids in labels.items():
@@ -676,6 +939,8 @@ if rigid_features:
         'frontLeftSkirt': 'pelvis',
         'sideRightSkirt': 'pelvis',
         'sideLeftSkirt': 'pelvis',
+        'rearRightSkirt': 'pelvis',
+        'rearLeftSkirt': 'pelvis',
     })
 
 for name, pos in positions.items():
@@ -735,27 +1000,49 @@ if rigid_features:
         kbsdf.inputs['Metallic'].default_value = 0.45
         kbsdf.inputs['Roughness'].default_value = 0.58
 
-def build_boundary_cap_object(label, part_mesh_data, bone_name):
-    """Find every open boundary loop on part_mesh_data and close it with an outward-oriented dark inner-frame fan."""
+SATIN_GUNMETAL_PARTS = {
+    'rightThigh', 'leftThigh', 'rightShin', 'leftShin',
+    'chestPart', 'waistPart',
+    'frontRightSkirtPart', 'frontLeftSkirtPart',
+    'sideRightSkirtPart', 'sideLeftSkirtPart',
+    'rearRightSkirtPart', 'rearLeftSkirtPart',
+}
+SKIRT_PART_SET = {
+    'frontRightSkirtPart', 'frontLeftSkirtPart',
+    'sideRightSkirtPart', 'sideLeftSkirtPart',
+    'rearRightSkirtPart', 'rearLeftSkirtPart',
+}
+
+def extract_boundary_loops(part_mesh_data):
+    """Return (vert_coords, edge_uvs, loops) where each loop is oriented opposite to its adjacent shell faces,
+    and edge_uvs[(u, v)] stores (uv_u, uv_v) from the exact adjacent face so UV seams never stretch across islands."""
     bm_part = bmesh.new()
     bm_part.from_mesh(part_mesh_data)
     bm_part.edges.ensure_lookup_table()
     bm_part.verts.ensure_lookup_table()
+    uv_lay = bm_part.loops.layers.uv.active
 
-    # Collect directed boundary half-edges: oriented opposite to the adjacent shell face so the cap closes outward
     next_map = collections.defaultdict(list)
+    edge_uvs = {}
     for e in bm_part.edges:
         if len(e.link_faces) == 1:
             f = e.link_faces[0]
             v0, v1 = e.verts[0], e.verts[1]
-            # Check order of (v0, v1) inside f.verts
             fv = list(f.verts)
             idx0 = fv.index(v0)
+            uv0, uv1 = (0.5, 0.5), (0.5, 0.5)
+            if uv_lay is not None:
+                for lp in f.loops:
+                    if lp.vert == v0:
+                        uv0 = (lp[uv_lay].uv.x, lp[uv_lay].uv.y)
+                    elif lp.vert == v1:
+                        uv1 = (lp[uv_lay].uv.x, lp[uv_lay].uv.y)
             if fv[(idx0 + 1) % len(fv)] == v1:
-                # Face uses v0 -> v1, so cap must use v1 -> v0
                 next_map[v1.index].append(v0.index)
+                edge_uvs[(v1.index, v0.index)] = (uv1, uv0)
             else:
                 next_map[v0.index].append(v1.index)
+                edge_uvs[(v0.index, v1.index)] = (uv0, uv1)
 
     vert_coords = [v.co.copy() for v in bm_part.verts]
     bm_part.free()
@@ -784,28 +1071,133 @@ def build_boundary_cap_object(label, part_mesh_data, bone_name):
                 u, v = v, nxt
             if len(loop) >= 3 and v == start_u:
                 loops.append(loop)
+    return vert_coords, edge_uvs, loops
 
+def simplify_ring_points(pts, min_edge_m):
+    """Drop vertices closer than min_edge_m to the previous kept vertex so recessed caps have low aspect ratios."""
+    if len(pts) <= 6 or min_edge_m <= 0.0:
+        return pts
+    kept = [pts[0]]
+    for pt in pts[1:]:
+        if (pt - kept[-1]).length >= min_edge_m:
+            kept.append(pt)
+    while len(kept) > 4 and (kept[-1] - kept[0]).length < min_edge_m * 0.7:
+        kept.pop()
+    return kept if len(kept) >= 3 else pts
+
+def build_boundary_cap_object(label, part_mesh_data, bone_name):
+    """Find every open boundary loop on part_mesh_data and close it with an outward-oriented inner-frame cap.
+    Waist and skirt boundary caps are recessed 7 mm inward behind the armor surface using satin gunmetal,
+    with concentric rings to prevent needle/sliver cap triangles."""
+    vert_coords, _, loops = extract_boundary_loops(part_mesh_data)
     if not loops:
         return None, 0, 0
 
     cap_verts = []
     cap_faces = []
     for loop in loops:
-        base_idx = len(cap_verts)
         pts = [vert_coords[vi] for vi in loop]
         centroid = sum(pts, Vector()) / len(pts)
-        for pt in pts:
-            cap_verts.append(pt)
-        center_idx = len(cap_verts)
-        cap_verts.append(centroid)
-        k = len(loop)
-        for j in range(k):
-            cap_faces.append((base_idx + j, base_idx + (j + 1) % k, center_idx))
+
+        is_waist_loop = (
+            label in ('chestPart', 'waistPart')
+            and abs(centroid.z - WAIST_PLANE_Z) < 0.025
+        )
+        is_recessed_ring = False
+        if is_waist_loop:
+            is_recessed_ring = True
+            z_dir = 1.0 if label == 'chestPart' else -1.0
+            recessed_pts = []
+            for pt in pts:
+                radial = Vector((centroid.x - pt.x, centroid.y - pt.y, 0.0))
+                rlen = radial.length
+                inset = min(0.006, 0.18 * rlen)
+                if rlen > 1e-6:
+                    radial = radial * (inset / rlen)
+                recessed_pts.append(Vector((pt.x + radial.x, pt.y + radial.y, pt.z + z_dir * WAIST_CAP_RECESS_M)))
+            recessed_pts = simplify_ring_points(recessed_pts, 0.014)
+            center_pt = Vector((centroid.x, centroid.y, centroid.z + z_dir * (WAIST_CAP_RECESS_M + 0.002)))
+        elif label == 'waistPart':
+            # Non-waist loops on waistPart (hip / skirt borders): recess 6 mm inward & use concentric rings
+            is_recessed_ring = True
+            recessed_pts = []
+            for pt in pts:
+                radial = centroid - pt
+                rlen = radial.length
+                inset = min(0.005, 0.15 * rlen)
+                shift = (radial * (inset / rlen)) if rlen > 1e-6 else Vector()
+                recessed_pts.append(pt + shift)
+            recessed_pts = simplify_ring_points(recessed_pts, 0.014)
+            center_pt = centroid
+        elif label in SKIRT_PART_SET:
+            is_recessed_ring = True
+            recessed_pts = []
+            for pt in pts:
+                # Pull 5 mm radially inward toward body centerline (0, 0, z) so skirt caps sit cleanly behind armor
+                to_axis = Vector((-pt.x, -pt.y, 0.0))
+                alen = to_axis.length
+                in_axis = (to_axis * (0.005 / alen)) if alen > 1e-6 else Vector()
+                radial = centroid - pt
+                rlen = radial.length
+                inset = min(0.0025, 0.10 * rlen)
+                shift = (radial * (inset / rlen)) if rlen > 1e-6 else Vector()
+                recessed_pts.append(pt + shift + in_axis)
+            recessed_pts = simplify_ring_points(recessed_pts, 0.014)
+            c_axis = Vector((-centroid.x, -centroid.y, 0.0))
+            if c_axis.length > 1e-6:
+                c_axis.normalize()
+            center_pt = centroid + c_axis * 0.006
+        else:
+            recessed_pts = pts
+            center_pt = centroid
+
+        k = len(recessed_pts)
+        if is_recessed_ring and k >= 3:
+            # Filter out tiny closing edges & use concentric rings for k>=6 or direct clean triangle(s) for k<6
+            if k >= 6:
+                ring0_base = len(cap_verts)
+                for pt in recessed_pts:
+                    cap_verts.append(pt)
+                ring1_base = len(cap_verts)
+                for pt in recessed_pts:
+                    cap_verts.append(pt.lerp(center_pt, 0.50))
+                center_idx = len(cap_verts)
+                cap_verts.append(center_pt)
+                for j in range(k):
+                    jn = (j + 1) % k
+                    for tri in (
+                        (ring0_base + j, ring0_base + jn, ring1_base + jn),
+                        (ring0_base + j, ring1_base + jn, ring1_base + j),
+                        (ring1_base + j, ring1_base + jn, center_idx),
+                    ):
+                        pa, pb, pc = cap_verts[tri[0]], cap_verts[tri[1]], cap_verts[tri[2]]
+                        max_e = max((pb - pa).length, (pc - pb).length, (pa - pc).length)
+                        area2 = (pb - pa).cross(pc - pa).length
+                        if area2 > 1e-10 and (max_e * max_e) / area2 <= 14.0:
+                            cap_faces.append(tri)
+            else:
+                base_idx = len(cap_verts)
+                for pt in recessed_pts:
+                    cap_verts.append(pt)
+                for j in range(1, k - 1):
+                    pa, pb, pc = cap_verts[base_idx], cap_verts[base_idx + j], cap_verts[base_idx + j + 1]
+                    max_e = max((pb - pa).length, (pc - pb).length, (pa - pc).length)
+                    area2 = (pb - pa).cross(pc - pa).length
+                    if area2 > 1e-10 and (max_e * max_e) / area2 <= 14.0:
+                        cap_faces.append((base_idx, base_idx + j, base_idx + j + 1))
+        else:
+            base_idx = len(cap_verts)
+            for pt in recessed_pts:
+                cap_verts.append(pt)
+            center_idx = len(cap_verts)
+            cap_verts.append(center_pt)
+            for j in range(k):
+                cap_faces.append((base_idx + j, base_idx + (j + 1) % k, center_idx))
 
     cap_data = bpy.data.meshes.new(f'{label}_capMesh')
     cap_data.from_pydata(cap_verts, [], cap_faces)
     cap_data.update()
-    cap_mat = knee_frame_mat if (knee_frame_mat is not None and label in ('rightThigh', 'leftThigh', 'rightShin', 'leftShin')) else inner_frame_mat
+    cap_mat = knee_frame_mat if (knee_frame_mat is not None and label in SATIN_GUNMETAL_PARTS) else inner_frame_mat
     cap_data.materials.append(cap_mat)
     cap_ob = bpy.data.objects.new(f'{label}_cap', cap_data)
     bpy.context.collection.objects.link(cap_ob)
@@ -818,8 +1210,140 @@ def build_boundary_cap_object(label, part_mesh_data, bone_name):
     mod.object = arm
     return cap_ob, len(loops), len(cap_faces)
 
+def build_abdomen_overlap_object(chest_mesh_data):
+    """Extend chestPart's bisected lower abdomen rim down inside the white skirt cavity (1.6 cm)
+    as a rigid-only textured sleeve (chestPart_overlap) with per-edge UV preservation (no seam stretching)
+    and 4-ring subdivision (zero sliver triangles). Also computes exact 2D bounding ellipse (95% size)
+    of the waist cut loop for fitting filler_torso."""
+    vert_coords, edge_uvs, loops = extract_boundary_loops(chest_mesh_data)
+    waist_loops = [
+        lp for lp in loops
+        if abs((sum((vert_coords[vi].z for vi in lp)) / len(lp)) - WAIST_PLANE_Z) < 0.015
+    ]
+    if not waist_loops:
+        raise RuntimeError('Failed to locate bisected waist cut loop on chestPart')
+    loop = max(waist_loops, key=len)
+    pts = [vert_coords[vi] for vi in loop]
+    xs = [p.x for p in pts]
+    ys = [p.y for p in pts]
+    cx_bb = 0.5 * (min(xs) + max(xs))
+    cy_bb = 0.5 * (min(ys) + max(ys))
+    rx_loop = 0.5 * (max(xs) - min(xs))
+    ry_loop = 0.5 * (max(ys) - min(ys))
+
+    # Fit elliptical filler_torso to the waist cut loop's 2D bounding ellipse (~95% width,
+    # and 95% depth excluding the narrow protruding center blue cockpit nose |x| < 0.055 so
+    # the filler sits cleanly inside the red abdomen indentation at 0 deg with zero poke-through).
+    abdomen_ys = [p.y for p in pts if abs(p.x) >= 0.050] or ys
+    cy_body = 0.5 * (min(abdomen_ys) + max(abdomen_ys))
+    ry_body = 0.5 * (max(abdomen_ys) - min(abdomen_ys))
+    rx_fit = 0.95 * rx_loop
+    ry_fit = 0.95 * ry_body
+    cx_fit = cx_bb
+    cy_fit = cy_body
+
+    # Merge sub-2.5mm micro-segments along the loop before extruding chestPart_overlap so
+    # every extruded quad has aspect ratio < 4 (zero sliver triangles).
+    ov_segments = []
+    k_raw = len(loop)
+    cur_start_idx = 0
+    for j in range(k_raw):
+        u_vi = loop[cur_start_idx]
+        v_vi = loop[(j + 1) % k_raw]
+        seg_len = (vert_coords[v_vi] - vert_coords[u_vi]).length
+        is_last = (j == k_raw - 1)
+        if seg_len >= 0.0025 or is_last:
+            if seg_len >= 1e-4:
+                # Sample UV from the longest raw edge inside this merged span (same UV island)
+                uv_pair = edge_uvs.get((loop[j], v_vi), edge_uvs.get((u_vi, loop[(cur_start_idx + 1) % k_raw]), ((0.5, 0.5), (0.5, 0.5))))
+                ov_segments.append((u_vi, v_vi, uv_pair))
+            cur_start_idx = (j + 1) % k_raw
+
+    # Build 5 rings (4 vertical strips of 4 mm each = 1.6 cm depth) using per-edge split vertices
+    # so every strip preserves its exact single-island UV (zero UV-seam stripes) and low aspect ratio!
+    ring_specs = [
+        (0.0, 0.0),
+        (-0.004, 0.0010),
+        (-0.008, 0.0020),
+        (-0.012, 0.0028),
+        (-WAIST_OVERLAP_DEPTH_M, 0.0035),
+    ]
+    ov_verts = []
+    ov_faces = []
+    ov_face_uvs = []
+    for u_vi, v_vi, (uv_u, uv_v) in ov_segments:
+        pu = vert_coords[u_vi]
+        pv = vert_coords[v_vi]
+        in_u = Vector((cx_fit - pu.x, cy_fit - pu.y, 0.0))
+        if in_u.length > 1e-6:
+            in_u.normalize()
+        in_v = Vector((cx_fit - pv.x, cy_fit - pv.y, 0.0))
+        if in_v.length > 1e-6:
+            in_v.normalize()
+        strip_ring_idx = []
+        for dz, inset in ring_specs:
+            idx_u = len(ov_verts)
+            ov_verts.append(Vector((pu.x + in_u.x * inset, pu.y + in_u.y * inset, pu.z + dz)))
+            idx_v = len(ov_verts)
+            ov_verts.append(Vector((pv.x + in_v.x * inset, pv.y + in_v.y * inset, pv.z + dz)))
+            strip_ring_idx.append((idx_u, idx_v))
+
+        for r in range(len(ring_specs) - 1):
+            a0, b0 = strip_ring_idx[r]
+            a1, b1 = strip_ring_idx[r + 1]
+            va, vb, vc = ov_verts[b0], ov_verts[b1], ov_verts[a1]
+            n = (vb - va).cross(vc - va)
+            mid = (ov_verts[a0] + ov_verts[b0] + ov_verts[a1] + ov_verts[b1]) * 0.25
+            out_dir = Vector((mid.x - cx_fit, mid.y - cy_fit, 0.0))
+            if n.dot(out_dir) >= 0.0:
+                ov_faces.append((b0, b1, a1))
+                ov_face_uvs.append((uv_v, uv_v, uv_u))
+                ov_faces.append((b0, a1, a0))
+                ov_face_uvs.append((uv_v, uv_u, uv_u))
+            else:
+                ov_faces.append((a0, a1, b1))
+                ov_face_uvs.append((uv_u, uv_u, uv_v))
+                ov_faces.append((a0, b1, b0))
+                ov_face_uvs.append((uv_u, uv_v, uv_v))
+
+    ov_data = bpy.data.meshes.new('chestPart_overlapMesh')
+    ov_data.from_pydata(ov_verts, [], ov_faces)
+    ov_data.update()
+    ov_data.materials.append(material)
+    uv_layer = ov_data.uv_layers.new(name='UVMap')
+    for poly, f_uvs in zip(ov_data.polygons, ov_face_uvs):
+        poly.use_smooth = True
+        for li, co in zip(poly.loop_indices, f_uvs):
+            uv_layer.data[li].uv = co
+
+    ov_ob = bpy.data.objects.new('chestPart_overlap', ov_data)
+    bpy.context.collection.objects.link(ov_ob)
+    ov_ob.parent = arm
+    for bname in positions:
+        vg = ov_ob.vertex_groups.new(name=bname)
+        if bname == 'torso':
+            vg.add(list(range(len(ov_verts))), 1.0, 'REPLACE')
+    mod = ov_ob.modifiers.new('RigidOverlapSkin', 'ARMATURE')
+    mod.object = arm
+
+    loop_info = {
+        'loop_vertices': k_raw,
+        'overlap_segments': len(ov_segments),
+        'center_xy': [round(cx_fit, 5), round(cy_fit, 5)],
+        'waist_plane_z_m': WAIST_PLANE_Z,
+        'loop_rx_m': round(rx_loop, 5),
+        'loop_ry_m': round(ry_loop, 5),
+        'fitted_filler_rx_m': round(rx_fit, 5),
+        'fitted_filler_ry_m': round(ry_fit, 5),
+        'overlap_depth_m': WAIST_OVERLAP_DEPTH_M,
+        'overlap_bottom_inset_m': 0.0035,
+        'overlap_triangles': len(ov_faces),
+    }
+    return ov_ob, loop_info
+
 parts = {}
 cap_stats = {}
+abdomen_overlap_info = None
 seam_records = collections.defaultdict(list)
 for label, ids in labels.items():
     used = sorted({v for i in ids for v in faces[i]})
@@ -857,14 +1381,42 @@ for label, ids in labels.items():
         if rigid_features:
             cap_ob, n_loops, n_tris = build_boundary_cap_object(label, data, rigid_bone_for[label])
             cap_stats[label] = {'loops_capped': n_loops, 'cap_triangles': n_tris}
+            if label == 'chestPart':
+                _, abdomen_overlap_info = build_abdomen_overlap_object(data)
 
-# Create dark-gray inner-frame joint fillers parented to each joint's parent bone
+# Create dark-gray / satin-gunmetal inner-frame joint fillers parented to each joint's parent bone
 filler_report = []
 if rigid_features:
     for spec in cfg['joint_fillers']:
         bm_f = bmesh.new()
+        center = list(spec['center'])
+        rx_out = spec['radius']
+        ry_out = spec.get('radius_y', spec['radius'])
+        depth_out = spec.get('depth')
         if spec['shape'] == 'sphere':
             bmesh.ops.create_uvsphere(bm_f, u_segments=18, v_segments=12, radius=spec['radius'])
+        elif spec['shape'] == 'elliptical_waist' and abdomen_overlap_info is not None:
+            rx_out = abdomen_overlap_info['fitted_filler_rx_m']
+            ry_out = abdomen_overlap_info['fitted_filler_ry_m']
+            depth_out = spec['depth']
+            z_top = WAIST_PLANE_Z - 0.006
+            center = [
+                abdomen_overlap_info['center_xy'][0],
+                abdomen_overlap_info['center_xy'][1],
+                round(z_top - 0.5 * depth_out, 5),
+            ]
+            bmesh.ops.create_cone(
+                bm_f,
+                cap_ends=True,
+                cap_tris=True,
+                segments=32,
+                radius1=1.0,
+                radius2=1.0,
+                depth=depth_out,
+            )
+            for v in bm_f.verts:
+                v.co.x *= rx_out
+                v.co.y *= ry_out
         else:
             bmesh.ops.create_cone(
                 bm_f,
@@ -893,14 +1445,15 @@ if rigid_features:
         fob.parent_type = 'BONE'
         fob.parent_bone = spec['parent']
         bpy.context.view_layer.update()
-        fob.matrix_world = Matrix.Translation(Vector(spec['center']) + root.location)
+        fob.matrix_world = Matrix.Translation(Vector(center) + root.location)
         filler_report.append({
             'name': spec['name'],
             'parent': spec['parent'],
             'shape': spec['shape'],
-            'center': list(spec['center']),
-            'radius_m': spec['radius'],
-            'depth_m': spec.get('depth'),
+            'center': center,
+            'radius_m': rx_out,
+            'radius_y_m': ry_out if spec['shape'] == 'elliptical_waist' else None,
+            'depth_m': depth_out,
             'axis': spec.get('axis'),
             'triangles': len(fdata.polygons),
         })
@@ -1019,10 +1572,13 @@ report = {
     'sockets': ['rightHand', 'leftHand', 'leftForearmSocket' if rigid_features else 'leftForearm', 'back'],
     'cut_loops': cut_summary,
     'knee_bisect': knee_bisect_stats,
+    'waist_bisect': waist_bisect_stats,
+    'abdomen_overlap': abdomen_overlap_info,
     'cap_stats': cap_stats,
     'joint_fillers': filler_report,
-    'method': 'Concavity-guided dual-graph min-cut segmentation along natural panel seams, centroid boundary loop capping with InnerFrameMaterial, parented inner-frame joint fillers, and 4 hip-driven secondary skirt armor bones (plus 2-ring smooth LBS weights preserved for comparison mode).',
+    'method': 'Planar bisection at knees and waist (inside red abdomen above all white skirts) + concavity-guided dual-graph min-cut at non-planar seams, global sliver cleanup (<50 tris components & >2cm centroid outliers), downward red abdomen overlap sleeve, recessed satin gunmetal caps, elliptical waist inner-frame filler, and 6 hip-driven secondary skirt bones (front/side/rear L/R), plus 2-ring smooth LBS weights preserved for comparison mode.',
     'cleanup': cleanup,
+    'reassigned_per_part': reassigned_report,
     'seam_checks': checks,
     'limitations': limitations,
 }
@@ -1031,8 +1587,10 @@ print(json.dumps({
     'asset': asset_key,
     'parts': {k: len(v) for k, v in labels.items()},
     'source_faces_preserved': report['source_faces_preserved'],
+    'abdomen_overlap': abdomen_overlap_info,
+    'filler_torso': next((f for f in filler_report if f['name'] == 'filler_torso'), None),
+    'reassigned_per_part': {k: v for k, v in reassigned_report.items() if v['total'] > 0},
     'cap_triangles_total': sum(v['cap_triangles'] for v in cap_stats.values()),
     'fillers_count': len(filler_report),
-    'cut_loops': cut_summary,
 }, indent=2))
 print('FULL_BODY_RIG_COMPLETE')

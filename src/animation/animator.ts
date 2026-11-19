@@ -48,6 +48,8 @@ export class Animator {
     frontLeftSkirt: 0,
     sideRightSkirt: 0,
     sideLeftSkirt: 0,
+    rearRightSkirt: 0,
+    rearLeftSkirt: 0,
   };
 
   constructor(private rig: ArmPreviewRig) {}
@@ -117,11 +119,23 @@ export class Animator {
       0,
       SKIRT_FK_CONFIG.sideMaxDeg,
     );
+    const rearRightDeg = MathUtils.clamp(
+      SKIRT_FK_CONFIG.rearK * Math.max(0, -rightHipDeg),
+      0,
+      SKIRT_FK_CONFIG.rearMaxDeg,
+    );
+    const rearLeftDeg = MathUtils.clamp(
+      SKIRT_FK_CONFIG.rearK * Math.max(0, -leftHipDeg),
+      0,
+      SKIRT_FK_CONFIG.rearMaxDeg,
+    );
     this.lastSkirtAngles = {
       frontRightSkirt: frontRightDeg,
       frontLeftSkirt: frontLeftDeg,
       sideRightSkirt: sideRightDeg,
       sideLeftSkirt: sideLeftDeg,
+      rearRightSkirt: rearRightDeg,
+      rearLeftSkirt: rearLeftDeg,
     };
     if (this.rig.skirtJoints && this.rig.skirtBindPose) {
       const applySkirt = (
@@ -141,11 +155,13 @@ export class Animator {
         this.tmpSkirtQ.setFromEuler(this.tmpSkirtEuler);
         joint.quaternion.copy(bind).multiply(this.tmpSkirtQ);
       };
-      // Front skirts swing forward (-X rotation); side skirts flare outward (-Z right, +Z left)
+      // Front skirts swing forward (-X); side skirts flare outward (-Z right, +Z left); rear skirts swing back (+X)
       applySkirt("frontRightSkirt", -frontRightDeg, 0);
       applySkirt("frontLeftSkirt", -frontLeftDeg, 0);
       applySkirt("sideRightSkirt", 0, -sideRightDeg);
       applySkirt("sideLeftSkirt", 0, sideLeftDeg);
+      applySkirt("rearRightSkirt", rearRightDeg, 0);
+      applySkirt("rearLeftSkirt", rearLeftDeg, 0);
     }
     if (this.rig.pelvisBindPosition && this.rig.bindAnkleY !== undefined) {
       this.rig.joints.pelvis.position.copy(this.rig.pelvisBindPosition);

@@ -1,27 +1,29 @@
 {
   "asset": "sentinel",
-  "source_vertices": 15105,
-  "source_triangles": 30518,
+  "source_vertices": 15172,
+  "source_triangles": 30651,
   "part_triangles": {
-    "waistPart": 2496,
-    "chestPart": 4311,
-    "headPart": 1506,
+    "waistPart": 1704,
+    "chestPart": 4280,
+    "headPart": 1508,
     "rightUpperArm": 1951,
     "rightForearm": 1457,
     "rightPalm": 643,
     "leftUpperArm": 1783,
-    "leftForearm": 1551,
-    "leftPalm": 708,
-    "rightThigh": 985,
+    "leftForearm": 1549,
+    "leftPalm": 710,
+    "rightThigh": 992,
     "rightShin": 3009,
     "rightFoot": 2026,
-    "leftThigh": 1011,
+    "leftThigh": 1014,
     "leftShin": 3145,
     "leftFoot": 1963,
-    "frontRightSkirtPart": 424,
-    "frontLeftSkirtPart": 406,
-    "sideRightSkirtPart": 603,
-    "sideLeftSkirtPart": 540
+    "frontRightSkirtPart": 472,
+    "frontLeftSkirtPart": 454,
+    "sideRightSkirtPart": 596,
+    "sideLeftSkirtPart": 537,
+    "rearRightSkirtPart": 450,
+    "rearLeftSkirtPart": 408
   },
   "source_faces_preserved": true,
   "articulated_joints": [
@@ -43,7 +45,9 @@
     "frontRightSkirt",
     "frontLeftSkirt",
     "sideRightSkirt",
-    "sideLeftSkirt"
+    "sideLeftSkirt",
+    "rearRightSkirt",
+    "rearLeftSkirt"
   ],
   "joint_hierarchy": {
     "torso": "pelvis",
@@ -63,7 +67,9 @@
     "frontRightSkirt": "pelvis",
     "frontLeftSkirt": "pelvis",
     "sideRightSkirt": "pelvis",
-    "sideLeftSkirt": "pelvis"
+    "sideLeftSkirt": "pelvis",
+    "rearRightSkirt": "pelvis",
+    "rearLeftSkirt": "pelvis"
   },
   "sockets": [
     "rightHand",
@@ -73,33 +79,33 @@
   ],
   "cut_loops": {
     "chestPart <-> frontLeftSkirtPart": {
-      "edges": 5,
-      "concave_fraction": 1.0,
-      "perimeter_m": 0.0547,
+      "edges": 9,
+      "concave_fraction": 0.0,
+      "perimeter_m": 0.0908,
       "mean_center": [
-        0.074,
-        -0.1069,
-        0.2762
+        0.0884,
+        -0.0913,
+        0.3332
       ]
     },
     "chestPart <-> frontRightSkirtPart": {
-      "edges": 5,
-      "concave_fraction": 1.0,
-      "perimeter_m": 0.0709,
+      "edges": 8,
+      "concave_fraction": 0.125,
+      "perimeter_m": 0.0772,
       "mean_center": [
-        -0.1037,
-        -0.1092,
-        0.2875
+        -0.1046,
+        -0.0902,
+        0.3296
       ]
     },
     "chestPart <-> headPart": {
-      "edges": 23,
-      "concave_fraction": 0.609,
-      "perimeter_m": 0.7657,
+      "edges": 21,
+      "concave_fraction": 0.762,
+      "perimeter_m": 0.5955,
       "mean_center": [
-        -0.0028,
-        0.0522,
-        0.7206
+        -0.0031,
+        0.0491,
+        0.7183
       ]
     },
     "chestPart <-> leftUpperArm": {
@@ -114,72 +120,72 @@
     },
     "chestPart <-> rightUpperArm": {
       "edges": 37,
-      "concave_fraction": 1.0,
-      "perimeter_m": 0.44,
+      "concave_fraction": 0.946,
+      "perimeter_m": 0.468,
       "mean_center": [
-        -0.1907,
-        0.0499,
-        0.6587
+        -0.1909,
+        0.0495,
+        0.6567
       ]
     },
     "chestPart <-> waistPart": {
-      "edges": 60,
-      "concave_fraction": 0.6,
-      "perimeter_m": 1.9985,
+      "edges": 67,
+      "concave_fraction": 0.075,
+      "perimeter_m": 0.7479,
       "mean_center": [
-        0.0027,
-        -0.0253,
-        0.3183
+        -0.0122,
+        -0.0125,
+        0.3328
       ]
     },
     "frontLeftSkirtPart <-> waistPart": {
-      "edges": 27,
-      "concave_fraction": 0.889,
-      "perimeter_m": 0.5145,
+      "edges": 29,
+      "concave_fraction": 0.862,
+      "perimeter_m": 0.6687,
       "mean_center": [
-        0.0507,
-        -0.1456,
-        0.2203
+        0.0587,
+        -0.1345,
+        0.2471
       ]
     },
     "frontRightSkirtPart <-> sideRightSkirtPart": {
-      "edges": 1,
-      "concave_fraction": 1.0,
-      "perimeter_m": 0.0381,
+      "edges": 4,
+      "concave_fraction": 0.25,
+      "perimeter_m": 0.1068,
       "mean_center": [
-        -0.2019,
-        -0.1004,
-        0.2799
+        -0.1982,
+        -0.0915,
+        0.2927
       ]
     },
     "frontRightSkirtPart <-> waistPart": {
-      "edges": 27,
-      "concave_fraction": 0.815,
-      "perimeter_m": 0.6601,
+      "edges": 35,
+      "concave_fraction": 0.6,
+      "perimeter_m": 0.8779,
       "mean_center": [
-        -0.0691,
-        -0.1465,
-        0.2224
+        -0.0749,
+        -0.1328,
+        0.2352
       ]
     },
     "leftFoot <-> leftShin": {
-      "edges": 54,
-      "concave_fraction": 0.778,
-      "perimeter_m": 1.2502,
+      "edges": 50,
+      "concave_fraction": 0.78,
+      "perimeter_m": 1.0662,
       "mean_center": [
-        0.3016,
-        0.023,
-        -0.7444
+        0.3047,
+        0.0153,
+        -0.7439
       ]
     },
     "leftForearm <-> leftPalm": {
-      "edges": 34,
-      "concave_fraction": 0.971,
-      "perimeter_m": 0.4628,
+      "edges": 32,
+      "concave_fraction": 0.938,
+      "perimeter_m": 0.4426,
       "mean_center": [
-        0.3952,
-        -0.0251,
-        0.134
+        0.3964,
+        -0.0239,
+        0.1344
       ]
     },
     "leftForearm <-> leftUpperArm": {
@@ -203,43 +209,73 @@
       ]
     },
     "leftThigh <-> sideLeftSkirtPart": {
-      "edges": 20,
-      "concave_fraction": 0.15,
-      "perimeter_m": 0.3646,
+      "edges": 9,
+      "concave_fraction": 0.333,
+      "perimeter_m": 0.1686,
       "mean_center": [
-        0.2002,
-        -0.0221,
-        0.1188
+        0.2032,
+        -0.0438,
+        0.1179
       ]
     },
     "leftThigh <-> waistPart": {
-      "edges": 44,
-      "concave_fraction": 0.636,
-      "perimeter_m": 0.9059,
+      "edges": 42,
+      "concave_fraction": 0.571,
+      "perimeter_m": 0.9162,
       "mean_center": [
-        0.1144,
-        -0.0031,
-        0.1086
+        0.1136,
+        0.0084,
+        0.1073
+      ]
+    },
+    "rearLeftSkirtPart <-> waistPart": {
+      "edges": 30,
+      "concave_fraction": 0.733,
+      "perimeter_m": 0.722,
+      "mean_center": [
+        0.0566,
+        0.1123,
+        0.2135
+      ]
+    },
+    "rearRightSkirtPart <-> sideRightSkirtPart": {
+      "edges": 5,
+      "concave_fraction": 1.0,
+      "perimeter_m": 0.0484,
+      "mean_center": [
+        -0.1928,
+        0.0849,
+        0.2792
+      ]
+    },
+    "rearRightSkirtPart <-> waistPart": {
+      "edges": 41,
+      "concave_fraction": 0.829,
+      "perimeter_m": 0.8862,
+      "mean_center": [
+        -0.0779,
+        0.1096,
+        0.237
       ]
     },
     "rightFoot <-> rightShin": {
-      "edges": 50,
-      "concave_fraction": 0.86,
-      "perimeter_m": 1.0526,
+      "edges": 46,
+      "concave_fraction": 0.717,
+      "perimeter_m": 1.0546,
       "mean_center": [
-        -0.3028,
-        0.0099,
-        -0.7452
+        -0.3026,
+        0.0104,
+        -0.7456
       ]
     },
     "rightForearm <-> rightPalm": {
-      "edges": 19,
-      "concave_fraction": 0.842,
-      "perimeter_m": 0.336,
+      "edges": 17,
+      "concave_fraction": 0.824,
+      "perimeter_m": 0.3239,
       "mean_center": [
-        -0.3961,
-        -0.006,
-        0.1316
+        -0.3968,
+        -0.0065,
+        0.1312
       ]
     },
     "rightForearm <-> rightUpperArm": {
@@ -264,42 +300,42 @@
     },
     "rightThigh <-> sideRightSkirtPart": {
       "edges": 13,
-      "concave_fraction": 0.231,
-      "perimeter_m": 0.3234,
+      "concave_fraction": 0.385,
+      "perimeter_m": 0.3275,
       "mean_center": [
-        -0.2022,
-        -0.028,
-        0.1193
+        -0.2001,
+        -0.0221,
+        0.1216
       ]
     },
     "rightThigh <-> waistPart": {
-      "edges": 44,
-      "concave_fraction": 0.75,
-      "perimeter_m": 0.9557,
+      "edges": 33,
+      "concave_fraction": 0.606,
+      "perimeter_m": 0.8112,
       "mean_center": [
-        -0.0891,
-        0.0029,
-        0.1047
+        -0.0837,
+        0.0068,
+        0.106
       ]
     },
     "sideLeftSkirtPart <-> waistPart": {
-      "edges": 44,
-      "concave_fraction": 0.364,
-      "perimeter_m": 1.5608,
+      "edges": 38,
+      "concave_fraction": 0.395,
+      "perimeter_m": 1.2157,
       "mean_center": [
-        0.1917,
-        -0.0161,
-        0.243
+        0.1896,
+        -0.0145,
+        0.242
       ]
     },
     "sideRightSkirtPart <-> waistPart": {
-      "edges": 57,
-      "concave_fraction": 0.439,
-      "perimeter_m": 1.7986,
+      "edges": 28,
+      "concave_fraction": 0.214,
+      "perimeter_m": 1.0773,
       "mean_center": [
-        -0.1868,
-        0.0045,
-        0.2653
+        -0.1893,
+        -0.0066,
+        0.2689
       ]
     }
   },
@@ -311,21 +347,47 @@
       0.8872
     ],
     "triangles_before": 29999,
-    "triangles_after": 30518,
-    "added_triangles": 519
+    "triangles_after": 30651,
+    "added_triangles": 652
+  },
+  "waist_bisect": {
+    "plane_equation": "z = 0.331",
+    "plane_normal": [
+      0.0,
+      0.0,
+      1.0
+    ],
+    "triangles_before_waist_bisect": 30272,
+    "triangles_after_total": 30651
+  },
+  "abdomen_overlap": {
+    "loop_vertices": 84,
+    "overlap_segments": 78,
+    "center_xy": [
+      -0.00366,
+      -0.01166
+    ],
+    "waist_plane_z_m": 0.331,
+    "loop_rx_m": 0.14395,
+    "loop_ry_m": 0.11812,
+    "fitted_filler_rx_m": 0.13675,
+    "fitted_filler_ry_m": 0.09569,
+    "overlap_depth_m": 0.016,
+    "overlap_bottom_inset_m": 0.0035,
+    "overlap_triangles": 624
   },
   "cap_stats": {
     "waistPart": {
-      "loops_capped": 9,
-      "cap_triangles": 303
+      "loops_capped": 7,
+      "cap_triangles": 669
     },
     "chestPart": {
-      "loops_capped": 10,
-      "cap_triangles": 166
+      "loops_capped": 9,
+      "cap_triangles": 202
     },
     "headPart": {
       "loops_capped": 1,
-      "cap_triangles": 23
+      "cap_triangles": 21
     },
     "rightUpperArm": {
       "loops_capped": 5,
@@ -333,11 +395,11 @@
     },
     "rightForearm": {
       "loops_capped": 2,
-      "cap_triangles": 41
+      "cap_triangles": 39
     },
     "rightPalm": {
       "loops_capped": 1,
-      "cap_triangles": 19
+      "cap_triangles": 17
     },
     "leftUpperArm": {
       "loops_capped": 4,
@@ -345,67 +407,76 @@
     },
     "leftForearm": {
       "loops_capped": 3,
-      "cap_triangles": 59
+      "cap_triangles": 57
     },
     "leftPalm": {
       "loops_capped": 2,
-      "cap_triangles": 34
+      "cap_triangles": 32
     },
     "rightThigh": {
       "loops_capped": 3,
-      "cap_triangles": 141
+      "cap_triangles": 130
     },
     "rightShin": {
       "loops_capped": 4,
-      "cap_triangles": 134
+      "cap_triangles": 130
     },
     "rightFoot": {
       "loops_capped": 3,
-      "cap_triangles": 50
+      "cap_triangles": 46
     },
     "leftThigh": {
-      "loops_capped": 5,
-      "cap_triangles": 157
+      "loops_capped": 4,
+      "cap_triangles": 144
     },
     "leftShin": {
-      "loops_capped": 4,
-      "cap_triangles": 147
+      "loops_capped": 3,
+      "cap_triangles": 143
     },
     "leftFoot": {
-      "loops_capped": 3,
-      "cap_triangles": 54
+      "loops_capped": 2,
+      "cap_triangles": 50
     },
     "frontRightSkirtPart": {
-      "loops_capped": 3,
-      "cap_triangles": 33
+      "loops_capped": 2,
+      "cap_triangles": 85
     },
     "frontLeftSkirtPart": {
       "loops_capped": 1,
-      "cap_triangles": 32
+      "cap_triangles": 62
     },
     "sideRightSkirtPart": {
-      "loops_capped": 3,
-      "cap_triangles": 71
+      "loops_capped": 2,
+      "cap_triangles": 118
     },
     "sideLeftSkirtPart": {
       "loops_capped": 2,
-      "cap_triangles": 64
+      "cap_triangles": 114
+    },
+    "rearRightSkirtPart": {
+      "loops_capped": 2,
+      "cap_triangles": 85
+    },
+    "rearLeftSkirtPart": {
+      "loops_capped": 1,
+      "cap_triangles": 44
     }
   },
   "joint_fillers": [
     {
       "name": "filler_torso",
       "parent": "pelvis",
-      "shape": "cylinder",
+      "shape": "elliptical_waist",
       "center": [
-        0.0,
-        -0.005,
-        0.332
+        -0.00366,
+        -0.01166,
+        0.263
       ],
-      "radius_m": 0.078,
-      "depth_m": 0.092,
+      "radius_m": 0.13675,
+      "radius_y_m": 0.09569,
+      "depth_m": 0.124,
       "axis": "Z",
-      "triangles": 80
+      "triangles": 128
     },
     {
       "name": "filler_head",
@@ -417,6 +488,7 @@
         0.728
       ],
       "radius_m": 0.046,
+      "radius_y_m": null,
       "depth_m": 0.068,
       "axis": "Z",
       "triangles": 80
@@ -431,6 +503,7 @@
         0.642
       ],
       "radius_m": 0.072,
+      "radius_y_m": null,
       "depth_m": null,
       "axis": null,
       "triangles": 396
@@ -445,6 +518,7 @@
         0.642
       ],
       "radius_m": 0.072,
+      "radius_y_m": null,
       "depth_m": null,
       "axis": null,
       "triangles": 396
@@ -459,6 +533,7 @@
         0.428
       ],
       "radius_m": 0.046,
+      "radius_y_m": null,
       "depth_m": 0.088,
       "axis": "X",
       "triangles": 80
@@ -473,6 +548,7 @@
         0.428
       ],
       "radius_m": 0.046,
+      "radius_y_m": null,
       "depth_m": 0.088,
       "axis": "X",
       "triangles": 80
@@ -487,6 +563,7 @@
         0.134
       ],
       "radius_m": 0.036,
+      "radius_y_m": null,
       "depth_m": null,
       "axis": null,
       "triangles": 396
@@ -501,6 +578,7 @@
         0.134
       ],
       "radius_m": 0.036,
+      "radius_y_m": null,
       "depth_m": null,
       "axis": null,
       "triangles": 396
@@ -515,6 +593,7 @@
         0.135
       ],
       "radius_m": 0.076,
+      "radius_y_m": null,
       "depth_m": null,
       "axis": null,
       "triangles": 396
@@ -529,6 +608,7 @@
         0.135
       ],
       "radius_m": 0.076,
+      "radius_y_m": null,
       "depth_m": null,
       "axis": null,
       "triangles": 396
@@ -539,11 +619,12 @@
       "shape": "cylinder",
       "center": [
         0.0,
-        0.005,
-        0.215
+        -0.013,
+        0.2
       ],
-      "radius_m": 0.122,
-      "depth_m": 0.185,
+      "radius_m": 0.14,
+      "radius_y_m": null,
+      "depth_m": 0.215,
       "axis": "Z",
       "triangles": 80
     },
@@ -557,6 +638,7 @@
         -0.194
       ],
       "radius_m": 0.062,
+      "radius_y_m": null,
       "depth_m": 0.118,
       "axis": "X",
       "triangles": 80
@@ -571,6 +653,7 @@
         -0.194
       ],
       "radius_m": 0.062,
+      "radius_y_m": null,
       "depth_m": 0.118,
       "axis": "X",
       "triangles": 80
@@ -585,6 +668,7 @@
         -0.752
       ],
       "radius_m": 0.058,
+      "radius_y_m": null,
       "depth_m": 0.118,
       "axis": "X",
       "triangles": 80
@@ -599,175 +683,625 @@
         -0.752
       ],
       "radius_m": 0.058,
+      "radius_y_m": null,
       "depth_m": 0.118,
       "axis": "X",
       "triangles": 80
     }
   ],
-  "method": "Concavity-guided dual-graph min-cut segmentation along natural panel seams, centroid boundary loop capping with InnerFrameMaterial, parented inner-frame joint fillers, and 4 hip-driven secondary skirt armor bones (plus 2-ring smooth LBS weights preserved for comparison mode).",
+  "method": "Planar bisection at knees and waist (inside red abdomen above all white skirts) + concavity-guided dual-graph min-cut at non-planar seams, global sliver cleanup (<50 tris components & >2cm centroid outliers), downward red abdomen overlap sleeve, recessed satin gunmetal caps, elliptical waist inner-frame filler, and 6 hip-driven secondary skirt bones (front/side/rear L/R), plus 2-ring smooth LBS weights preserved for comparison mode.",
   "cleanup": [
     {
-      "from": "waistPart",
-      "to": "sideRightSkirtPart",
-      "faces": 9
-    },
-    {
+      "reason": "component<50",
       "from": "chestPart",
       "to": "headPart",
       "faces": 18
     },
     {
+      "reason": "component<50",
       "from": "chestPart",
       "to": "rightUpperArm",
       "faces": 8
     },
     {
+      "reason": "component<50",
       "from": "chestPart",
       "to": "leftUpperArm",
       "faces": 6
     },
     {
+      "reason": "component<50",
       "from": "chestPart",
       "to": "rightUpperArm",
       "faces": 4
     },
     {
+      "reason": "component<50",
       "from": "chestPart",
       "to": "leftUpperArm",
       "faces": 4
     },
     {
-      "from": "chestPart",
-      "to": "sideLeftSkirtPart",
-      "faces": 1
-    },
-    {
+      "reason": "component<50",
       "from": "rightForearm",
-      "to": "rightPalm",
+      "to": "sideRightSkirtPart",
       "faces": 4
     },
     {
+      "reason": "component<50",
       "from": "rightPalm",
       "to": "sideRightSkirtPart",
-      "faces": 36
+      "faces": 32
     },
     {
+      "reason": "component<50",
       "from": "leftForearm",
       "to": "sideLeftSkirtPart",
       "faces": 1
     },
     {
+      "reason": "component<50",
       "from": "leftPalm",
       "to": "sideLeftSkirtPart",
       "faces": 6
     },
     {
+      "reason": "component<50",
       "from": "leftPalm",
-      "to": "sideLeftSkirtPart",
+      "to": "leftThigh",
       "faces": 1
     },
     {
+      "reason": "disconnected",
       "from": "rightThigh",
       "to": "sideRightSkirtPart",
       "faces": 53
     },
     {
-      "from": "rightThigh",
-      "to": "waistPart",
-      "faces": 43
-    },
-    {
+      "reason": "component<50",
       "from": "rightThigh",
       "to": "rightShin",
       "faces": 29
     },
     {
+      "reason": "component<50",
       "from": "rightThigh",
       "to": "frontRightSkirtPart",
       "faces": 25
     },
     {
+      "reason": "component<50",
+      "from": "rightThigh",
+      "to": "rearRightSkirtPart",
+      "faces": 17
+    },
+    {
+      "reason": "component<50",
       "from": "rightThigh",
       "to": "rightShin",
       "faces": 6
     },
     {
+      "reason": "component<50",
       "from": "rightThigh",
-      "to": "waistPart",
+      "to": "frontLeftSkirtPart",
       "faces": 3
     },
     {
+      "reason": "disconnected",
       "from": "leftThigh",
       "to": "leftShin",
       "faces": 92
     },
     {
+      "reason": "disconnected",
       "from": "leftThigh",
       "to": "sideLeftSkirtPart",
-      "faces": 74
+      "faces": 75
     },
     {
+      "reason": "component<50",
       "from": "leftThigh",
-      "to": "waistPart",
-      "faces": 15
+      "to": "rearLeftSkirtPart",
+      "faces": 22
     },
     {
+      "reason": "component<50",
       "from": "leftThigh",
       "to": "leftShin",
       "faces": 14
     },
     {
+      "reason": "component<50",
       "from": "leftThigh",
       "to": "frontLeftSkirtPart",
       "faces": 14
     },
     {
+      "reason": "component<50",
       "from": "leftThigh",
       "to": "leftShin",
       "faces": 9
     },
     {
+      "reason": "component<50",
       "from": "leftThigh",
       "to": "leftShin",
       "faces": 7
     },
     {
+      "reason": "component<50",
       "from": "frontRightSkirtPart",
       "to": "waistPart",
       "faces": 8
     },
     {
+      "reason": "component<50",
       "from": "frontLeftSkirtPart",
       "to": "waistPart",
       "faces": 11
     },
     {
-      "from": "frontLeftSkirtPart",
-      "to": "waistPart",
-      "faces": 1
-    },
-    {
+      "reason": "component<50",
       "from": "frontLeftSkirtPart",
       "to": "leftThigh",
       "faces": 1
     },
     {
+      "reason": "component<50",
       "from": "sideRightSkirtPart",
       "to": "frontRightSkirtPart",
-      "faces": 55
+      "faces": 46
     },
     {
+      "reason": "component<50",
       "from": "sideLeftSkirtPart",
       "to": "frontLeftSkirtPart",
       "faces": 6
+    },
+    {
+      "reason": "component<50",
+      "from": "rearRightSkirtPart",
+      "to": "frontRightSkirtPart",
+      "faces": 9
+    },
+    {
+      "reason": "component<50",
+      "from": "rearLeftSkirtPart",
+      "to": "leftThigh",
+      "faces": 10
+    },
+    {
+      "reason": "component<50",
+      "from": "rearLeftSkirtPart",
+      "to": "sideLeftSkirtPart",
+      "faces": 2
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "waistPart",
+      "to": "sideRightSkirtPart",
+      "faces": 11
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "waistPart",
+      "to": "frontRightSkirtPart",
+      "faces": 10
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "waistPart",
+      "to": "rightThigh",
+      "faces": 8
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "waistPart",
+      "to": "rearRightSkirtPart",
+      "faces": 3
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "waistPart",
+      "to": "rearLeftSkirtPart",
+      "faces": 9
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "waistPart",
+      "to": "frontLeftSkirtPart",
+      "faces": 8
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "waistPart",
+      "to": "leftThigh",
+      "faces": 2
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "waistPart",
+      "to": "sideLeftSkirtPart",
+      "faces": 3
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "chestPart",
+      "to": "rightUpperArm",
+      "faces": 1
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "chestPart",
+      "to": "headPart",
+      "faces": 2
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "rightUpperArm",
+      "to": "chestPart",
+      "faces": 1
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "rightForearm",
+      "to": "rightPalm",
+      "faces": 1
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "rightPalm",
+      "to": "rightForearm",
+      "faces": 1
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "leftForearm",
+      "to": "leftPalm",
+      "faces": 2
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "rightThigh",
+      "to": "waistPart",
+      "faces": 3
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "rightShin",
+      "to": "rightFoot",
+      "faces": 3
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "rightFoot",
+      "to": "rightShin",
+      "faces": 4
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "leftThigh",
+      "to": "waistPart",
+      "faces": 3
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "leftShin",
+      "to": "leftFoot",
+      "faces": 3
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "leftFoot",
+      "to": "leftShin",
+      "faces": 3
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "frontRightSkirtPart",
+      "to": "waistPart",
+      "faces": 2
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "frontLeftSkirtPart",
+      "to": "waistPart",
+      "faces": 2
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "sideRightSkirtPart",
+      "to": "rightThigh",
+      "faces": 1
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "sideRightSkirtPart",
+      "to": "waistPart",
+      "faces": 1
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "sideRightSkirtPart",
+      "to": "frontRightSkirtPart",
+      "faces": 1
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "sideLeftSkirtPart",
+      "to": "waistPart",
+      "faces": 3
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "sideLeftSkirtPart",
+      "to": "leftThigh",
+      "faces": 5
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "rearRightSkirtPart",
+      "to": "waistPart",
+      "faces": 5
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "rearLeftSkirtPart",
+      "to": "waistPart",
+      "faces": 6
+    },
+    {
+      "reason": "component<50",
+      "from": "waistPart",
+      "to": "frontLeftSkirtPart",
+      "faces": 3
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "waistPart",
+      "to": "rightThigh",
+      "faces": 1
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "waistPart",
+      "to": "rearLeftSkirtPart",
+      "faces": 2
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "waistPart",
+      "to": "frontLeftSkirtPart",
+      "faces": 1
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "waistPart",
+      "to": "frontRightSkirtPart",
+      "faces": 1
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "rightShin",
+      "to": "rightFoot",
+      "faces": 1
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "sideLeftSkirtPart",
+      "to": "leftThigh",
+      "faces": 1
+    },
+    {
+      "reason": "centroid>2cm",
+      "from": "rearRightSkirtPart",
+      "to": "waistPart",
+      "faces": 1
     }
   ],
+  "reassigned_per_part": {
+    "waistPart": {
+      "small_components": 3,
+      "distance_outliers": 59,
+      "total": 62,
+      "to": {
+        "sideRightSkirtPart": 11,
+        "frontRightSkirtPart": 11,
+        "rightThigh": 9,
+        "rearRightSkirtPart": 3,
+        "rearLeftSkirtPart": 11,
+        "frontLeftSkirtPart": 12,
+        "leftThigh": 2,
+        "sideLeftSkirtPart": 3
+      }
+    },
+    "chestPart": {
+      "small_components": 40,
+      "distance_outliers": 3,
+      "total": 43,
+      "to": {
+        "headPart": 20,
+        "rightUpperArm": 13,
+        "leftUpperArm": 10
+      }
+    },
+    "headPart": {
+      "small_components": 0,
+      "distance_outliers": 0,
+      "total": 0,
+      "to": {}
+    },
+    "rightUpperArm": {
+      "small_components": 0,
+      "distance_outliers": 1,
+      "total": 1,
+      "to": {
+        "chestPart": 1
+      }
+    },
+    "rightForearm": {
+      "small_components": 4,
+      "distance_outliers": 1,
+      "total": 5,
+      "to": {
+        "sideRightSkirtPart": 4,
+        "rightPalm": 1
+      }
+    },
+    "rightPalm": {
+      "small_components": 32,
+      "distance_outliers": 1,
+      "total": 33,
+      "to": {
+        "sideRightSkirtPart": 32,
+        "rightForearm": 1
+      }
+    },
+    "leftUpperArm": {
+      "small_components": 0,
+      "distance_outliers": 0,
+      "total": 0,
+      "to": {}
+    },
+    "leftForearm": {
+      "small_components": 1,
+      "distance_outliers": 2,
+      "total": 3,
+      "to": {
+        "sideLeftSkirtPart": 1,
+        "leftPalm": 2
+      }
+    },
+    "leftPalm": {
+      "small_components": 7,
+      "distance_outliers": 0,
+      "total": 7,
+      "to": {
+        "sideLeftSkirtPart": 6,
+        "leftThigh": 1
+      }
+    },
+    "rightThigh": {
+      "small_components": 133,
+      "distance_outliers": 3,
+      "total": 136,
+      "to": {
+        "sideRightSkirtPart": 53,
+        "rightShin": 35,
+        "frontRightSkirtPart": 25,
+        "rearRightSkirtPart": 17,
+        "frontLeftSkirtPart": 3,
+        "waistPart": 3
+      }
+    },
+    "rightShin": {
+      "small_components": 0,
+      "distance_outliers": 4,
+      "total": 4,
+      "to": {
+        "rightFoot": 4
+      }
+    },
+    "rightFoot": {
+      "small_components": 0,
+      "distance_outliers": 4,
+      "total": 4,
+      "to": {
+        "rightShin": 4
+      }
+    },
+    "leftThigh": {
+      "small_components": 233,
+      "distance_outliers": 3,
+      "total": 236,
+      "to": {
+        "leftShin": 122,
+        "sideLeftSkirtPart": 75,
+        "rearLeftSkirtPart": 22,
+        "frontLeftSkirtPart": 14,
+        "waistPart": 3
+      }
+    },
+    "leftShin": {
+      "small_components": 0,
+      "distance_outliers": 3,
+      "total": 3,
+      "to": {
+        "leftFoot": 3
+      }
+    },
+    "leftFoot": {
+      "small_components": 0,
+      "distance_outliers": 3,
+      "total": 3,
+      "to": {
+        "leftShin": 3
+      }
+    },
+    "frontRightSkirtPart": {
+      "small_components": 8,
+      "distance_outliers": 2,
+      "total": 10,
+      "to": {
+        "waistPart": 10
+      }
+    },
+    "frontLeftSkirtPart": {
+      "small_components": 12,
+      "distance_outliers": 2,
+      "total": 14,
+      "to": {
+        "waistPart": 13,
+        "leftThigh": 1
+      }
+    },
+    "sideRightSkirtPart": {
+      "small_components": 46,
+      "distance_outliers": 3,
+      "total": 49,
+      "to": {
+        "frontRightSkirtPart": 47,
+        "rightThigh": 1,
+        "waistPart": 1
+      }
+    },
+    "sideLeftSkirtPart": {
+      "small_components": 6,
+      "distance_outliers": 9,
+      "total": 15,
+      "to": {
+        "frontLeftSkirtPart": 6,
+        "waistPart": 3,
+        "leftThigh": 6
+      }
+    },
+    "rearRightSkirtPart": {
+      "small_components": 9,
+      "distance_outliers": 6,
+      "total": 15,
+      "to": {
+        "frontRightSkirtPart": 9,
+        "waistPart": 6
+      }
+    },
+    "rearLeftSkirtPart": {
+      "small_components": 12,
+      "distance_outliers": 6,
+      "total": 18,
+      "to": {
+        "leftThigh": 10,
+        "sideLeftSkirtPart": 2,
+        "waistPart": 6
+      }
+    }
+  },
   "seam_checks": [
     {
       "id": "bind",
       "label": "Bind / Rest Pose",
       "angles_deg": {},
-      "shared_vertices_checked": 809,
+      "shared_vertices_checked": 836,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
       "pelvis_vertical_offset_m": 0.0,
@@ -782,7 +1316,7 @@
         "rightElbow": 55,
         "rightWrist": 10
       },
-      "shared_vertices_checked": 809,
+      "shared_vertices_checked": 836,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
       "pelvis_vertical_offset_m": 0.0,
@@ -797,7 +1331,7 @@
         "leftElbow": 65,
         "leftWrist": -15
       },
-      "shared_vertices_checked": 809,
+      "shared_vertices_checked": 836,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
       "pelvis_vertical_offset_m": 0.0,
@@ -815,7 +1349,7 @@
         "leftElbow": 60,
         "leftWrist": -15
       },
-      "shared_vertices_checked": 809,
+      "shared_vertices_checked": 836,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
       "pelvis_vertical_offset_m": 0.0,
@@ -834,7 +1368,7 @@
         "leftShoulder": 20,
         "leftElbow": 35
       },
-      "shared_vertices_checked": 809,
+      "shared_vertices_checked": 836,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
       "pelvis_vertical_offset_m": 0.0,
@@ -856,7 +1390,7 @@
         "leftShoulder": 20,
         "leftElbow": 40
       },
-      "shared_vertices_checked": 809,
+      "shared_vertices_checked": 836,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
       "pelvis_vertical_offset_m": -0.05465918779373169,
@@ -882,7 +1416,7 @@
         "leftElbow": 70,
         "leftWrist": -10
       },
-      "shared_vertices_checked": 809,
+      "shared_vertices_checked": 836,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
       "pelvis_vertical_offset_m": -0.09845709800720215,
@@ -909,7 +1443,7 @@
         "leftElbow": 55,
         "leftWrist": 15
       },
-      "shared_vertices_checked": 809,
+      "shared_vertices_checked": 836,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
       "pelvis_vertical_offset_m": -0.044422447681427,
@@ -936,7 +1470,7 @@
         "leftKnee": 54,
         "leftAnkle": 27
       },
-      "shared_vertices_checked": 809,
+      "shared_vertices_checked": 836,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
       "pelvis_vertical_offset_m": -0.09845709800720215,

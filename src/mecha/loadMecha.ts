@@ -140,10 +140,12 @@ export async function loadPrepared(
   }
 
   const rigidCaps: Object3D[] = [];
+  const rigidOverlaps: Object3D[] = [];
   const jointFillers: Object3D[] = [];
   gltf.scene.traverse((o) => {
     if (o instanceof Mesh) {
       if (o.name.endsWith("_cap")) rigidCaps.push(o);
+      else if (o.name.endsWith("_overlap")) rigidOverlaps.push(o);
       else if (o.name.startsWith("filler_")) jointFillers.push(o);
     }
   });
@@ -154,7 +156,13 @@ export async function loadPrepared(
   });
 
   displayRoot.updateMatrixWorld(true);
-  const lbs = new LbsManager(displayRoot, parts, rigidCaps, jointFillers);
+  const lbs = new LbsManager(
+    displayRoot,
+    parts,
+    rigidCaps,
+    jointFillers,
+    rigidOverlaps,
+  );
 
   const pelvisBindPosition = joints.pelvis.position.clone();
   const leftAnklePos = joints.leftAnkle.getWorldPosition(new Vector3());
@@ -205,6 +213,7 @@ export async function loadPrepared(
     sockets,
     parts,
     rigidCaps,
+    rigidOverlaps,
     jointFillers,
     originalMaterials,
     pelvisBindPosition,

@@ -9,6 +9,8 @@
     "6-view x 9-pose silhouette visible-gap pixel check completed for Rigid armor vs Smooth LBS",
     "captured edge-length strain heat-map screenshots for torsoTwist and maxArticulation",
     "captured before/after same-camera close-ups (LBS vs Rigid) for shoulder decal, front skirt, waist twist, and knee bend",
+    "torso yaw sweep (-40° to +40° in 5° steps) verified: rigid <= smooth LBS for both visible slivers (>15) and 6-view waist hole pixels at all 17 steps",
+    "captured 10 same-camera waist close-ups (front and 3/4 at 0°, ±20°, ±40°): docs/results/rigid-waist-*.png",
     "Loadout drawer, aim/swing auto-equip, and exact M6 attachment verified in Rigid armor mode",
     "3-way skinning toggle (Rigid armor / Smooth LBS / Three.js) and frame-time comparison verified",
     "model switch (\"Sentinel (new)\" / \"Legacy\") verified",
@@ -19,35 +21,35 @@
     "rigid": {
       "mode": "rigid",
       "samples": 85,
-      "meanMs": 17.253,
-      "medianMs": 16.7,
-      "p95Ms": 17.5
+      "meanMs": 16.786,
+      "medianMs": 16.6,
+      "p95Ms": 17.3
     },
     "lbs": {
       "mode": "lbs",
       "samples": 85,
-      "meanMs": 17.451,
+      "meanMs": 16.951,
       "medianMs": 16.6,
-      "p95Ms": 18.1
+      "p95Ms": 17.4
     },
     "three": {
       "mode": "three",
       "samples": 85,
-      "meanMs": 17.447,
-      "medianMs": 16.6,
-      "p95Ms": 17.7
+      "meanMs": 17.153,
+      "medianMs": 16.7,
+      "p95Ms": 17.3
     }
   },
   "actionAttachmentErrors": {
     "aim": {
-      "saber": 4.775249788392736e-16,
-      "rifle": 4.775249788392736e-16,
-      "shield": 1.2412670766236366e-16
+      "saber": 2.2887833992611187e-16,
+      "rifle": 2.2887833992611187e-16,
+      "shield": 5.551115123125783e-17
     },
     "swing": {
       "saber": 1.2719202621569003e-16,
       "rifle": 1.2719202621569003e-16,
-      "shield": 0
+      "shield": 2.7755575615628914e-16
     }
   },
   "poseResults": [
@@ -74,26 +76,28 @@
         "frontRightSkirt": 0,
         "frontLeftSkirt": 0,
         "sideRightSkirt": 0,
-        "sideLeftSkirt": 0
+        "sideLeftSkirt": 0,
+        "rearRightSkirt": 0,
+        "rearLeftSkirt": 0
       },
-      "boundaryGroups": 809,
-      "skinnedVertexCount": 36663,
+      "boundaryGroups": 836,
+      "skinnedVertexCount": 36774,
       "edgeStrainRigid": {
         "maxStrain": 0,
         "meanStrain": 0,
-        "triangleCount": 30518,
+        "triangleCount": 30651,
         "strainedTrianglesOver1Pct": 0
       },
       "edgeStrainLbs": {
         "maxStrain": 0.0000825669213255647,
-        "meanStrain": 1.2925246773798367e-7,
-        "triangleCount": 30518,
+        "meanStrain": 1.2709593315678703e-7,
+        "triangleCount": 30651,
         "strainedTrianglesOver1Pct": 0
       },
-      "lbsSeamGapMax": 1.5669961994646542e-9,
-      "lbsSeamGapMean": 5.387750665014389e-11,
-      "lbsVsThreeMaxDiff": 1.8626452047421083e-9,
-      "lbsVsThreeMeanDiff": 4.836949718371487e-10,
+      "lbsSeamGapMax": 3.7882144643397453e-10,
+      "lbsSeamGapMean": 1.7527161245018858e-11,
+      "lbsVsThreeMaxDiff": 4.656613011855271e-10,
+      "lbsVsThreeMeanDiff": 1.460283108335473e-10,
       "equipmentAttachmentErrors": {
         "saber": 0,
         "rifle": 0,
@@ -125,29 +129,31 @@
         "frontRightSkirt": 0,
         "frontLeftSkirt": 0,
         "sideRightSkirt": 0,
-        "sideLeftSkirt": 0
+        "sideLeftSkirt": 0,
+        "rearRightSkirt": 0,
+        "rearLeftSkirt": 0
       },
-      "boundaryGroups": 809,
-      "skinnedVertexCount": 36663,
+      "boundaryGroups": 836,
+      "skinnedVertexCount": 36774,
       "edgeStrainRigid": {
         "maxStrain": 2.422387638191318e-8,
-        "meanStrain": 1.5715812629102546e-9,
-        "triangleCount": 30518,
+        "meanStrain": 1.5641690281219933e-9,
+        "triangleCount": 30651,
         "strainedTrianglesOver1Pct": 0
       },
       "edgeStrainLbs": {
-        "maxStrain": 9.581178622024327,
-        "meanStrain": 0.003542194478825874,
-        "triangleCount": 30518,
-        "strainedTrianglesOver1Pct": 630
+        "maxStrain": 9.58116216685481,
+        "meanStrain": 0.0035201545962621947,
+        "triangleCount": 30651,
+        "strainedTrianglesOver1Pct": 631
       },
-      "lbsSeamGapMax": 5.7473809293536036e-8,
-      "lbsSeamGapMean": 2.4446812494210185e-9,
-      "lbsVsThreeMaxDiff": 5.720682675407575e-8,
-      "lbsVsThreeMeanDiff": 3.085525002536981e-9,
+      "lbsSeamGapMax": 5.722837942238907e-8,
+      "lbsSeamGapMean": 2.0500894246488136e-9,
+      "lbsVsThreeMaxDiff": 5.720506545008861e-8,
+      "lbsVsThreeMeanDiff": 2.809154581432314e-9,
       "equipmentAttachmentErrors": {
-        "saber": 5.551115123125783e-17,
-        "rifle": 5.551115123125783e-17,
+        "saber": 2.2887833992611187e-16,
+        "rifle": 2.2887833992611187e-16,
         "shield": 0
       },
       "leftFootMinY": 0,
@@ -176,30 +182,32 @@
         "frontRightSkirt": 0,
         "frontLeftSkirt": 0,
         "sideRightSkirt": 0,
-        "sideLeftSkirt": 0
+        "sideLeftSkirt": 0,
+        "rearRightSkirt": 0,
+        "rearLeftSkirt": 0
       },
-      "boundaryGroups": 809,
-      "skinnedVertexCount": 36663,
+      "boundaryGroups": 836,
+      "skinnedVertexCount": 36774,
       "edgeStrainRigid": {
         "maxStrain": 2.7711177922520113e-8,
-        "meanStrain": 1.810452187373024e-9,
-        "triangleCount": 30518,
+        "meanStrain": 1.8029110771515446e-9,
+        "triangleCount": 30651,
         "strainedTrianglesOver1Pct": 0
       },
       "edgeStrainLbs": {
-        "maxStrain": 8.30424162229193,
-        "meanStrain": 0.005647089630519269,
-        "triangleCount": 30518,
+        "maxStrain": 8.304234649859408,
+        "meanStrain": 0.005622651777411331,
+        "triangleCount": 30651,
         "strainedTrianglesOver1Pct": 582
       },
-      "lbsSeamGapMax": 5.271701017719247e-8,
-      "lbsSeamGapMean": 1.5698091750110883e-9,
-      "lbsVsThreeMaxDiff": 4.8587386240470914e-8,
-      "lbsVsThreeMeanDiff": 8.957852728710944e-10,
+      "lbsSeamGapMax": 5.061103849329771e-8,
+      "lbsSeamGapMean": 1.7625704262387108e-9,
+      "lbsVsThreeMaxDiff": 4.626756546169864e-8,
+      "lbsVsThreeMeanDiff": 6.95009825072008e-10,
       "equipmentAttachmentErrors": {
         "saber": 0,
         "rifle": 0,
-        "shield": 7.850462293418876e-17
+        "shield": 2.2887833992611187e-16
       },
       "leftFootMinY": 0,
       "rightFootMinY": 0.00013333559036254883
@@ -227,30 +235,32 @@
         "frontRightSkirt": 0,
         "frontLeftSkirt": 0,
         "sideRightSkirt": 0,
-        "sideLeftSkirt": 0
+        "sideLeftSkirt": 0,
+        "rearRightSkirt": 0,
+        "rearLeftSkirt": 0
       },
-      "boundaryGroups": 809,
-      "skinnedVertexCount": 36663,
+      "boundaryGroups": 836,
+      "skinnedVertexCount": 36774,
       "edgeStrainRigid": {
         "maxStrain": 2.7711177922520113e-8,
-        "meanStrain": 2.9323533747601205e-9,
-        "triangleCount": 30518,
+        "meanStrain": 2.919698202565294e-9,
+        "triangleCount": 30651,
         "strainedTrianglesOver1Pct": 0
       },
       "edgeStrainLbs": {
-        "maxStrain": 14.328705900578628,
-        "meanStrain": 0.01094276052050686,
-        "triangleCount": 30518,
-        "strainedTrianglesOver1Pct": 1241
+        "maxStrain": 14.328700073544852,
+        "meanStrain": 0.010886034358524916,
+        "triangleCount": 30651,
+        "strainedTrianglesOver1Pct": 1240
       },
-      "lbsSeamGapMax": 5.345252636878321e-8,
-      "lbsSeamGapMean": 3.657830722146859e-9,
-      "lbsVsThreeMaxDiff": 5.3923622531731344e-8,
-      "lbsVsThreeMeanDiff": 4.528556041511668e-9,
+      "lbsSeamGapMax": 5.3186421501811364e-8,
+      "lbsSeamGapMean": 4.132890531414817e-9,
+      "lbsVsThreeMaxDiff": 5.3961754865321306e-8,
+      "lbsVsThreeMeanDiff": 4.4658952503276485e-9,
       "equipmentAttachmentErrors": {
-        "saber": 2.2887833992611187e-16,
-        "rifle": 2.2887833992611187e-16,
-        "shield": 5.551115123125783e-17
+        "saber": 2.5438405243138006e-16,
+        "rifle": 2.5438405243138006e-16,
+        "shield": 0
       },
       "leftFootMinY": 0,
       "rightFootMinY": 0.00013333559036254883
@@ -278,29 +288,31 @@
         "frontRightSkirt": 0,
         "frontLeftSkirt": 0,
         "sideRightSkirt": 0,
-        "sideLeftSkirt": 0
+        "sideLeftSkirt": 0,
+        "rearRightSkirt": 0,
+        "rearLeftSkirt": 0
       },
-      "boundaryGroups": 809,
-      "skinnedVertexCount": 36663,
+      "boundaryGroups": 836,
+      "skinnedVertexCount": 36774,
       "edgeStrainRigid": {
         "maxStrain": 3.150821616254915e-8,
-        "meanStrain": 9.29609594272441e-9,
-        "triangleCount": 30518,
+        "meanStrain": 9.291801380061085e-9,
+        "triangleCount": 30651,
         "strainedTrianglesOver1Pct": 0
       },
       "edgeStrainLbs": {
-        "maxStrain": 7.417242578822134,
-        "meanStrain": 0.012623448021859015,
-        "triangleCount": 30518,
-        "strainedTrianglesOver1Pct": 1684
+        "maxStrain": 49.21708278809789,
+        "meanStrain": 0.014163908281347037,
+        "triangleCount": 30651,
+        "strainedTrianglesOver1Pct": 1611
       },
-      "lbsSeamGapMax": 6.595340633553793e-8,
-      "lbsSeamGapMean": 6.867092860179902e-9,
-      "lbsVsThreeMaxDiff": 5.473714497938486e-8,
-      "lbsVsThreeMeanDiff": 6.079179779532678e-9,
+      "lbsSeamGapMax": 6.38581249136933e-8,
+      "lbsSeamGapMean": 6.861888823801321e-9,
+      "lbsVsThreeMaxDiff": 5.692517147881138e-8,
+      "lbsVsThreeMeanDiff": 6.506406078034941e-9,
       "equipmentAttachmentErrors": {
-        "saber": 2.2887833992611187e-16,
-        "rifle": 2.2887833992611187e-16,
+        "saber": 4.041272810440265e-16,
+        "rifle": 4.041272810440265e-16,
         "shield": 2.482534153247273e-16
       },
       "leftFootMinY": 0,
@@ -329,26 +341,28 @@
         "frontRightSkirt": 9.999999999999998,
         "frontLeftSkirt": 9.999999999999998,
         "sideRightSkirt": 5.999999999999999,
-        "sideLeftSkirt": 5.999999999999999
+        "sideLeftSkirt": 5.999999999999999,
+        "rearRightSkirt": 0,
+        "rearLeftSkirt": 0
       },
-      "boundaryGroups": 809,
-      "skinnedVertexCount": 36663,
+      "boundaryGroups": 836,
+      "skinnedVertexCount": 36774,
       "edgeStrainRigid": {
         "maxStrain": 3.016464952896495e-8,
-        "meanStrain": 2.9931802914504013e-9,
-        "triangleCount": 30518,
+        "meanStrain": 3.0192257800710655e-9,
+        "triangleCount": 30651,
         "strainedTrianglesOver1Pct": 0
       },
       "edgeStrainLbs": {
         "maxStrain": 189.41159091656056,
-        "meanStrain": 0.06388640939263393,
-        "triangleCount": 30518,
-        "strainedTrianglesOver1Pct": 3716
+        "meanStrain": 0.06352699182049132,
+        "triangleCount": 30651,
+        "strainedTrianglesOver1Pct": 3670
       },
-      "lbsSeamGapMax": 5.96101649340339e-8,
-      "lbsSeamGapMean": 6.6031853355864465e-9,
-      "lbsVsThreeMaxDiff": 5.237935601740249e-8,
-      "lbsVsThreeMeanDiff": 1.5728549586810794e-8,
+      "lbsSeamGapMax": 5.865945652912971e-8,
+      "lbsSeamGapMean": 6.337861382781064e-9,
+      "lbsVsThreeMaxDiff": 5.240331824466056e-8,
+      "lbsVsThreeMeanDiff": 1.569330779284422e-8,
       "equipmentAttachmentErrors": {
         "saber": 5.551115123125783e-17,
         "rifle": 5.551115123125783e-17,
@@ -380,30 +394,32 @@
         "frontRightSkirt": 13.499999999999998,
         "frontLeftSkirt": 13.499999999999998,
         "sideRightSkirt": 8.099999999999998,
-        "sideLeftSkirt": 8.099999999999998
+        "sideLeftSkirt": 8.099999999999998,
+        "rearRightSkirt": 0,
+        "rearLeftSkirt": 0
       },
-      "boundaryGroups": 809,
-      "skinnedVertexCount": 36663,
+      "boundaryGroups": 836,
+      "skinnedVertexCount": 36774,
       "edgeStrainRigid": {
         "maxStrain": 3.469452015087403e-8,
-        "meanStrain": 5.554860641752153e-9,
-        "triangleCount": 30518,
+        "meanStrain": 5.542253364236487e-9,
+        "triangleCount": 30651,
         "strainedTrianglesOver1Pct": 0
       },
       "edgeStrainLbs": {
         "maxStrain": 251.47014670990168,
-        "meanStrain": 0.09402721186533733,
-        "triangleCount": 30518,
-        "strainedTrianglesOver1Pct": 4870
+        "meanStrain": 0.09418317695364888,
+        "triangleCount": 30651,
+        "strainedTrianglesOver1Pct": 4762
       },
-      "lbsSeamGapMax": 8.378094450517308e-8,
-      "lbsSeamGapMean": 1.3663469032300808e-8,
-      "lbsVsThreeMaxDiff": 5.435099987637254e-8,
-      "lbsVsThreeMeanDiff": 3.3078248033624144e-8,
+      "lbsSeamGapMax": 8.393867957090671e-8,
+      "lbsSeamGapMean": 1.2742826205684922e-8,
+      "lbsVsThreeMaxDiff": 6.245325644764271e-8,
+      "lbsVsThreeMeanDiff": 3.3219602485378176e-8,
       "equipmentAttachmentErrors": {
-        "saber": 7.364386412590295e-16,
-        "rifle": 7.364386412590295e-16,
-        "shield": 1.3877787807814457e-16
+        "saber": 4.871083751574258e-16,
+        "rifle": 4.871083751574258e-16,
+        "shield": 0
       },
       "leftFootMinY": -2.7755575615628914e-17,
       "rightFootMinY": 0.00013333559036252107
@@ -431,30 +447,32 @@
         "frontRightSkirt": 9.000000000000002,
         "frontLeftSkirt": 9.000000000000002,
         "sideRightSkirt": 5.400000000000001,
-        "sideLeftSkirt": 5.400000000000001
+        "sideLeftSkirt": 5.400000000000001,
+        "rearRightSkirt": 0,
+        "rearLeftSkirt": 0
       },
-      "boundaryGroups": 809,
-      "skinnedVertexCount": 36663,
+      "boundaryGroups": 836,
+      "skinnedVertexCount": 36774,
       "edgeStrainRigid": {
         "maxStrain": 3.1167470298266924e-8,
-        "meanStrain": 9.377092096428207e-9,
-        "triangleCount": 30518,
+        "meanStrain": 9.374317919618514e-9,
+        "triangleCount": 30651,
         "strainedTrianglesOver1Pct": 0
       },
       "edgeStrainLbs": {
         "maxStrain": 171.1175945575748,
-        "meanStrain": 0.0684522059570195,
-        "triangleCount": 30518,
-        "strainedTrianglesOver1Pct": 4815
+        "meanStrain": 0.06989074583178768,
+        "triangleCount": 30651,
+        "strainedTrianglesOver1Pct": 4688
       },
-      "lbsSeamGapMax": 7.687411675898358e-8,
-      "lbsSeamGapMean": 1.4488502397222177e-8,
+      "lbsSeamGapMax": 6.847644130523719e-8,
+      "lbsSeamGapMean": 1.266746164959163e-8,
       "lbsVsThreeMaxDiff": 6.245895999312338e-8,
-      "lbsVsThreeMeanDiff": 3.8113440276027464e-8,
+      "lbsVsThreeMeanDiff": 3.815995084717306e-8,
       "equipmentAttachmentErrors": {
-        "saber": 1.1102230246251565e-16,
-        "rifle": 5.551115123125783e-17,
-        "shield": 2.7194799110210365e-16
+        "saber": 2.7755575615628914e-16,
+        "rifle": 2.7755575615628914e-16,
+        "shield": 2.5438405243138006e-16
       },
       "leftFootMinY": 2.7755575615628914e-17,
       "rightFootMinY": 0.00013333559036257658
@@ -482,30 +500,32 @@
         "frontRightSkirt": 13.499999999999998,
         "frontLeftSkirt": 13.499999999999998,
         "sideRightSkirt": 8.099999999999998,
-        "sideLeftSkirt": 8.099999999999998
+        "sideLeftSkirt": 8.099999999999998,
+        "rearRightSkirt": 0,
+        "rearLeftSkirt": 0
       },
-      "boundaryGroups": 809,
-      "skinnedVertexCount": 36663,
+      "boundaryGroups": 836,
+      "skinnedVertexCount": 36774,
       "edgeStrainRigid": {
         "maxStrain": 3.3845516884250604e-8,
-        "meanStrain": 1.516200232880615e-8,
-        "triangleCount": 30518,
+        "meanStrain": 1.5176309658622117e-8,
+        "triangleCount": 30651,
         "strainedTrianglesOver1Pct": 0
       },
       "edgeStrainLbs": {
         "maxStrain": 251.47014865205387,
-        "meanStrain": 0.10227765270907671,
-        "triangleCount": 30518,
-        "strainedTrianglesOver1Pct": 4946
+        "meanStrain": 0.10359505182492347,
+        "triangleCount": 30651,
+        "strainedTrianglesOver1Pct": 4813
       },
-      "lbsSeamGapMax": 7.238627584769133e-8,
-      "lbsSeamGapMean": 1.7115311211149364e-8,
-      "lbsVsThreeMaxDiff": 5.8133890655529764e-8,
-      "lbsVsThreeMeanDiff": 3.361689923530246e-8,
+      "lbsSeamGapMax": 7.296945433439449e-8,
+      "lbsSeamGapMean": 1.728036512255233e-8,
+      "lbsVsThreeMaxDiff": 5.099777904707786e-8,
+      "lbsVsThreeMeanDiff": 3.359891105740108e-8,
       "equipmentAttachmentErrors": {
-        "saber": 3.1401849173675503e-16,
-        "rifle": 3.1401849173675503e-16,
-        "shield": 1.0007415106216802e-16
+        "saber": 4.577566798522237e-16,
+        "rifle": 4.577566798522237e-16,
+        "shield": 5.551115123125783e-17
       },
       "leftFootMinY": -2.7755575615628914e-17,
       "rightFootMinY": 0.00013333559036252107
@@ -514,14 +534,14 @@
   "visibleGapReport": [
     {
       "pose": "bind",
-      "rigidTotalHolePixels": 746,
+      "rigidTotalHolePixels": 745,
       "rigidNoFillersTotalHolePixels": 794,
       "lbsTotalHolePixels": 794,
       "rigidPerView": [
         {
           "view": "front",
           "holePixels": 24,
-          "bodyPixels": 42933,
+          "bodyPixels": 42928,
           "componentCount": 7,
           "largestComponentPx": 6,
           "topComponents": [
@@ -554,9 +574,9 @@
         },
         {
           "view": "back",
-          "holePixels": 24,
-          "bodyPixels": 43654,
-          "componentCount": 7,
+          "holePixels": 23,
+          "bodyPixels": 43655,
+          "componentCount": 6,
           "largestComponentPx": 9,
           "topComponents": [
             {
@@ -581,8 +601,8 @@
             },
             {
               "size": 1,
-              "cx": 246,
-              "cy": 238
+              "cx": 210,
+              "cy": 235
             }
           ]
         },
@@ -613,7 +633,7 @@
         {
           "view": "left",
           "holePixels": 5,
-          "bodyPixels": 27749,
+          "bodyPixels": 27750,
           "componentCount": 2,
           "largestComponentPx": 4,
           "topComponents": [
@@ -765,14 +785,14 @@
     },
     {
       "pose": "rightArmAim",
-      "rigidTotalHolePixels": 404,
+      "rigidTotalHolePixels": 403,
       "rigidNoFillersTotalHolePixels": 438,
       "lbsTotalHolePixels": 440,
       "rigidPerView": [
         {
           "view": "front",
           "holePixels": 15,
-          "bodyPixels": 41895,
+          "bodyPixels": 41890,
           "componentCount": 4,
           "largestComponentPx": 6,
           "topComponents": [
@@ -800,9 +820,9 @@
         },
         {
           "view": "back",
-          "holePixels": 16,
-          "bodyPixels": 41635,
-          "componentCount": 6,
+          "holePixels": 15,
+          "bodyPixels": 41636,
+          "componentCount": 5,
           "largestComponentPx": 9,
           "topComponents": [
             {
@@ -822,13 +842,13 @@
             },
             {
               "size": 1,
-              "cx": 246,
-              "cy": 238
+              "cx": 210,
+              "cy": 235
             },
             {
               "size": 1,
-              "cx": 210,
-              "cy": 235
+              "cx": 306,
+              "cy": 231
             }
           ]
         },
@@ -849,7 +869,7 @@
         {
           "view": "left",
           "holePixels": 5,
-          "bodyPixels": 29293,
+          "bodyPixels": 29294,
           "componentCount": 2,
           "largestComponentPx": 4,
           "topComponents": [
@@ -986,14 +1006,14 @@
     },
     {
       "pose": "leftArmGuard",
-      "rigidTotalHolePixels": 375,
+      "rigidTotalHolePixels": 374,
       "rigidNoFillersTotalHolePixels": 408,
       "lbsTotalHolePixels": 408,
       "rigidPerView": [
         {
           "view": "front",
           "holePixels": 22,
-          "bodyPixels": 42240,
+          "bodyPixels": 42235,
           "componentCount": 7,
           "largestComponentPx": 6,
           "topComponents": [
@@ -1026,9 +1046,9 @@
         },
         {
           "view": "back",
-          "holePixels": 15,
-          "bodyPixels": 41776,
-          "componentCount": 6,
+          "holePixels": 14,
+          "bodyPixels": 41777,
+          "componentCount": 5,
           "largestComponentPx": 8,
           "topComponents": [
             {
@@ -1043,11 +1063,6 @@
             },
             {
               "size": 1,
-              "cx": 246,
-              "cy": 238
-            },
-            {
-              "size": 1,
               "cx": 210,
               "cy": 235
             },
@@ -1055,6 +1070,11 @@
               "size": 1,
               "cx": 306,
               "cy": 231
+            },
+            {
+              "size": 1,
+              "cx": 211,
+              "cy": 141
             }
           ]
         },
@@ -1085,7 +1105,7 @@
         {
           "view": "left",
           "holePixels": 1,
-          "bodyPixels": 30077,
+          "bodyPixels": 30078,
           "componentCount": 1,
           "largestComponentPx": 1,
           "topComponents": [
@@ -1099,7 +1119,7 @@
         {
           "view": "frontRight34",
           "holePixels": 330,
-          "bodyPixels": 43491,
+          "bodyPixels": 43487,
           "componentCount": 5,
           "largestComponentPx": 313,
           "topComponents": [
@@ -1217,14 +1237,14 @@
     },
     {
       "pose": "dualArmReady",
-      "rigidTotalHolePixels": 39,
+      "rigidTotalHolePixels": 38,
       "rigidNoFillersTotalHolePixels": 59,
       "lbsTotalHolePixels": 61,
       "rigidPerView": [
         {
           "view": "front",
           "holePixels": 19,
-          "bodyPixels": 41850,
+          "bodyPixels": 41845,
           "componentCount": 5,
           "largestComponentPx": 6,
           "topComponents": [
@@ -1257,20 +1277,15 @@
         },
         {
           "view": "back",
-          "holePixels": 7,
-          "bodyPixels": 39924,
-          "componentCount": 5,
+          "holePixels": 6,
+          "bodyPixels": 39925,
+          "componentCount": 4,
           "largestComponentPx": 3,
           "topComponents": [
             {
               "size": 3,
               "cx": 209,
               "cy": 232
-            },
-            {
-              "size": 1,
-              "cx": 246,
-              "cy": 238
             },
             {
               "size": 1,
@@ -1306,7 +1321,7 @@
         {
           "view": "left",
           "holePixels": 1,
-          "bodyPixels": 30426,
+          "bodyPixels": 30427,
           "componentCount": 1,
           "largestComponentPx": 1,
           "topComponents": [
@@ -1320,7 +1335,7 @@
         {
           "view": "frontRight34",
           "holePixels": 9,
-          "bodyPixels": 40072,
+          "bodyPixels": 40068,
           "componentCount": 2,
           "largestComponentPx": 8,
           "topComponents": [
@@ -1418,14 +1433,14 @@
     },
     {
       "pose": "torsoTwist",
-      "rigidTotalHolePixels": 590,
-      "rigidNoFillersTotalHolePixels": 663,
-      "lbsTotalHolePixels": 634,
+      "rigidTotalHolePixels": 600,
+      "rigidNoFillersTotalHolePixels": 624,
+      "lbsTotalHolePixels": 636,
       "rigidPerView": [
         {
           "view": "front",
           "holePixels": 4,
-          "bodyPixels": 40945,
+          "bodyPixels": 40922,
           "componentCount": 4,
           "largestComponentPx": 1,
           "topComponents": [
@@ -1453,13 +1468,13 @@
         },
         {
           "view": "back",
-          "holePixels": 523,
-          "bodyPixels": 41321,
+          "holePixels": 533,
+          "bodyPixels": 41327,
           "componentCount": 2,
-          "largestComponentPx": 519,
+          "largestComponentPx": 529,
           "topComponents": [
             {
-              "size": 519,
+              "size": 529,
               "cx": 296,
               "cy": 169
             },
@@ -1472,13 +1487,13 @@
         },
         {
           "view": "right",
-          "holePixels": 16,
-          "bodyPixels": 35945,
+          "holePixels": 17,
+          "bodyPixels": 35964,
           "componentCount": 4,
-          "largestComponentPx": 12,
+          "largestComponentPx": 13,
           "topComponents": [
             {
-              "size": 12,
+              "size": 13,
               "cx": 298,
               "cy": 182
             },
@@ -1501,22 +1516,16 @@
         },
         {
           "view": "left",
-          "holePixels": 1,
-          "bodyPixels": 34116,
-          "componentCount": 1,
-          "largestComponentPx": 1,
-          "topComponents": [
-            {
-              "size": 1,
-              "cx": 247,
-              "cy": 66
-            }
-          ]
+          "holePixels": 0,
+          "bodyPixels": 34092,
+          "componentCount": 0,
+          "largestComponentPx": 0,
+          "topComponents": []
         },
         {
           "view": "frontRight34",
           "holePixels": 0,
-          "bodyPixels": 38168,
+          "bodyPixels": 38144,
           "componentCount": 0,
           "largestComponentPx": 0,
           "topComponents": []
@@ -1524,24 +1533,24 @@
         {
           "view": "frontLeft34",
           "holePixels": 46,
-          "bodyPixels": 42122,
-          "componentCount": 6,
-          "largestComponentPx": 39,
+          "bodyPixels": 42095,
+          "componentCount": 5,
+          "largestComponentPx": 38,
           "topComponents": [
             {
-              "size": 39,
-              "cx": 302,
+              "size": 38,
+              "cx": 301,
               "cy": 156
+            },
+            {
+              "size": 4,
+              "cx": 248,
+              "cy": 107
             },
             {
               "size": 2,
               "cx": 220,
               "cy": 283
-            },
-            {
-              "size": 2,
-              "cx": 248,
-              "cy": 107
             },
             {
               "size": 1,
@@ -1550,8 +1559,8 @@
             },
             {
               "size": 1,
-              "cx": 313,
-              "cy": 90
+              "cx": 197,
+              "cy": 132
             }
           ]
         }
@@ -1559,33 +1568,33 @@
       "rigidNoFillersPerView": [
         {
           "view": "front",
-          "holePixels": 13,
-          "componentCount": 10
+          "holePixels": 7,
+          "componentCount": 5
         },
         {
           "view": "back",
           "holePixels": 533,
-          "componentCount": 3
+          "componentCount": 2
         },
         {
           "view": "right",
-          "holePixels": 16,
+          "holePixels": 17,
           "componentCount": 4
         },
         {
           "view": "left",
-          "holePixels": 30,
-          "componentCount": 3
+          "holePixels": 18,
+          "componentCount": 1
         },
         {
           "view": "frontRight34",
-          "holePixels": 21,
-          "componentCount": 2
+          "holePixels": 0,
+          "componentCount": 0
         },
         {
           "view": "frontLeft34",
-          "holePixels": 50,
-          "componentCount": 7
+          "holePixels": 49,
+          "componentCount": 6
         }
       ],
       "lbsPerView": [
@@ -1596,18 +1605,18 @@
         },
         {
           "view": "back",
-          "holePixels": 542,
+          "holePixels": 545,
           "componentCount": 2
         },
         {
           "view": "right",
-          "holePixels": 16,
+          "holePixels": 18,
           "componentCount": 4
         },
         {
           "view": "left",
-          "holePixels": 19,
-          "componentCount": 2
+          "holePixels": 18,
+          "componentCount": 1
         },
         {
           "view": "frontRight34",
@@ -1616,22 +1625,22 @@
         },
         {
           "view": "frontLeft34",
-          "holePixels": 50,
+          "holePixels": 48,
           "componentCount": 7
         }
       ]
     },
     {
       "pose": "crouch",
-      "rigidTotalHolePixels": 62,
-      "rigidNoFillersTotalHolePixels": 164,
+      "rigidTotalHolePixels": 67,
+      "rigidNoFillersTotalHolePixels": 189,
       "lbsTotalHolePixels": 73,
       "rigidPerView": [
         {
           "view": "front",
-          "holePixels": 14,
-          "bodyPixels": 39135,
-          "componentCount": 8,
+          "holePixels": 15,
+          "bodyPixels": 39129,
+          "componentCount": 9,
           "largestComponentPx": 3,
           "topComponents": [
             {
@@ -1663,31 +1672,31 @@
         },
         {
           "view": "back",
-          "holePixels": 1,
-          "bodyPixels": 39496,
-          "componentCount": 1,
-          "largestComponentPx": 1,
-          "topComponents": [
-            {
-              "size": 1,
-              "cx": 209,
-              "cy": 246
-            }
-          ]
-        },
-        {
-          "view": "right",
           "holePixels": 0,
-          "bodyPixels": 31262,
+          "bodyPixels": 39491,
           "componentCount": 0,
           "largestComponentPx": 0,
           "topComponents": []
         },
         {
+          "view": "right",
+          "holePixels": 1,
+          "bodyPixels": 31261,
+          "componentCount": 1,
+          "largestComponentPx": 1,
+          "topComponents": [
+            {
+              "size": 1,
+              "cx": 288,
+              "cy": 247
+            }
+          ]
+        },
+        {
           "view": "left",
-          "holePixels": 12,
-          "bodyPixels": 30079,
-          "componentCount": 6,
+          "holePixels": 16,
+          "bodyPixels": 30076,
+          "componentCount": 9,
           "largestComponentPx": 7,
           "topComponents": [
             {
@@ -1696,24 +1705,24 @@
               "cy": 112
             },
             {
+              "size": 2,
+              "cx": 222,
+              "cy": 247
+            },
+            {
+              "size": 1,
+              "cx": 221,
+              "cy": 245
+            },
+            {
+              "size": 1,
+              "cx": 220,
+              "cy": 244
+            },
+            {
               "size": 1,
               "cx": 222,
               "cy": 200
-            },
-            {
-              "size": 1,
-              "cx": 225,
-              "cy": 199
-            },
-            {
-              "size": 1,
-              "cx": 299,
-              "cy": 182
-            },
-            {
-              "size": 1,
-              "cx": 288,
-              "cy": 116
             }
           ]
         },
@@ -1734,7 +1743,7 @@
         {
           "view": "frontLeft34",
           "holePixels": 23,
-          "bodyPixels": 40099,
+          "bodyPixels": 40096,
           "componentCount": 3,
           "largestComponentPx": 15,
           "topComponents": [
@@ -1759,22 +1768,22 @@
       "rigidNoFillersPerView": [
         {
           "view": "front",
-          "holePixels": 18,
-          "componentCount": 11
+          "holePixels": 16,
+          "componentCount": 9
         },
         {
           "view": "back",
-          "holePixels": 1,
-          "componentCount": 1
+          "holePixels": 0,
+          "componentCount": 0
         },
         {
           "view": "right",
-          "holePixels": 52,
-          "componentCount": 2
+          "holePixels": 71,
+          "componentCount": 3
         },
         {
           "view": "left",
-          "holePixels": 56,
+          "holePixels": 66,
           "componentCount": 10
         },
         {
@@ -1784,8 +1793,8 @@
         },
         {
           "view": "frontLeft34",
-          "holePixels": 25,
-          "componentCount": 4
+          "holePixels": 24,
+          "componentCount": 3
         }
       ],
       "lbsPerView": [
@@ -1823,19 +1832,19 @@
     },
     {
       "pose": "deepCrouchAim",
-      "rigidTotalHolePixels": 133,
-      "rigidNoFillersTotalHolePixels": 324,
-      "lbsTotalHolePixels": 164,
+      "rigidTotalHolePixels": 141,
+      "rigidNoFillersTotalHolePixels": 345,
+      "lbsTotalHolePixels": 169,
       "rigidPerView": [
         {
           "view": "front",
           "holePixels": 60,
-          "bodyPixels": 39623,
-          "componentCount": 4,
-          "largestComponentPx": 56,
+          "bodyPixels": 39607,
+          "componentCount": 5,
+          "largestComponentPx": 55,
           "topComponents": [
             {
-              "size": 56,
+              "size": 55,
               "cx": 200,
               "cy": 112
             },
@@ -1853,25 +1862,25 @@
               "size": 1,
               "cx": 304,
               "cy": 244
+            },
+            {
+              "size": 1,
+              "cx": 243,
+              "cy": 126
             }
           ]
         },
         {
           "view": "back",
-          "holePixels": 64,
+          "holePixels": 65,
           "bodyPixels": 38886,
           "componentCount": 6,
-          "largestComponentPx": 53,
+          "largestComponentPx": 57,
           "topComponents": [
             {
-              "size": 53,
+              "size": 57,
               "cx": 178,
               "cy": 145
-            },
-            {
-              "size": 5,
-              "cx": 237,
-              "cy": 122
             },
             {
               "size": 2,
@@ -1884,56 +1893,82 @@
               "cy": 248
             },
             {
+              "size": 2,
+              "cx": 238,
+              "cy": 123
+            },
+            {
               "size": 1,
-              "cx": 246,
-              "cy": 259
+              "cx": 208,
+              "cy": 244
             }
           ]
         },
         {
           "view": "right",
-          "holePixels": 3,
-          "bodyPixels": 31998,
+          "holePixels": 2,
+          "bodyPixels": 32013,
           "componentCount": 2,
-          "largestComponentPx": 2,
+          "largestComponentPx": 1,
           "topComponents": [
-            {
-              "size": 2,
-              "cx": 231,
-              "cy": 123
-            },
             {
               "size": 1,
               "cx": 233,
               "cy": 123
+            },
+            {
+              "size": 1,
+              "cx": 231,
+              "cy": 122
             }
           ]
         },
         {
           "view": "left",
-          "holePixels": 0,
-          "bodyPixels": 31806,
-          "componentCount": 0,
-          "largestComponentPx": 0,
-          "topComponents": []
+          "holePixels": 5,
+          "bodyPixels": 31788,
+          "componentCount": 4,
+          "largestComponentPx": 2,
+          "topComponents": [
+            {
+              "size": 2,
+              "cx": 222,
+              "cy": 256
+            },
+            {
+              "size": 1,
+              "cx": 221,
+              "cy": 254
+            },
+            {
+              "size": 1,
+              "cx": 220,
+              "cy": 253
+            },
+            {
+              "size": 1,
+              "cx": 219,
+              "cy": 252
+            }
+          ]
         },
         {
           "view": "frontRight34",
           "holePixels": 0,
-          "bodyPixels": 39292,
+          "bodyPixels": 39248,
           "componentCount": 0,
           "largestComponentPx": 0,
           "topComponents": []
         },
         {
           "view": "frontLeft34",
-          "holePixels": 6,
-          "bodyPixels": 41308,
-          "componentCount": 2,
-          "largestComponentPx": 4,
+          "holePixels": 9,
+          "bodyPixels": 41298,
+          "componentCount": 4,
+          "largestComponentPx": 5,
           "topComponents": [
             {
-              "size": 4,
+              "size": 5,
               "cx": 248,
               "cy": 127
             },
@@ -1941,6 +1976,16 @@
               "size": 2,
               "cx": 304,
               "cy": 444
+            },
+            {
+              "size": 1,
+              "cx": 285,
+              "cy": 128
+            },
+            {
+              "size": 1,
+              "cx": 284,
+              "cy": 127
             }
           ]
         }
@@ -1948,49 +1993,49 @@
       "rigidNoFillersPerView": [
         {
           "view": "front",
-          "holePixels": 80,
+          "holePixels": 81,
           "componentCount": 5
         },
         {
           "view": "back",
-          "holePixels": 65,
+          "holePixels": 66,
           "componentCount": 7
         },
         {
           "view": "right",
-          "holePixels": 82,
-          "componentCount": 8
+          "holePixels": 97,
+          "componentCount": 5
         },
         {
           "view": "left",
-          "holePixels": 82,
+          "holePixels": 87,
           "componentCount": 3
         },
         {
           "view": "frontRight34",
-          "holePixels": 1,
-          "componentCount": 1
+          "holePixels": 2,
+          "componentCount": 2
         },
         {
           "view": "frontLeft34",
-          "holePixels": 14,
+          "holePixels": 12,
           "componentCount": 7
         }
       ],
       "lbsPerView": [
         {
           "view": "front",
-          "holePixels": 82,
+          "holePixels": 84,
           "componentCount": 5
         },
         {
           "view": "back",
-          "holePixels": 64,
-          "componentCount": 6
+          "holePixels": 66,
+          "componentCount": 7
         },
         {
           "view": "right",
-          "holePixels": 4,
+          "holePixels": 3,
           "componentCount": 2
         },
         {
@@ -2000,26 +2045,26 @@
         },
         {
           "view": "frontRight34",
-          "holePixels": 1,
-          "componentCount": 1
+          "holePixels": 2,
+          "componentCount": 2
         },
         {
           "view": "frontLeft34",
-          "holePixels": 13,
-          "componentCount": 6
+          "holePixels": 14,
+          "componentCount": 8
         }
       ]
     },
     {
       "pose": "fullBodyTwistCrouch",
-      "rigidTotalHolePixels": 922,
-      "rigidNoFillersTotalHolePixels": 1057,
-      "lbsTotalHolePixels": 924,
+      "rigidTotalHolePixels": 916,
+      "rigidNoFillersTotalHolePixels": 1007,
+      "lbsTotalHolePixels": 918,
       "rigidPerView": [
         {
           "view": "front",
           "holePixels": 1,
-          "bodyPixels": 40560,
+          "bodyPixels": 40541,
           "componentCount": 1,
           "largestComponentPx": 1,
           "topComponents": [
@@ -2033,31 +2078,26 @@
         {
           "view": "back",
           "holePixels": 28,
-          "bodyPixels": 40507,
-          "componentCount": 3,
-          "largestComponentPx": 18,
+          "bodyPixels": 40516,
+          "componentCount": 2,
+          "largestComponentPx": 19,
           "topComponents": [
             {
-              "size": 18,
+              "size": 19,
               "cx": 332,
-              "cy": 136
+              "cy": 135
             },
             {
               "size": 9,
-              "cx": 207,
+              "cx": 206,
               "cy": 154
-            },
-            {
-              "size": 1,
-              "cx": 236,
-              "cy": 110
             }
           ]
         },
         {
           "view": "right",
           "holePixels": 235,
-          "bodyPixels": 37767,
+          "bodyPixels": 37733,
           "componentCount": 3,
           "largestComponentPx": 232,
           "topComponents": [
@@ -2080,47 +2120,37 @@
         },
         {
           "view": "left",
-          "holePixels": 45,
-          "bodyPixels": 36224,
-          "componentCount": 6,
-          "largestComponentPx": 16,
+          "holePixels": 35,
+          "bodyPixels": 36218,
+          "componentCount": 3,
+          "largestComponentPx": 15,
           "topComponents": [
-            {
-              "size": 16,
-              "cx": 282,
-              "cy": 111
-            },
             {
               "size": 15,
               "cx": 272,
               "cy": 419
             },
             {
-              "size": 7,
-              "cx": 285,
-              "cy": 98
+              "size": 15,
+              "cx": 282,
+              "cy": 111
             },
             {
               "size": 5,
               "cx": 269,
               "cy": 404
-            },
-            {
-              "size": 1,
-              "cx": 300,
-              "cy": 177
             }
           ]
         },
         {
           "view": "frontRight34",
-          "holePixels": 613,
-          "bodyPixels": 39674,
-          "componentCount": 4,
-          "largestComponentPx": 576,
+          "holePixels": 617,
+          "bodyPixels": 39634,
+          "componentCount": 3,
+          "largestComponentPx": 581,
           "topComponents": [
             {
-              "size": 576,
+              "size": 581,
               "cx": 243,
               "cy": 403
             },
@@ -2133,18 +2163,13 @@
               "size": 1,
               "cx": 257,
               "cy": 369
-            },
-            {
-              "size": 1,
-              "cx": 267,
-              "cy": 116
             }
           ]
         },
         {
           "view": "frontLeft34",
           "holePixels": 0,
-          "bodyPixels": 38012,
+          "bodyPixels": 37984,
           "componentCount": 0,
           "largestComponentPx": 0,
           "topComponents": []
@@ -2153,44 +2178,44 @@
       "rigidNoFillersPerView": [
         {
           "view": "front",
-          "holePixels": 20,
-          "componentCount": 6
+          "holePixels": 6,
+          "componentCount": 4
         },
         {
           "view": "back",
-          "holePixels": 43,
-          "componentCount": 9
+          "holePixels": 31,
+          "componentCount": 4
         },
         {
           "view": "right",
-          "holePixels": 266,
-          "componentCount": 8
-        },
-        {
-          "view": "left",
-          "holePixels": 67,
-          "componentCount": 11
-        },
-        {
-          "view": "frontRight34",
-          "holePixels": 660,
+          "holePixels": 261,
           "componentCount": 5
         },
         {
+          "view": "left",
+          "holePixels": 53,
+          "componentCount": 6
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 656,
+          "componentCount": 3
+        },
+        {
           "view": "frontLeft34",
-          "holePixels": 1,
-          "componentCount": 1
+          "holePixels": 0,
+          "componentCount": 0
         }
       ],
       "lbsPerView": [
         {
           "view": "front",
-          "holePixels": 4,
+          "holePixels": 3,
           "componentCount": 3
         },
         {
           "view": "back",
-          "holePixels": 29,
+          "holePixels": 30,
           "componentCount": 4
         },
         {
@@ -2200,60 +2225,76 @@
         },
         {
           "view": "left",
-          "holePixels": 46,
-          "componentCount": 7
+          "holePixels": 39,
+          "componentCount": 6
         },
         {
           "view": "frontRight34",
           "holePixels": 588,
-          "componentCount": 3
+          "componentCount": 2
         },
         {
           "view": "frontLeft34",
-          "holePixels": 0,
-          "componentCount": 0
+          "holePixels": 1,
+          "componentCount": 1
         }
       ]
     },
     {
       "pose": "maxArticulation",
-      "rigidTotalHolePixels": 1391,
-      "rigidNoFillersTotalHolePixels": 1616,
-      "lbsTotalHolePixels": 1422,
+      "rigidTotalHolePixels": 1414,
+      "rigidNoFillersTotalHolePixels": 1541,
+      "lbsTotalHolePixels": 1427,
       "rigidPerView": [
         {
           "view": "front",
-          "holePixels": 340,
-          "bodyPixels": 40894,
-          "componentCount": 1,
-          "largestComponentPx": 340,
+          "holePixels": 355,
+          "bodyPixels": 40873,
+          "componentCount": 3,
+          "largestComponentPx": 346,
           "topComponents": [
             {
-              "size": 340,
+              "size": 346,
               "cx": 197,
               "cy": 106
+            },
+            {
+              "size": 8,
+              "cx": 244,
+              "cy": 127
+            },
+            {
+              "size": 1,
+              "cx": 240,
+              "cy": 126
             }
           ]
         },
         {
           "view": "back",
-          "holePixels": 0,
-          "bodyPixels": 40637,
-          "componentCount": 0,
-          "largestComponentPx": 0,
-          "topComponents": []
+          "holePixels": 1,
+          "bodyPixels": 40645,
+          "componentCount": 1,
+          "largestComponentPx": 1,
+          "topComponents": [
+            {
+              "size": 1,
+              "cx": 268,
+              "cy": 121
+            }
+          ]
         },
         {
           "view": "right",
-          "holePixels": 292,
-          "bodyPixels": 37480,
-          "componentCount": 9,
-          "largestComponentPx": 251,
+          "holePixels": 311,
+          "bodyPixels": 37429,
+          "componentCount": 8,
+          "largestComponentPx": 267,
           "topComponents": [
             {
-              "size": 251,
+              "size": 267,
               "cx": 236,
-              "cy": 415
+              "cy": 414
             },
             {
               "size": 18,
@@ -2266,21 +2307,21 @@
               "cy": 302
             },
             {
-              "size": 2,
-              "cx": 242,
-              "cy": 393
+              "size": 4,
+              "cx": 226,
+              "cy": 114
             },
             {
-              "size": 2,
+              "size": 3,
               "cx": 267,
-              "cy": 96
+              "cy": 95
             }
           ]
         },
         {
           "view": "left",
           "holePixels": 711,
-          "bodyPixels": 38568,
+          "bodyPixels": 38509,
           "componentCount": 5,
           "largestComponentPx": 703,
           "topComponents": [
@@ -2313,23 +2354,17 @@
         },
         {
           "view": "frontRight34",
-          "holePixels": 11,
-          "bodyPixels": 37897,
-          "componentCount": 1,
-          "largestComponentPx": 11,
-          "topComponents": [
-            {
-              "size": 11,
-              "cx": 266,
-              "cy": 126
-            }
-          ]
+          "holePixels": 0,
+          "bodyPixels": 37870,
+          "componentCount": 0,
+          "largestComponentPx": 0,
+          "topComponents": []
         },
         {
           "view": "frontLeft34",
-          "holePixels": 37,
-          "bodyPixels": 39210,
-          "componentCount": 6,
+          "holePixels": 36,
+          "bodyPixels": 39182,
+          "componentCount": 5,
           "largestComponentPx": 14,
           "topComponents": [
             {
@@ -2343,19 +2378,19 @@
               "cy": 420
             },
             {
+              "size": 6,
+              "cx": 281,
+              "cy": 101
+            },
+            {
               "size": 5,
               "cx": 275,
               "cy": 414
             },
             {
-              "size": 5,
-              "cx": 281,
-              "cy": 102
-            },
-            {
-              "size": 2,
-              "cx": 280,
-              "cy": 99
+              "size": 1,
+              "cx": 167,
+              "cy": 111
             }
           ]
         }
@@ -2363,67 +2398,1107 @@
       "rigidNoFillersPerView": [
         {
           "view": "front",
-          "holePixels": 369,
-          "componentCount": 6
+          "holePixels": 373,
+          "componentCount": 4
         },
         {
           "view": "back",
-          "holePixels": 4,
-          "componentCount": 3
-        },
-        {
-          "view": "right",
-          "holePixels": 387,
-          "componentCount": 12
-        },
-        {
-          "view": "left",
-          "holePixels": 755,
-          "componentCount": 10
-        },
-        {
-          "view": "frontRight34",
-          "holePixels": 12,
+          "holePixels": 2,
           "componentCount": 2
         },
         {
+          "view": "right",
+          "holePixels": 362,
+          "componentCount": 9
+        },
+        {
+          "view": "left",
+          "holePixels": 741,
+          "componentCount": 6
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0,
+          "componentCount": 0
+        },
+        {
           "view": "frontLeft34",
-          "holePixels": 89,
-          "componentCount": 10
+          "holePixels": 63,
+          "componentCount": 8
         }
       ],
       "lbsPerView": [
         {
           "view": "front",
-          "holePixels": 367,
+          "holePixels": 371,
           "componentCount": 3
         },
         {
           "view": "back",
-          "holePixels": 0,
-          "componentCount": 0
+          "holePixels": 1,
+          "componentCount": 1
         },
         {
           "view": "right",
-          "holePixels": 289,
+          "holePixels": 296,
           "componentCount": 9
         },
         {
           "view": "left",
-          "holePixels": 713,
+          "holePixels": 714,
           "componentCount": 4
         },
         {
           "view": "frontRight34",
-          "holePixels": 11,
-          "componentCount": 1
+          "holePixels": 0,
+          "componentCount": 0
         },
         {
           "view": "frontLeft34",
-          "holePixels": 42,
-          "componentCount": 7
+          "holePixels": 45,
+          "componentCount": 9
         }
       ]
+    }
+  ],
+  "torsoLimitDeg": 40,
+  "waistSweepReport": [
+    {
+      "deg": -40,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 0,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 287,
+      "lbsVisibleSlivers": 305,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 524
+    },
+    {
+      "deg": -35,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 1,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 1
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 287,
+      "lbsVisibleSlivers": 296,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 517
+    },
+    {
+      "deg": -30,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 1,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 1
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 286,
+      "lbsVisibleSlivers": 296,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 511
+    },
+    {
+      "deg": -25,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 1,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 1
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 284,
+      "lbsVisibleSlivers": 295,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 510
+    },
+    {
+      "deg": -20,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 0,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 285,
+      "lbsVisibleSlivers": 297,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 507
+    },
+    {
+      "deg": -15,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 0,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 291,
+      "lbsVisibleSlivers": 299,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 502
+    },
+    {
+      "deg": -10,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 0,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 289,
+      "lbsVisibleSlivers": 291,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 498
+    },
+    {
+      "deg": -5,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 0,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 292,
+      "lbsVisibleSlivers": 302,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 502
+    },
+    {
+      "deg": 0,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 0,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 295,
+      "lbsVisibleSlivers": 303,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 502
+    },
+    {
+      "deg": 5,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 0,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 297,
+      "lbsVisibleSlivers": 309,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 505
+    },
+    {
+      "deg": 10,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 0,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 289,
+      "lbsVisibleSlivers": 295,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 495
+    },
+    {
+      "deg": 15,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 0,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 284,
+      "lbsVisibleSlivers": 291,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 495
+    },
+    {
+      "deg": 20,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 0,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 282,
+      "lbsVisibleSlivers": 297,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 501
+    },
+    {
+      "deg": 25,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 0,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 279,
+      "lbsVisibleSlivers": 295,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 510
+    },
+    {
+      "deg": 30,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 0,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 281,
+      "lbsVisibleSlivers": 294,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 510
+    },
+    {
+      "deg": 35,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 0,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 279,
+      "lbsVisibleSlivers": 292,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 512
+    },
+    {
+      "deg": 40,
+      "rigidHolePixels": 0,
+      "lbsHolePixels": 0,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 0
+        },
+        {
+          "view": "back",
+          "holePixels": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0
+        }
+      ],
+      "rigidVisibleSlivers": 282,
+      "lbsVisibleSlivers": 301,
+      "rigidTotalSlivers": 502,
+      "lbsTotalSlivers": 521
     }
   ],
   "errors": [],

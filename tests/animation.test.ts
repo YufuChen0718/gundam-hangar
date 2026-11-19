@@ -397,18 +397,21 @@ test("rigid armor mode has ~0 edge-length strain, drives skirt FK, and Smooth LB
     parts[n] = found;
   }
   const rigidCaps: Object3D[] = [];
+  const rigidOverlaps: Object3D[] = [];
   const jointFillers: Object3D[] = [];
   gltf.scene.traverse((o) => {
     if ("geometry" in o) {
       if (o.name.endsWith("_cap")) rigidCaps.push(o);
+      else if (o.name.endsWith("_overlap")) rigidOverlaps.push(o);
       else if (o.name.startsWith("filler_")) jointFillers.push(o);
     }
   });
-  assert.equal(rigidCaps.length, 19, "Expected 19 boundary cap meshes");
-  assert.ok(jointFillers.length >= 14, "Expected dark-gray inner-frame fillers");
+  assert.equal(rigidCaps.length, 21, "Expected 21 boundary cap meshes (15 body + 6 skirts)");
+  assert.equal(rigidOverlaps.length, 1, "Expected 1 abdomen overlap mesh (chestPart_overlap)");
+  assert.ok(jointFillers.length >= 14, "Expected inner-frame fillers");
 
   displayRoot.updateMatrixWorld(true);
-  const lbs = new LbsManager(displayRoot, parts, rigidCaps, jointFillers);
+  const lbs = new LbsManager(displayRoot, parts, rigidCaps, jointFillers, rigidOverlaps);
   assert.equal(lbs.getMode(), "rigid", "Rigid armor should be default mode");
   const pelvisBindPosition = joints.pelvis.position.clone();
   const bindAnkleY = Math.min(
@@ -428,6 +431,7 @@ test("rigid armor mode has ~0 edge-length strain, drives skirt FK, and Smooth LB
     sockets,
     parts,
     rigidCaps,
+    rigidOverlaps,
     jointFillers,
     originalMaterials: new Map(),
     pelvisBindPosition,
@@ -507,6 +511,21 @@ test("rigid armor mode has ~0 edge-length strain, drives skirt FK, and Smooth LB
     TEST_POSES.length,
     `Expected Sentinel per-pose LBS vs Three.js diffs to differ across all 9 poses: ${vsThreeMaxs.join(", ")}`,
   );
+
+  // Verify rear skirt secondary FK swings backward on hip extension (rightHip/leftHip < 0)
+  lbs.setMode("rigid");
+  animator.manual({ rightHip: -20, leftHip: -15 });
+  const rearAngles = animator.skirtAngles();
+  assert.ok(
+    Math.abs(rearAngles.rearRightSkirt - Math.min(SKIRT_FK_CONFIG.rearMaxDeg, SKIRT_FK_CONFIG.rearK * 20)) < 1e-5,
+    `Rear right skirt FK mismatch: got ${rearAngles.rearRightSkirt}`,
+  );
+  assert.ok(
+    Math.abs(rearAngles.rearLeftSkirt - Math.min(SKIRT_FK_CONFIG.rearMaxDeg, SKIRT_FK_CONFIG.rearK * 15)) < 1e-5,
+    `Rear left skirt FK mismatch: got ${rearAngles.rearLeftSkirt}`,
+  );
+  assert.equal(rearAngles.frontRightSkirt, 0);
+  assert.equal(rearAngles.sideRightSkirt, 0);
 });
 
 test("swing automatically returns to idle while aim holds its final pose", () => {

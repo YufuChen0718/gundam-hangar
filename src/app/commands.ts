@@ -314,6 +314,27 @@ export function createCommands(
       cameraPos: [number, number, number],
       size = 512,
     ) => world.measureSilhouetteHoleView(target, cameraPos, size),
+    countVisibleWaistSlivers: (
+      mode: "lbs" | "rigid",
+      cameraPositions: readonly [number, number, number][],
+      aspectThreshold = 15,
+    ) => {
+      rig.displayRoot.updateMatrixWorld(true);
+      const torsoY = rig.joints.torso.getWorldPosition(new Vector3()).y;
+      return (
+        rig.lbs?.countVisibleWaistSlivers(
+          mode,
+          torsoY,
+          cameraPositions,
+          aspectThreshold,
+        ) ?? {
+          totalSliverTriangles: 0,
+          visibleSliverTriangles: 0,
+          maxAspectRatio: 0,
+          checkedTriangles: 0,
+        }
+      );
+    },
   };
 
   let accumulator = 0;

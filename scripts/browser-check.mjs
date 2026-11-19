@@ -469,6 +469,142 @@ try {
     "captured before/after same-camera close-ups (LBS vs Rigid) for shoulder decal, front skirt, waist twist, and knee bend",
   );
 
+  // 4b. Waist fix validation (Item 9): Sweep torso yaw from -limit to +limit in 5° steps,
+  //     measuring visible sliver triangles (aspect ratio > 15) and background hole pixels
+  //     in 6 close-up views of the waist. Rigid must be <= Smooth LBS at every step.
+  const torsoLimit = await page.evaluate(() => {
+    const slider = document.getElementById("torso");
+    return slider ? Number(slider.max) : 40;
+  });
+  await page.evaluate(() => {
+    const c = window.__hangar.commands;
+    c.setRightHandItem("none");
+    c.setShieldVisible(false);
+    c.setLoadoutCollapsed(true);
+    c.setPoseAngles({});
+  });
+  await page.waitForTimeout(80);
+  const waistOrigin = (
+    await page.evaluate(() => window.__hangar.diagnostics())
+  ).jointWorldPositions.torso;
+  const [wtx, wty, wtz] = waistOrigin;
+  // Tight 6 close-up waist views (front, back, right, left, frontRight34, frontLeft34) with shoulders raised
+  // so left/right/3/4 cameras inspect the waist directly without forearms entering the frame.
+  const WAIST_CLOSEUP_VIEWS_6 = [
+    { id: "front", target: [wtx, wty - 0.02, wtz], pos: [wtx, wty + 0.02, wtz + 0.62] },
+    { id: "back", target: [wtx, wty - 0.02, wtz], pos: [wtx, wty + 0.02, wtz - 0.62] },
+    { id: "right", target: [wtx, wty - 0.02, wtz], pos: [wtx - 0.62, wty + 0.02, wtz] },
+    { id: "left", target: [wtx, wty - 0.02, wtz], pos: [wtx + 0.62, wty + 0.02, wtz] },
+    { id: "frontRight34", target: [wtx, wty - 0.02, wtz], pos: [wtx - 0.45, wty + 0.04, wtz + 0.45] },
+    { id: "frontLeft34", target: [wtx, wty - 0.02, wtz], pos: [wtx + 0.45, wty + 0.04, wtz + 0.45] },
+  ];
+  const waistCamPositions = WAIST_CLOSEUP_VIEWS_6.map((v) => v.pos);
+
+  const waistSweepReport = [];
+  for (let deg = -torsoLimit; deg <= torsoLimit; deg += 5) {
+    const step = await page.evaluate(
+      ({ deg, views, cams }) => {
+        const c = window.__hangar.commands;
+        c.setPoseAngles({
+          torso: deg,
+          rightShoulder: 65,
+          rightElbow: 90,
+          leftShoulder: 65,
+          leftElbow: 90,
+        });
+
+        c.setSkinningMode("rigid");
+        c.setRigidInnerFrameVisible(true);
+        const rViews = views.map((v) => ({
+          view: v.id,
+          ...c.measureSilhouetteHoleView(v.target, v.pos, 512),
+        }));
+        const rSlivers = c.countVisibleWaistSlivers("rigid", cams, 15);
+
+        c.setSkinningMode("lbs");
+        const lViews = views.map((v) => ({
+          view: v.id,
+          ...c.measureSilhouetteHoleView(v.target, v.pos, 512),
+        }));
+        const lSlivers = c.countVisibleWaistSlivers("lbs", cams, 15);
+
+        return {
+          deg,
+          rigidHolePixels: rViews.reduce((a, b) => a + b.holePixels, 0),
+          lbsHolePixels: lViews.reduce((a, b) => a + b.holePixels, 0),
+          rigidPerView: rViews.map((v) => ({ view: v.view, holePixels: v.holePixels })),
+          lbsPerView: lViews.map((v) => ({ view: v.view, holePixels: v.holePixels })),
+          rigidVisibleSlivers: rSlivers.visibleSliverTriangles,
+          lbsVisibleSlivers: lSlivers.visibleSliverTriangles,
+          rigidTotalSlivers: rSlivers.totalSliverTriangles,
+          lbsTotalSlivers: lSlivers.totalSliverTriangles,
+        };
+      },
+      { deg, views: WAIST_CLOSEUP_VIEWS_6, cams: waistCamPositions },
+    );
+    assert.ok(
+      step.rigidHolePixels <= step.lbsHolePixels,
+      `Waist sweep hole pixels failed at ${deg} deg: rigid=${step.rigidHolePixels} > lbs=${step.lbsHolePixels}`,
+    );
+    assert.ok(
+      step.rigidVisibleSlivers <= step.lbsVisibleSlivers,
+      `Waist sweep visible slivers failed at ${deg} deg: rigid=${step.rigidVisibleSlivers} > lbs=${step.lbsVisibleSlivers}`,
+    );
+    waistSweepReport.push(step);
+  }
+  checks.push(
+    `torso yaw sweep (-${torsoLimit}° to +${torsoLimit}° in 5° steps) verified: rigid <= smooth LBS for both visible slivers (>15) and 6-view waist hole pixels at all ${waistSweepReport.length} steps`,
+  );
+
+  // 4c. Waist fix close-ups (Item 10): same-camera front and 3/4 views at 0°, ±20°, ±limit
+  const waistShotAngles = [
+    { deg: 0, tag: "0" },
+    { deg: -20, tag: "m20" },
+    { deg: 20, tag: "p20" },
+    { deg: -torsoLimit, tag: `m${torsoLimit}` },
+    { deg: torsoLimit, tag: `p${torsoLimit}` },
+  ];
+  const waistFrontCam = {
+    target: [wtx, wty - 0.02, wtz + 0.02],
+    pos: [wtx, wty + 0.04, wtz + 0.84],
+  };
+  const waist34Cam = {
+    target: [wtx, wty - 0.02, wtz + 0.02],
+    pos: [wtx - 0.54, wty + 0.06, wtz + 0.64],
+  };
+  for (const shot of waistShotAngles) {
+    await page.evaluate(
+      ({ deg, cam }) => {
+        const c = window.__hangar.commands;
+        c.setSkinningMode("rigid");
+        c.setPoseAngles({ torso: deg });
+        c.focusCamera(cam.target, cam.pos);
+      },
+      { deg: shot.deg, cam: waistFrontCam },
+    );
+    await page.waitForTimeout(180);
+    await page.screenshot({
+      path: `docs/results/rigid-waist-${shot.tag}-front.png`,
+    });
+
+    await page.evaluate(
+      ({ deg, cam }) => {
+        const c = window.__hangar.commands;
+        c.setSkinningMode("rigid");
+        c.setPoseAngles({ torso: deg });
+        c.focusCamera(cam.target, cam.pos);
+      },
+      { deg: shot.deg, cam: waist34Cam },
+    );
+    await page.waitForTimeout(180);
+    await page.screenshot({
+      path: `docs/results/rigid-waist-${shot.tag}-34.png`,
+    });
+  }
+  checks.push(
+    `captured 10 same-camera waist close-ups (front and 3/4 at 0°, ±20°, ±${torsoLimit}°): docs/results/rigid-waist-*.png`,
+  );
+
   // Restore Loadout drawer & equipment for interactive UI / action / equipment checks
   await page.evaluate(() => {
     const c = window.__hangar.commands;
@@ -644,6 +780,8 @@ try {
     },
     poseResults,
     visibleGapReport,
+    torsoLimitDeg: torsoLimit,
+    waistSweepReport,
     errors,
     failedRequests,
   };
@@ -657,6 +795,16 @@ try {
         checks,
         frameTimes: report.frameTimes,
         actionAttachmentErrors: report.actionAttachmentErrors,
+        torsoLimitDeg: torsoLimit,
+        waistSweepSummary: waistSweepReport.map((w) => ({
+          deg: w.deg,
+          rigidHolePixels: w.rigidHolePixels,
+          lbsHolePixels: w.lbsHolePixels,
+          rigidVisibleSlivers: w.rigidVisibleSlivers,
+          lbsVisibleSlivers: w.lbsVisibleSlivers,
+          rigidTotalSlivers: w.rigidTotalSlivers,
+          lbsTotalSlivers: w.lbsTotalSlivers,
+        })),
         strainSummary: poseResults.map((r) => ({
           pose: r.pose,
           rigidMaxStrain: r.edgeStrainRigid.maxStrain,
