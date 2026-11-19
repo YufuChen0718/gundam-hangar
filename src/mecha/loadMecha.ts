@@ -8,27 +8,27 @@ import {
 } from "three";
 import type { Material, Object3D, Quaternion, Texture } from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { JOINTS } from "./types";
+import { JOINTS, SECONDARY_SKIRT_JOINTS } from "./types";
 import type {
   ArmPreviewRig,
   FootGroundSample,
   JointName,
+  RiggedModelVariant,
+  SkirtJointName,
   SocketName,
 } from "./types";
 import { modelPaths, rigConfig } from "./rigConfig";
 import { LbsManager } from "./lbs";
 
-const loader = new GLTFLoader();
+export const gltfLoader = new GLTFLoader();
 
-function prepare(root: Object3D) {
+export function prepareMeshMaterials(root: Object3D) {
   root.traverse((o) => {
     if (o instanceof Mesh) {
       o.castShadow = true;
       o.receiveShadow = true;
       for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
         if ("map" in m && m.map) m.map.colorSpace = SRGBColorSpace;
-        // Sharper textures at grazing angles, and a gentler normal map: the
-        // generated normal map carries baked dither noise that reads as grain.
         for (const key of [
           "map",
           "normalMap",
@@ -54,38 +54,115 @@ function requireNode(root: Object3D, name: string): Object3D {
   return node;
 }
 
-export async function loadPrepared(): Promise<ArmPreviewRig> {
-  const gltf = await loader.loadAsync(modelPaths.prepared);
-  prepare(gltf.scene);
+function findMeshByName(root: Object3D, name: string): Mesh | undefined {
+  let found: Mesh | undefined;
+  root.traverse((o) => {
+    if (!found && o instanceof Mesh && o.name === name) found = o;
+  });
+  return found;
+}
+
+export async function loadPrepared(
+  variant: RiggedModelVariant = "sentinel",
+): Promise<ArmPreviewRig> {
+  const path =
+    variant === "legacy" ? modelPaths.legacy : modelPaths.sentinel;
+  const hasEmbeddedEquipment = variant === "legacy";
+  const gltf = await gltfLoader.loadAsync(path);
+  prepareMeshMaterials(gltf.scene);
   const displayRoot = new Group();
-  displayRoot.name = "appDisplayRoot";
+  displayRoot.name =
+    variant === "legacy" ? "legacyDisplayRoot" : "appDisplayRoot";
   displayRoot.add(gltf.scene);
+
   const joints = Object.fromEntries(
     JOINTS.map((j) => [j, requireNode(gltf.scene, rigConfig.joints[j])]),
   ) as Record<JointName, Object3D>;
   const bindPose = Object.fromEntries(
     JOINTS.map((j) => [j, joints[j].quaternion.clone()]),
   ) as Record<JointName, Quaternion>;
-  const sockets = Object.fromEntries(
-    Object.entries(rigConfig.sockets).map(([s, n]) => [
-      s,
-      requireNode(gltf.scene, n),
-    ]),
-  ) as Record<SocketName, Object3D>;
+
+  const skirtJoints: Partial<Record<SkirtJointName, Object3D>> = {};
+  const skirtBindPose: Partial<Record<SkirtJointName, Quaternion>> = {};
+  for (const sj of SECONDARY_SKIRT_JOINTS) {
+    const node = gltf.scene.getObjectByName(sj);
+    if (node && !(node instanceof Mesh)) {
+      skirtJoints[sj] = node;
+      skirtBindPose[sj] = node.quaternion.clone();
+    } else if (node) {
+      // Find the Bone specifically if a mesh shares the prefix
+      gltf.scene.traverse((o) => {
+        if (o.name === sj && !(o instanceof Mesh) && !skirtJoints[sj]) {
+          skirtJoints[sj] = o;
+          skirtBindPose[sj] = o.quaternion.clone();
+        }
+      });
+    }
+  }
+
+  const leftForearmSocket =
+    gltf.scene.getObjectByName("leftForearmSocket") ??
+    (() => {
+      let nonMesh: Object3D | undefined;
+      gltf.scene.traverse((o) => {
+        if (!nonMesh && o.name === rigConfig.sockets.leftForearm && !(o instanceof Mesh)) {
+          nonMesh = o;
+        }
+      });
+      return nonMesh;
+    })() ??
+    joints.leftElbow;
+
+  const sockets: Record<SocketName, Object3D> = {
+    rightHand: requireNode(gltf.scene, rigConfig.sockets.rightHand),
+    leftHand: requireNode(gltf.scene, rigConfig.sockets.leftHand),
+    leftForearm: leftForearmSocket,
+    back: requireNode(gltf.scene, rigConfig.sockets.back),
+  };
+
   const rifleOffset = gltf.scene.getObjectByName("rifleOffset");
   if (rifleOffset) {
     rifleOffset.quaternion.copy(sockets.rightHand.quaternion).invert();
   }
-  const parts = Object.fromEntries(
-    rigConfig.partNames.map((n) => [n, requireNode(gltf.scene, n)]),
-  );
+
+  const activePartNames = hasEmbeddedEquipment
+    ? rigConfig.partNames
+    : rigConfig.bodyPartNames;
+
+  const parts: Record<string, Object3D> = {};
+  for (const n of activePartNames) {
+    const meshNode = findMeshByName(gltf.scene, n) ?? requireNode(gltf.scene, n);
+    parts[n] = meshNode;
+  }
+  for (const sn of rigConfig.skirtPartNames) {
+    const skirtMesh = findMeshByName(gltf.scene, sn);
+    if (skirtMesh) parts[sn] = skirtMesh;
+  }
+
+  const rigidCaps: Object3D[] = [];
+  const rigidOverlaps: Object3D[] = [];
+  const jointFillers: Object3D[] = [];
+  gltf.scene.traverse((o) => {
+    if (o instanceof Mesh) {
+      if (o.name.endsWith("_cap")) rigidCaps.push(o);
+      else if (o.name.endsWith("_overlap")) rigidOverlaps.push(o);
+      else if (o.name.startsWith("filler_")) jointFillers.push(o);
+    }
+  });
+
   const originalMaterials = new Map<Object3D, Material | Material[]>();
   displayRoot.traverse((o) => {
     if (o instanceof Mesh) originalMaterials.set(o, o.material);
   });
 
   displayRoot.updateMatrixWorld(true);
-  const lbs = new LbsManager(displayRoot, parts);
+  const lbs = new LbsManager(
+    displayRoot,
+    parts,
+    rigidCaps,
+    jointFillers,
+    rigidOverlaps,
+  );
 
   const pelvisBindPosition = joints.pelvis.position.clone();
   const leftAnklePos = joints.leftAnkle.getWorldPosition(new Vector3());
@@ -108,7 +185,7 @@ export async function loadPrepared(): Promise<ArmPreviewRig> {
       let partMinY = Infinity;
       const candidates: { rootY: number; worldPt: Vector3 }[] = [];
       for (let i = 0; i < posAttr.count; i++) {
-        lbs.cpuPosition(footObj, i, "lbs", v);
+        lbs.cpuPosition(footObj, i, "rigid", v);
         rootPt.copy(v);
         displayRoot.worldToLocal(rootPt);
         if (rootPt.y < partMinY) partMinY = rootPt.y;
@@ -126,11 +203,18 @@ export async function loadPrepared(): Promise<ArmPreviewRig> {
   if (!Number.isFinite(bindFootMinY)) bindFootMinY = 0;
 
   return {
+    variant,
+    hasEmbeddedEquipment,
     displayRoot,
     joints,
     bindPose,
+    skirtJoints,
+    skirtBindPose,
     sockets,
     parts,
+    rigidCaps,
+    rigidOverlaps,
+    jointFillers,
     originalMaterials,
     pelvisBindPosition,
     bindAnkleY,
@@ -141,8 +225,8 @@ export async function loadPrepared(): Promise<ArmPreviewRig> {
 }
 
 export async function loadOriginal(): Promise<Group> {
-  const gltf = await loader.loadAsync(modelPaths.original);
-  prepare(gltf.scene);
+  const gltf = await gltfLoader.loadAsync(modelPaths.original);
+  prepareMeshMaterials(gltf.scene);
   const root = new Group();
   root.add(gltf.scene);
   root.updateMatrixWorld(true);

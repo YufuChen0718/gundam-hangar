@@ -8,11 +8,13 @@ import {
   HemisphereLight,
   Mesh,
   MeshStandardMaterial,
+  NoToneMapping,
   PerspectiveCamera,
   Scene,
   SRGBColorSpace,
   TorusGeometry,
   WebGLRenderer,
+  WebGLRenderTarget,
 } from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 export function createScene(container: HTMLElement) {
@@ -114,6 +116,151 @@ export function createScene(container: HTMLElement) {
     camera.position.set(cameraPos[0], cameraPos[1], cameraPos[2]);
     controls.update();
   }
+
+  /**
+   * Renders the current scene from an arbitrary camera position into a crisp 512x512
+   * offscreen target against a pure #ff00ff background (with stage/grid hidden) and
+   * counts interior background pixels showing through the body silhouette (holes).
+   */
+  function measureSilhouetteHoleView(
+    target: [number, number, number],
+    cameraPos: [number, number, number],
+    size = 512,
+  ) {
+    const savedBg = scene.background;
+    const savedTone = renderer.toneMapping;
+    const savedStage = stage.visible;
+    const savedRim = rim.visible;
+    const savedGrid = grid.visible;
+    const savedAspect = camera.aspect;
+    const savedPos = camera.position.clone();
+    const savedTarget = controls.target.clone();
+
+    const rt = new WebGLRenderTarget(size, size, { depthBuffer: true });
+    const buf = new Uint8Array(size * size * 4);
+    try {
+      stage.visible = false;
+      rim.visible = false;
+      grid.visible = false;
+      scene.background = new Color(0xff00ff);
+      renderer.toneMapping = NoToneMapping;
+      camera.aspect = 1;
+      camera.position.set(cameraPos[0], cameraPos[1], cameraPos[2]);
+      camera.lookAt(target[0], target[1], target[2]);
+      camera.updateProjectionMatrix();
+      camera.updateMatrixWorld(true);
+
+      renderer.setRenderTarget(rt);
+      renderer.clear();
+      renderer.render(scene, camera);
+      renderer.readRenderTargetPixels(rt, 0, 0, size, size, buf);
+      renderer.setRenderTarget(null);
+    } finally {
+      rt.dispose();
+      stage.visible = savedStage;
+      rim.visible = savedRim;
+      grid.visible = savedGrid;
+      scene.background = savedBg;
+      renderer.toneMapping = savedTone;
+      camera.aspect = savedAspect;
+      camera.position.copy(savedPos);
+      controls.target.copy(savedTarget);
+      camera.updateProjectionMatrix();
+      controls.update();
+    }
+
+    const total = size * size;
+    const isBg = new Uint8Array(total);
+    let bodyPixels = 0;
+    for (let i = 0; i < total; i++) {
+      const r = buf[i * 4];
+      const g = buf[i * 4 + 1];
+      const b = buf[i * 4 + 2];
+      if (r > 215 && g < 35 && b > 215) {
+        isBg[i] = 1;
+      } else {
+        bodyPixels++;
+      }
+    }
+
+    // 4-connected flood-fill from image edges to mark exterior background
+    const exterior = new Uint8Array(total);
+    const queue = new Int32Array(total);
+    let head = 0;
+    let tail = 0;
+    const enqueue = (idx: number) => {
+      if (isBg[idx] && !exterior[idx]) {
+        exterior[idx] = 1;
+        queue[tail++] = idx;
+      }
+    };
+    for (let x = 0; x < size; x++) {
+      enqueue(x);
+      enqueue((size - 1) * size + x);
+    }
+    for (let y = 0; y < size; y++) {
+      enqueue(y * size);
+      enqueue(y * size + (size - 1));
+    }
+    while (head < tail) {
+      const idx = queue[head++];
+      const x = idx % size;
+      const y = (idx - x) / size;
+      if (x > 0) enqueue(idx - 1);
+      if (x + 1 < size) enqueue(idx + 1);
+      if (y > 0) enqueue(idx - size);
+      if (y + 1 < size) enqueue(idx + size);
+    }
+
+    // Count connected components of interior hole pixels + classify whether inside hand-fist region
+    const visited = new Uint8Array(total);
+    let holePixels = 0;
+    const components: { size: number; cx: number; cy: number }[] = [];
+    for (let i = 0; i < total; i++) {
+      if (isBg[i] && !exterior[i] && !visited[i]) {
+        let ch = 0;
+        let ct = 0;
+        visited[i] = 1;
+        queue[ct++] = i;
+        let sumX = 0;
+        let sumY = 0;
+        while (ch < ct) {
+          const cur = queue[ch++];
+          const cx = cur % size;
+          const cy = (cur - cx) / size;
+          sumX += cx;
+          sumY += cy;
+          const nbrs = [
+            cx > 0 ? cur - 1 : -1,
+            cx + 1 < size ? cur + 1 : -1,
+            cy > 0 ? cur - size : -1,
+            cy + 1 < size ? cur + size : -1,
+          ];
+          for (const n of nbrs) {
+            if (n >= 0 && isBg[n] && !exterior[n] && !visited[n]) {
+              visited[n] = 1;
+              queue[ct++] = n;
+            }
+          }
+        }
+        holePixels += ct;
+        components.push({
+          size: ct,
+          cx: Math.round(sumX / ct),
+          cy: Math.round(size - 1 - sumY / ct),
+        });
+      }
+    }
+    components.sort((a, b) => b.size - a.size);
+    return {
+      size,
+      bodyPixels,
+      holePixels,
+      componentCount: components.length,
+      largestComponentPx: components[0]?.size ?? 0,
+      topComponents: components.slice(0, 5),
+    };
+  }
   const resize = new ResizeObserver(() => {
     const { width, height } = container.getBoundingClientRect();
     if (!width || !height) return;
@@ -135,5 +282,6 @@ export function createScene(container: HTMLElement) {
     top,
     zoom,
     focus,
+    measureSilhouetteHoleView,
   };
 }

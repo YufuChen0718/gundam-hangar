@@ -1,0 +1,38 @@
+{
+  "bake_engine": "CYCLES",
+  "compute_device": "METAL (Apple M4 Pro (GPU - 16 cores))",
+  "samples": 1,
+  "selected_to_active": true,
+  "cage_extrusion_tight_m": 0.005,
+  "max_ray_distance_tight_m": 0.016,
+  "cage_extrusion_wide_m": 0.015,
+  "max_ray_distance_wide_m": 0.035,
+  "margin_px": 8,
+  "smart_uv_angle_deg": 66.0,
+  "smart_uv_island_margin": 0.0008,
+  "uv_min": [
+    0.0007999436347745359,
+    0.0007999762310646474
+  ],
+  "uv_max": [
+    0.9984740614891052,
+    0.9950727820396423
+  ],
+  "unique_uv_coords": 38367,
+  "low_poly_vertices": 14632,
+  "low_poly_triangles": 30043,
+  "covered_texel_fraction_4k": 0.8048,
+  "inverted_normal_fraction_4k": 0.0,
+  "textures_4096_bytes": {
+    "basecolor": 24039587,
+    "normal": 20535562,
+    "metallicRoughness": 13503241
+  },
+  "textures_2048_bytes": {
+    "basecolor": 6515425,
+    "normal": 6418309,
+    "metallicRoughness": 4221897
+  },
+  "source_blend_bytes": 18697849,
+  "elapsed_seconds": 110.99
+}

@@ -1,12 +1,93 @@
 import { Euler, MathUtils, Quaternion } from "three";
 import { JOINTS } from "./types";
-import type { JointAngles, JointName, PoseInput } from "./types";
+import type {
+  EquipmentItemId,
+  JointAngles,
+  JointName,
+  PoseInput,
+  SocketName,
+} from "./types";
 
 const baseUrl = import.meta.env?.BASE_URL ?? "/";
 
 export const modelPaths = {
-  prepared: `${baseUrl}assets/models/gundam-rigged.glb?v=full-body-15`,
+  sentinel: `${baseUrl}assets/models/gundam-sentinel.glb?v=sentinel-rigid-2`,
+  legacy: `${baseUrl}assets/models/gundam-rigged.glb?v=full-body-15`,
+  prepared: `${baseUrl}assets/models/gundam-sentinel.glb?v=sentinel-rigid-2`,
   original: `${baseUrl}assets/models/mecha-original.glb`,
+  equipBeamSaber: `${baseUrl}assets/models/equip-beam-saber.glb?v=saber-1`,
+  equipRifle: `${baseUrl}assets/models/equip-rifle.glb?v=rifle-1`,
+  equipShield: `${baseUrl}assets/models/equip-shield.glb?v=shield-1`,
+};
+
+/**
+ * Secondary skirt armor FK coupling (Requirement 6):
+ *   frontSkirtAngle = clamp(frontK * hipAngle, 0, frontMaxDeg)
+ *   sideSkirtAngle  = clamp(sideK * hipAngle, 0, sideMaxDeg)
+ *   rearSkirtAngle  = clamp(rearK * max(0, -hipAngle), 0, rearMaxDeg)
+ */
+export const SKIRT_FK_CONFIG = {
+  frontK: 0.5,
+  frontMaxDeg: 40,
+  sideK: 0.3,
+  sideMaxDeg: 25,
+  rearK: 0.45,
+  rearMaxDeg: 30,
+} as const;
+
+export interface EquipmentOffsetSpec {
+  id: EquipmentItemId;
+  label: string;
+  joint: JointName;
+  socket: SocketName;
+  url: string;
+  thumbUrl: string;
+  position: readonly [number, number, number];
+  rotationDeg: readonly [number, number, number];
+  scale: number;
+}
+
+/**
+ * Per-item attachment transform config (M6):
+ *   M_equipment^world = M_joint^world * M_socket^joint * M_equipment^socket
+ * - beam saber -> rightHandSocket: hilt along socket +Z, grip centered in the palm
+ * - rifle      -> rightHandSocket: barrel forward, grip in the palm
+ * - shield     -> leftForearmSocket: flat against the outer forearm
+ */
+export const EQUIPMENT_OFFSETS: Record<EquipmentItemId, EquipmentOffsetSpec> = {
+  saber: {
+    id: "saber",
+    label: "Beam Saber",
+    joint: "rightWrist",
+    socket: "rightHand",
+    url: modelPaths.equipBeamSaber,
+    thumbUrl: `${baseUrl}assets/thumbs/thumb-saber.png`,
+    position: [-0.012, -0.012, 0.016],
+    rotationDeg: [-12, -14, 0],
+    scale: 0.58,
+  },
+  rifle: {
+    id: "rifle",
+    label: "Rifle",
+    joint: "rightWrist",
+    socket: "rightHand",
+    url: modelPaths.equipRifle,
+    thumbUrl: `${baseUrl}assets/thumbs/thumb-rifle.png`,
+    position: [-0.022, -0.020, 0.032],
+    rotationDeg: [54, -4, 0],
+    scale: 0.42,
+  },
+  shield: {
+    id: "shield",
+    label: "Shield",
+    joint: "leftElbow",
+    socket: "leftForearm",
+    url: modelPaths.equipShield,
+    thumbUrl: `${baseUrl}assets/thumbs/thumb-shield.png`,
+    position: [0.042, -0.045, 0.015],
+    rotationDeg: [0, 8, -4],
+    scale: 0.54,
+  },
 };
 
 export const JOINT_LIMITS: Record<JointName, readonly [number, number]> = {
@@ -20,38 +101,54 @@ export const JOINT_LIMITS: Record<JointName, readonly [number, number]> = {
   leftElbow: [0, 90],
   leftWrist: [-25, 25],
   rightHip: [-20, 45],
-  rightKnee: [0, 75],
+  rightKnee: [0, 55],
   rightAnkle: [-25, 35],
   leftHip: [-20, 45],
-  leftKnee: [0, 75],
+  leftKnee: [0, 55],
   leftAnkle: [-25, 35],
 } as const;
+
+export const BODY_PART_NAMES = [
+  "waistPart",
+  "chestPart",
+  "headPart",
+  "rightUpperArm",
+  "rightForearm",
+  "rightPalm",
+  "leftUpperArm",
+  "leftForearm",
+  "leftPalm",
+  "rightThigh",
+  "rightShin",
+  "rightFoot",
+  "leftThigh",
+  "leftShin",
+  "leftFoot",
+] as const;
+
+export const SKIRT_PART_NAMES = [
+  "frontRightSkirtPart",
+  "frontLeftSkirtPart",
+  "sideRightSkirtPart",
+  "sideLeftSkirtPart",
+  "rearRightSkirtPart",
+  "rearLeftSkirtPart",
+] as const;
 
 export const rigConfig = {
   joints: Object.fromEntries(JOINTS.map((j) => [j, j])) as Record<
     JointName,
     string
   >,
-  sockets: { rightHand: "rightHand", leftHand: "leftHand", back: "back" },
-  partNames: [
-    "waistPart",
-    "chestPart",
-    "headPart",
-    "rightUpperArm",
-    "rightForearm",
-    "rightPalm",
-    "leftUpperArm",
-    "leftForearm",
-    "leftPalm",
-    "rightThigh",
-    "rightShin",
-    "rightFoot",
-    "leftThigh",
-    "leftShin",
-    "leftFoot",
-    "rifle",
-    "shield",
-  ],
+  sockets: {
+    rightHand: "rightHand",
+    leftHand: "leftHand",
+    leftForearm: "leftForearm",
+    back: "back",
+  },
+  bodyPartNames: [...BODY_PART_NAMES],
+  skirtPartNames: [...SKIRT_PART_NAMES],
+  partNames: [...BODY_PART_NAMES, "rifle", "shield"],
   limits: JOINT_LIMITS,
 };
 
@@ -182,12 +279,12 @@ export const TEST_POSES: readonly TestPoseSpec[] = [
     label: "Symmetric Tactical Crouch",
     shortLabel: "战术半蹲",
     angles: {
-      rightHip: 22,
-      rightKnee: 44,
-      rightAnkle: 22,
-      leftHip: 22,
-      leftKnee: 44,
-      leftAnkle: 22,
+      rightHip: 20,
+      rightKnee: 40,
+      rightAnkle: 20,
+      leftHip: 20,
+      leftKnee: 40,
+      leftAnkle: 20,
       rightShoulder: 25,
       rightElbow: 45,
       leftShoulder: 20,
@@ -199,12 +296,12 @@ export const TEST_POSES: readonly TestPoseSpec[] = [
     label: "Deep Crouch + Dual Arm Aim/Guard",
     shortLabel: "深蹲瞄准",
     angles: {
-      rightHip: 32,
-      rightKnee: 64,
-      rightAnkle: 32,
-      leftHip: 32,
-      leftKnee: 64,
-      leftAnkle: 32,
+      rightHip: 27,
+      rightKnee: 54,
+      rightAnkle: 27,
+      leftHip: 27,
+      leftKnee: 54,
+      leftAnkle: 27,
       torso: 15,
       head: -15,
       rightShoulder: 50,
@@ -251,12 +348,12 @@ export const TEST_POSES: readonly TestPoseSpec[] = [
       leftShoulder: 55,
       leftElbow: 80,
       leftWrist: -20,
-      rightHip: 30,
-      rightKnee: 60,
-      rightAnkle: 30,
-      leftHip: 30,
-      leftKnee: 60,
-      leftAnkle: 30,
+      rightHip: 27,
+      rightKnee: 54,
+      rightAnkle: 27,
+      leftHip: 27,
+      leftKnee: 54,
+      leftAnkle: 27,
     },
   },
-] as const;
+];

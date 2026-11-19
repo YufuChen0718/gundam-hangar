@@ -9,6 +9,7 @@ import type {
   ModelMode,
   PoseInput,
   PosePresetName,
+  RightHandItem,
   SkinningMode,
 } from "../mecha/types";
 import {
@@ -16,28 +17,19 @@ import {
   normalizePoseInput,
   TEST_POSES,
 } from "../mecha/rigConfig";
-import { loadOriginal } from "../mecha/loadMecha";
+import { loadOriginal, loadPrepared } from "../mecha/loadMecha";
 import { EquipmentManager } from "../mecha/equipment";
 import { Appearance } from "../mecha/appearance";
 import { Animator } from "../animation/animator";
 import type { ActionName, TransitionMode } from "../animation/clips";
 import type { createScene } from "../scene/createScene";
 
-export function createCommands(
-  store: Store,
-  rig: ArmPreviewRig,
-  world: ReturnType<typeof createScene>,
-) {
-  const animator = new Animator(rig),
-    equipment = new EquipmentManager(rig),
-    appearance = new Appearance(rig);
-  let original: Group | undefined;
-  let originalPromise: Promise<Group> | undefined;
-
-  const helpers = [
-    ...JOINTS.map((j) => rig.joints[j]),
-    rig.sockets.rightHand,
-    rig.sockets.leftHand,
+function attachHelpers(r: ArmPreviewRig): AxesHelper[] {
+  return [
+    ...JOINTS.map((j) => r.joints[j]),
+    r.sockets.rightHand,
+    r.sockets.leftHand,
+    r.sockets.leftForearm,
   ].map((j) => {
     const h = new AxesHelper(0.11);
     h.visible = false;
@@ -45,6 +37,36 @@ export function createCommands(
     j.add(h);
     return h;
   });
+}
+
+function computeLegacyGripLocal(r: ArmPreviewRig): Vector3 {
+  if (!r.hasEmbeddedEquipment || !r.parts.rifle) return new Vector3();
+  r.displayRoot.updateMatrixWorld(true);
+  const gripLocal = r.parts.rifle.getWorldPosition(new Vector3());
+  r.sockets.rightHand.worldToLocal(gripLocal);
+  return gripLocal;
+}
+
+export function createCommands(
+  store: Store,
+  initialRig: ArmPreviewRig,
+  world: ReturnType<typeof createScene>,
+  equipment: EquipmentManager,
+) {
+  let rig = initialRig;
+  const sentinelRig = initialRig;
+  let legacyRig: ArmPreviewRig | undefined;
+  let legacyPromise: Promise<ArmPreviewRig> | undefined;
+  let original: Group | undefined;
+  let originalPromise: Promise<Group> | undefined;
+
+  const animator = new Animator(rig),
+    appearance = new Appearance(rig);
+
+  const helperMap = new Map<ArmPreviewRig, AxesHelper[]>();
+  const gripLocalMap = new Map<ArmPreviewRig, Vector3>();
+  helperMap.set(sentinelRig, attachHelpers(sentinelRig));
+  gripLocalMap.set(sentinelRig, computeLegacyGripLocal(sentinelRig));
 
   const repaint = () =>
     appearance.apply(store.get().parts, store.get().wireframe, original);
@@ -62,7 +84,7 @@ export function createCommands(
   }
 
   function manual(angles: PoseInput) {
-    if (store.get().mode !== "prepared") return;
+    if (store.get().mode === "original") return;
     animator.manual(normalizePoseInput(angles));
     sync();
   }
@@ -72,6 +94,14 @@ export function createCommands(
     elbow: "rightElbow",
     wrist: "rightWrist",
   };
+
+  function setRightHandItemInternal(item: RightHandItem) {
+    equipment.setRightHandItem(item);
+    store.set({
+      rightHandItem: item,
+      weapon: item !== "none",
+    });
+  }
 
   const commands = {
     setJoint: (
@@ -102,7 +132,7 @@ export function createCommands(
       if (preset) manual(preset.angles);
     },
     play: () => {
-      if (store.get().mode !== "prepared") return;
+      if (store.get().mode === "original") return;
       if (animator.playing) animator.pause();
       else if (animator.time > 0 && animator.time < animator.duration)
         animator.resume();
@@ -110,7 +140,12 @@ export function createCommands(
       sync();
     },
     playAction: (action: ActionName) => {
-      if (store.get().mode !== "prepared") return;
+      if (store.get().mode === "original") return;
+      if (action === "aim") {
+        setRightHandItemInternal("rifle");
+      } else if (action === "swing") {
+        setRightHandItemInternal("saber");
+      }
       animator.play(action);
       sync();
     },
@@ -120,7 +155,7 @@ export function createCommands(
       sync();
     },
     seek: (time: number) => {
-      if (store.get().mode !== "prepared") return;
+      if (store.get().mode === "original") return;
       animator.seek(time);
       sync();
     },
@@ -130,16 +165,42 @@ export function createCommands(
     },
     setSkinningMode: (mode: SkinningMode) => {
       rig.lbs?.setMode(mode);
+      animator.reapply();
       store.set({ skinning: mode });
       repaint();
     },
+    setStrainHeatmap: (enabled: boolean) => {
+      rig.lbs?.setStrainHeatmap(enabled);
+    },
+    setRigidInnerFrameVisible: (visible: boolean) => {
+      rig.lbs?.setRigidInnerFrameVisible(visible);
+    },
+    setRightHandItem: (item: RightHandItem) => {
+      setRightHandItemInternal(item);
+    },
+    setSaberBladeVisible: (visible: boolean) => {
+      equipment.setSaberBladeVisible(visible);
+      store.set({ saberBlade: visible });
+    },
     setWeaponVisible: (visible: boolean) => {
-      equipment.setWeaponVisible(visible);
-      store.set({ weapon: visible });
+      if (!visible) {
+        setRightHandItemInternal("none");
+      } else if (store.get().rightHandItem === "none") {
+        setRightHandItemInternal("rifle");
+      } else {
+        equipment.setWeaponVisible(visible);
+        store.set({ weapon: visible });
+      }
     },
     setShieldVisible: (visible: boolean) => {
       equipment.setShieldVisible(visible);
       store.set({ shield: visible });
+    },
+    setLoadoutCollapsed: (collapsed: boolean) => {
+      store.set({ loadoutCollapsed: collapsed });
+    },
+    toggleLoadoutCollapsed: () => {
+      store.set({ loadoutCollapsed: !store.get().loadoutCollapsed });
     },
     setWireframe: (v: boolean) => {
       store.set({ wireframe: v });
@@ -150,11 +211,16 @@ export function createCommands(
       repaint();
     },
     setJointsVisible: (v: boolean) => {
-      helpers.forEach((h) => (h.visible = v));
+      for (const list of helperMap.values()) {
+        list.forEach((h) => (h.visible = v));
+      }
       store.set({ joints: v });
     },
-    setModel: async (mode: ModelMode) => {
+    setModel: async (requestedMode: ModelMode) => {
+      const mode: ModelMode =
+        requestedMode === "prepared" ? "sentinel" : requestedMode;
       if (store.get().loading || store.get().mode === mode) return;
+      const savedAngles = { ...store.get().angles };
       animator.pause();
       sync();
       store.set({ loading: true, error: null });
@@ -163,16 +229,49 @@ export function createCommands(
           originalPromise ??= loadOriginal();
           original = await originalPromise;
           world.scene.add(original);
+        } else if (mode === "legacy" && !legacyRig) {
+          legacyPromise ??= loadPrepared("legacy");
+          legacyRig = await legacyPromise;
+          helperMap.set(legacyRig, attachHelpers(legacyRig));
+          gripLocalMap.set(legacyRig, computeLegacyGripLocal(legacyRig));
+          world.scene.add(legacyRig.displayRoot);
         }
-        rig.displayRoot.visible = mode === "prepared";
+
+        if (mode === "legacy" && legacyRig) {
+          rig = legacyRig;
+        } else if (mode === "sentinel") {
+          rig = sentinelRig;
+        }
+
+        sentinelRig.displayRoot.visible = mode === "sentinel";
+        if (legacyRig) {
+          legacyRig.displayRoot.visible = mode === "legacy";
+          legacyRig.displayRoot.rotation.y = sentinelRig.displayRoot.rotation.y;
+        }
         if (original) {
           original.visible = mode === "original";
-          original.rotation.y = rig.displayRoot.rotation.y;
+          original.rotation.y = sentinelRig.displayRoot.rotation.y;
+        }
+
+        if (mode !== "original") {
+          animator.setRig(rig);
+          equipment.setRig(rig);
+          appearance.setRig(rig);
+          rig.lbs?.setMode(store.get().skinning);
+          equipment.setRightHandItem(store.get().rightHandItem);
+          equipment.setSaberBladeVisible(store.get().saberBlade);
+          equipment.setShieldVisible(store.get().shield);
+          helperMap
+            .get(rig)
+            ?.forEach((h) => (h.visible = store.get().joints));
+          animator.manual(savedAngles);
         }
         store.set({ mode });
         repaint();
+        sync();
       } catch (e) {
-        originalPromise = undefined;
+        if (mode === "original") originalPromise = undefined;
+        if (mode === "legacy") legacyPromise = undefined;
         store.set({ error: e instanceof Error ? e.message : String(e) });
       } finally {
         store.set({ loading: false });
@@ -180,12 +279,15 @@ export function createCommands(
     },
     rotateModel: (degrees: number) => {
       store.set({ modelYawDeg: degrees });
-      rig.displayRoot.rotation.y = MathUtils.degToRad(degrees);
+      const rad = MathUtils.degToRad(degrees);
+      sentinelRig.displayRoot.rotation.y = rad;
+      if (legacyRig) legacyRig.displayRoot.rotation.y = rad;
       rig.lbs?.updateBoneMatrices();
-      if (original) original.rotation.y = rig.displayRoot.rotation.y;
+      if (original) original.rotation.y = rad;
     },
     resetModelTransform: () => {
-      rig.displayRoot.rotation.set(0, 0, 0);
+      sentinelRig.displayRoot.rotation.set(0, 0, 0);
+      if (legacyRig) legacyRig.displayRoot.rotation.set(0, 0, 0);
       rig.lbs?.updateBoneMatrices();
       if (original) original.rotation.set(0, 0, 0);
       store.set({ modelYawDeg: 0 });
@@ -207,11 +309,37 @@ export function createCommands(
       target: [number, number, number],
       cameraPos: [number, number, number],
     ) => world.focus(target, cameraPos),
+    measureSilhouetteHoleView: (
+      target: [number, number, number],
+      cameraPos: [number, number, number],
+      size = 512,
+    ) => world.measureSilhouetteHoleView(target, cameraPos, size),
+    countVisibleWaistSlivers: (
+      mode: "lbs" | "rigid",
+      cameraPositions: readonly [number, number, number][],
+      aspectThreshold = 15,
+    ) => {
+      rig.displayRoot.updateMatrixWorld(true);
+      const torsoY = rig.joints.torso.getWorldPosition(new Vector3()).y;
+      return (
+        rig.lbs?.countVisibleWaistSlivers(
+          mode,
+          torsoY,
+          cameraPositions,
+          aspectThreshold,
+        ) ?? {
+          totalSliverTriangles: 0,
+          visibleSliverTriangles: 0,
+          maxAspectRatio: 0,
+          checkedTriangles: 0,
+        }
+      );
+    },
   };
 
   let accumulator = 0;
   function update(dt: number) {
-    if (store.get().mode === "prepared") {
+    if (store.get().mode !== "original") {
       animator.update(dt);
       rig.lbs?.updateBoneMatrices();
       accumulator += dt;
@@ -226,11 +354,12 @@ export function createCommands(
     const part = rig.parts[partName];
     if (!(part instanceof Mesh)) return 0;
     const count = part.geometry.attributes.position.count;
+    const evalMode = store.get().skinning === "rigid" ? "rigid" : "lbs";
     const v = new Vector3();
     let minY = Infinity;
     for (let i = 0; i < count; i++) {
       if (rig.lbs) {
-        rig.lbs.cpuPosition(part, i, "lbs", v);
+        rig.lbs.cpuPosition(part, i, evalMode, v);
       } else {
         part.getVertexPosition(i, v);
         part.localToWorld(v);
@@ -240,10 +369,6 @@ export function createCommands(
     }
     return Number.isFinite(minY) ? minY : 0;
   }
-
-  rig.displayRoot.updateMatrixWorld(true);
-  const gripLocal = rig.parts.rifle.getWorldPosition(new Vector3());
-  rig.sockets.rightHand.worldToLocal(gripLocal);
 
   function diagnostics() {
     rig.displayRoot.updateMatrixWorld(true);
@@ -258,6 +383,18 @@ export function createCommands(
       meanGap: 0,
       boundaryGroups: 0,
     };
+    const edgeStrainRigid = rig.lbs?.computeEdgeStrain("rigid") ?? {
+      maxStrain: 0,
+      meanStrain: 0,
+      triangleCount: 0,
+      strainedTrianglesOver1Pct: 0,
+    };
+    const edgeStrainLbs = rig.lbs?.computeEdgeStrain("lbs") ?? {
+      maxStrain: 0,
+      meanStrain: 0,
+      triangleCount: 0,
+      strainedTrianglesOver1Pct: 0,
+    };
     const activeSeam = skinningMode === "rigid" ? rigidSeam : lbsSeam;
     const lbsVsThree = rig.lbs?.compareWithThreeSkinning() ?? {
       maxDiff: 0,
@@ -265,8 +402,17 @@ export function createCommands(
       vertexCount: 0,
     };
 
-    const expected = rig.sockets.rightHand.localToWorld(gripLocal.clone());
-    const actual = rig.parts.rifle.getWorldPosition(new Vector3());
+    const itemErrors = equipment.computeItemAttachmentErrors(
+      gripLocalMap.get(rig),
+    );
+    const activeRightItem = store.get().rightHandItem;
+    const attachmentError =
+      activeRightItem === "saber"
+        ? itemErrors.saber
+        : activeRightItem === "rifle"
+          ? itemErrors.rifle
+          : itemErrors.shield;
+
     const jointWorldPositions = Object.fromEntries(
       JOINTS.map((j) => [
         j,
@@ -280,24 +426,31 @@ export function createCommands(
       action: animator.action,
       status: animator.status,
       transitionMode: animator.transitionMode,
+      rightHandItem: store.get().rightHandItem,
+      saberBladeVisible: store.get().saberBlade,
+      shieldVisible: store.get().shield,
       skinSeamGap: activeSeam.maxGap,
       skinSeamMeanGap: activeSeam.meanGap,
       lbsSeamGapMax: lbsSeam.maxGap,
       lbsSeamGapMean: lbsSeam.meanGap,
       rigidSeamGapMax: rigidSeam.maxGap,
       rigidSeamGapMean: rigidSeam.meanGap,
+      edgeStrainRigid,
+      edgeStrainLbs,
+      skirtAngles: animator.skirtAngles(),
       lbsVsThreeMaxDiff: lbsVsThree.maxDiff,
       lbsVsThreeMeanDiff: lbsVsThree.meanDiff,
       skinnedVertexCount: lbsVsThree.vertexCount,
       boundaryGroups: activeSeam.boundaryGroups,
-      attachmentError: expected.distanceTo(actual),
+      attachmentError,
+      equipmentAttachmentErrors: itemErrors,
       leftFootMinY,
       rightFootMinY,
       jointWorldPositions,
       angles: store.get().angles as JointAngles,
       shoulderRotation: rig.joints.rightShoulder.quaternion.toArray(),
       elbowRotation: rig.joints.rightElbow.quaternion.toArray(),
-      weaponVisible: rig.parts.rifle.visible,
+      weaponVisible: store.get().rightHandItem !== "none",
       mode: store.get().mode,
       playing: animator.playing,
       time: animator.time,

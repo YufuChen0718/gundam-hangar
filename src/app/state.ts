@@ -1,4 +1,9 @@
-import type { JointAngles, ModelMode, SkinningMode } from "../mecha/types";
+import type {
+  JointAngles,
+  ModelMode,
+  RightHandItem,
+  SkinningMode,
+} from "../mecha/types";
 import type {
   ActionName,
   AnimatorStatus,
@@ -15,8 +20,11 @@ export interface HangarState {
   status: AnimatorStatus;
   transitionMode: TransitionMode;
   angles: JointAngles;
+  rightHandItem: RightHandItem;
+  saberBlade: boolean;
   weapon: boolean;
   shield: boolean;
+  loadoutCollapsed: boolean;
   wireframe: boolean;
   parts: boolean;
   joints: boolean;
@@ -31,14 +39,17 @@ export function createStore() {
   let state: HangarState = {
     ready: false,
     error: null,
-    mode: "prepared",
-    skinning: "lbs",
+    mode: "sentinel",
+    skinning: "rigid",
     action: "idle",
     status: "holding",
     transitionMode: "blend",
     angles: zeroJointAngles(),
+    rightHandItem: "rifle",
+    saberBlade: true,
     weapon: true,
     shield: true,
+    loadoutCollapsed: false,
     wireframe: false,
     parts: false,
     joints: false,

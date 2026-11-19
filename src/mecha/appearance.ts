@@ -18,6 +18,12 @@ const colors: Record<string, number> = {
   leftThigh: 0x4a8fe7,
   leftShin: 0x93c47d,
   leftFoot: 0xe06666,
+  frontRightSkirtPart: 0xf5d442,
+  frontLeftSkirtPart: 0xe8be32,
+  sideRightSkirtPart: 0xe6659e,
+  sideLeftSkirtPart: 0xd957b2,
+  rearRightSkirtPart: 0x62b6cb,
+  rearLeftSkirtPart: 0x4ca1b8,
   rifle: 0xea6676,
   shield: 0x7b9ec2,
 };
@@ -30,6 +36,9 @@ export class Appearance {
         part,
         new MeshStandardMaterial({ color, roughness: 0.75, metalness: 0.12 }),
       );
+  }
+  setRig(rig: ArmPreviewRig) {
+    this.rig = rig;
   }
   apply(parts: boolean, wireframe: boolean, original?: Group) {
     this.rig.lbs?.setAppearance(parts, wireframe);

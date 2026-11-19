@@ -10,7 +10,13 @@ _site/
 # Blender autosaves / backups (keep the .blend sources, skip the noise)
 *.blend1
 *.blend2
+assets-src/Meshy_AI_Gundam_Guardian_20261118_texture.blend
+assets-src/Meshy_AI_Gundam_Guardian_20261118_part-segmentation_split.stl
 
 # Local env files
 .env
 .env.*
+
+# Raw Meshy sources (too large for GitHub)
+assets-src/Meshy_AI_*.blend
+assets-src/Meshy_AI_*.stl

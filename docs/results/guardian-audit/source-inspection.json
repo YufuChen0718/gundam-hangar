@@ -1,0 +1,215 @@
+{
+  "file": "/Users/jerrychen/Desktop/cs184/Final_Project/assets-src/Meshy_AI_Gundam_Guardian_20261118_texture.blend",
+  "file_size_bytes": 225158540,
+  "file_size_mb": 214.73,
+  "blender_version": "5.2.0 LTS",
+  "scene_unit_system": "METRIC",
+  "scene_scale_length": 1.0,
+  "armatures": [],
+  "objects": [
+    {
+      "name": "Mesh_0",
+      "type": "MESH",
+      "parent": null,
+      "parent_type": "OBJECT",
+      "parent_bone": "",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimensions": [
+        1.3692610263824463,
+        1.0783430337905884,
+        1.9005000591278076
+      ],
+      "local_min": [
+        -0.6858869791030884,
+        -0.5382980108261108,
+        -0.9506139755249023
+      ],
+      "local_max": [
+        0.6833739876747131,
+        0.5400450229644775,
+        0.9498860239982605
+      ],
+      "world_min": [
+        -0.6858869791030884,
+        -0.5382980108261108,
+        -0.9506139755249023
+      ],
+      "world_max": [
+        0.6833739876747131,
+        0.5400450229644775,
+        0.9498860239982605
+      ],
+      "modifiers": [],
+      "vertex_groups": [],
+      "vertices": 1001106,
+      "edges": 3004470,
+      "polygons": 2002991,
+      "triangles": 2002991,
+      "uv_layers": [
+        "UVMap"
+      ],
+      "materials": [
+        "Material_0"
+      ],
+      "material_face_counts": {
+        "0": 2002991
+      },
+      "shape_keys": [],
+      "connected_components": 1,
+      "largest_components": [
+        {
+          "vertices": 1001106,
+          "world_min": [
+            -0.6858869791030884,
+            -0.5382980108261108,
+            -0.9506139755249023
+          ],
+          "world_max": [
+            0.6833739876747131,
+            0.5400450229644775,
+            0.9498860239982605
+          ],
+          "dimensions": [
+            1.3692609667778015,
+            1.0783430337905884,
+            1.9004999995231628
+          ],
+          "centroid": [
+            0.0660101494228735,
+            0.04397010487682186,
+            0.04492490052305914
+          ]
+        }
+      ],
+      "loose_vertices": 0
+    }
+  ],
+  "materials": [
+    {
+      "name": "Material_0",
+      "nodes": [
+        {
+          "name": "Principled BSDF",
+          "type": "BSDF_PRINCIPLED",
+          "image": null
+        },
+        {
+          "name": "Material Output",
+          "type": "OUTPUT_MATERIAL",
+          "image": null
+        },
+        {
+          "name": "Image Texture",
+          "type": "TEX_IMAGE",
+          "image": "Image_0"
+        },
+        {
+          "name": "Separate Color",
+          "type": "SEPARATE_COLOR",
+          "image": null
+        },
+        {
+          "name": "Image Texture.001",
+          "type": "TEX_IMAGE",
+          "image": "Image_1"
+        },
+        {
+          "name": "Normal Map",
+          "type": "NORMAL_MAP",
+          "image": null
+        },
+        {
+          "name": "Image Texture.002",
+          "type": "TEX_IMAGE",
+          "image": "Image_2"
+        }
+      ],
+      "links": [
+        {
+          "from": "Principled BSDF.BSDF",
+          "to": "Material Output.Surface"
+        },
+        {
+          "from": "Image Texture.Color",
+          "to": "Principled BSDF.Base Color"
+        },
+        {
+          "from": "Separate Color.Blue",
+          "to": "Principled BSDF.Metallic"
+        },
+        {
+          "from": "Separate Color.Green",
+          "to": "Principled BSDF.Roughness"
+        },
+        {
+          "from": "Image Texture.001.Color",
+          "to": "Separate Color.Color"
+        },
+        {
+          "from": "Normal Map.Normal",
+          "to": "Principled BSDF.Normal"
+        },
+        {
+          "from": "Image Texture.002.Color",
+          "to": "Normal Map.Color"
+        }
+      ]
+    }
+  ],
+  "images": [
+    {
+      "name": "Image_0",
+      "size": [
+        8192,
+        8192
+      ],
+      "source": "FILE",
+      "filepath": "",
+      "packed": true,
+      "packed_bytes": 38337702,
+      "packed_mb": 36.56,
+      "colorspace": "sRGB"
+    },
+    {
+      "name": "Image_1",
+      "size": [
+        4096,
+        4096
+      ],
+      "source": "FILE",
+      "filepath": "",
+      "packed": true,
+      "packed_bytes": 6532676,
+      "packed_mb": 6.23,
+      "colorspace": "Non-Color"
+    },
+    {
+      "name": "Image_2",
+      "size": [
+        4096,
+        4096
+      ],
+      "source": "FILE",
+      "filepath": "",
+      "packed": true,
+      "packed_bytes": 9613753,
+      "packed_mb": 9.17,
+      "colorspace": "Non-Color"
+    }
+  ],
+  "actions": []
+}
