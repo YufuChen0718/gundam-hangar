@@ -1,23 +1,27 @@
 {
   "asset": "sentinel",
-  "source_vertices": 14845,
-  "source_triangles": 29999,
+  "source_vertices": 15105,
+  "source_triangles": 30518,
   "part_triangles": {
-    "waistPart": 4476,
-    "chestPart": 5531,
-    "headPart": 1804,
-    "rightUpperArm": 2134,
-    "rightForearm": 1247,
-    "rightPalm": 499,
-    "leftUpperArm": 2108,
-    "leftForearm": 1260,
-    "leftPalm": 526,
-    "rightThigh": 2014,
-    "rightShin": 1059,
-    "rightFoot": 2136,
-    "leftThigh": 2079,
-    "leftShin": 1054,
-    "leftFoot": 2072
+    "waistPart": 2496,
+    "chestPart": 4311,
+    "headPart": 1506,
+    "rightUpperArm": 1951,
+    "rightForearm": 1457,
+    "rightPalm": 643,
+    "leftUpperArm": 1783,
+    "leftForearm": 1551,
+    "leftPalm": 708,
+    "rightThigh": 985,
+    "rightShin": 3009,
+    "rightFoot": 2026,
+    "leftThigh": 1011,
+    "leftShin": 3145,
+    "leftFoot": 1963,
+    "frontRightSkirtPart": 424,
+    "frontLeftSkirtPart": 406,
+    "sideRightSkirtPart": 603,
+    "sideLeftSkirtPart": 540
   },
   "source_faces_preserved": true,
   "articulated_joints": [
@@ -35,7 +39,11 @@
     "rightAnkle",
     "leftHip",
     "leftKnee",
-    "leftAnkle"
+    "leftAnkle",
+    "frontRightSkirt",
+    "frontLeftSkirt",
+    "sideRightSkirt",
+    "sideLeftSkirt"
   ],
   "joint_hierarchy": {
     "torso": "pelvis",
@@ -51,65 +59,707 @@
     "rightAnkle": "rightKnee",
     "leftHip": "pelvis",
     "leftKnee": "leftHip",
-    "leftAnkle": "leftKnee"
+    "leftAnkle": "leftKnee",
+    "frontRightSkirt": "pelvis",
+    "frontLeftSkirt": "pelvis",
+    "sideRightSkirt": "pelvis",
+    "sideLeftSkirt": "pelvis"
   },
   "sockets": [
     "rightHand",
     "leftHand",
-    "leftForearm",
+    "leftForearmSocket",
     "back"
   ],
-  "method": "Full-body 15-joint hierarchy rooted at pelvis; shared vertex skin weights computed on original vertex indices before part separation, 2-ring joint blend bands with rigid armor interiors, and topological connected-component cleanup.",
+  "cut_loops": {
+    "chestPart <-> frontLeftSkirtPart": {
+      "edges": 5,
+      "concave_fraction": 1.0,
+      "perimeter_m": 0.0547,
+      "mean_center": [
+        0.074,
+        -0.1069,
+        0.2762
+      ]
+    },
+    "chestPart <-> frontRightSkirtPart": {
+      "edges": 5,
+      "concave_fraction": 1.0,
+      "perimeter_m": 0.0709,
+      "mean_center": [
+        -0.1037,
+        -0.1092,
+        0.2875
+      ]
+    },
+    "chestPart <-> headPart": {
+      "edges": 23,
+      "concave_fraction": 0.609,
+      "perimeter_m": 0.7657,
+      "mean_center": [
+        -0.0028,
+        0.0522,
+        0.7206
+      ]
+    },
+    "chestPart <-> leftUpperArm": {
+      "edges": 32,
+      "concave_fraction": 0.969,
+      "perimeter_m": 0.4688,
+      "mean_center": [
+        0.1893,
+        0.0166,
+        0.6707
+      ]
+    },
+    "chestPart <-> rightUpperArm": {
+      "edges": 37,
+      "concave_fraction": 1.0,
+      "perimeter_m": 0.44,
+      "mean_center": [
+        -0.1907,
+        0.0499,
+        0.6587
+      ]
+    },
+    "chestPart <-> waistPart": {
+      "edges": 60,
+      "concave_fraction": 0.6,
+      "perimeter_m": 1.9985,
+      "mean_center": [
+        0.0027,
+        -0.0253,
+        0.3183
+      ]
+    },
+    "frontLeftSkirtPart <-> waistPart": {
+      "edges": 27,
+      "concave_fraction": 0.889,
+      "perimeter_m": 0.5145,
+      "mean_center": [
+        0.0507,
+        -0.1456,
+        0.2203
+      ]
+    },
+    "frontRightSkirtPart <-> sideRightSkirtPart": {
+      "edges": 1,
+      "concave_fraction": 1.0,
+      "perimeter_m": 0.0381,
+      "mean_center": [
+        -0.2019,
+        -0.1004,
+        0.2799
+      ]
+    },
+    "frontRightSkirtPart <-> waistPart": {
+      "edges": 27,
+      "concave_fraction": 0.815,
+      "perimeter_m": 0.6601,
+      "mean_center": [
+        -0.0691,
+        -0.1465,
+        0.2224
+      ]
+    },
+    "leftFoot <-> leftShin": {
+      "edges": 54,
+      "concave_fraction": 0.778,
+      "perimeter_m": 1.2502,
+      "mean_center": [
+        0.3016,
+        0.023,
+        -0.7444
+      ]
+    },
+    "leftForearm <-> leftPalm": {
+      "edges": 34,
+      "concave_fraction": 0.971,
+      "perimeter_m": 0.4628,
+      "mean_center": [
+        0.3952,
+        -0.0251,
+        0.134
+      ]
+    },
+    "leftForearm <-> leftUpperArm": {
+      "edges": 25,
+      "concave_fraction": 1.0,
+      "perimeter_m": 0.3221,
+      "mean_center": [
+        0.3258,
+        0.0484,
+        0.4576
+      ]
+    },
+    "leftShin <-> leftThigh": {
+      "edges": 93,
+      "concave_fraction": 0.022,
+      "perimeter_m": 0.7445,
+      "mean_center": [
+        0.1889,
+        -0.0011,
+        -0.1571
+      ]
+    },
+    "leftThigh <-> sideLeftSkirtPart": {
+      "edges": 20,
+      "concave_fraction": 0.15,
+      "perimeter_m": 0.3646,
+      "mean_center": [
+        0.2002,
+        -0.0221,
+        0.1188
+      ]
+    },
+    "leftThigh <-> waistPart": {
+      "edges": 44,
+      "concave_fraction": 0.636,
+      "perimeter_m": 0.9059,
+      "mean_center": [
+        0.1144,
+        -0.0031,
+        0.1086
+      ]
+    },
+    "rightFoot <-> rightShin": {
+      "edges": 50,
+      "concave_fraction": 0.86,
+      "perimeter_m": 1.0526,
+      "mean_center": [
+        -0.3028,
+        0.0099,
+        -0.7452
+      ]
+    },
+    "rightForearm <-> rightPalm": {
+      "edges": 19,
+      "concave_fraction": 0.842,
+      "perimeter_m": 0.336,
+      "mean_center": [
+        -0.3961,
+        -0.006,
+        0.1316
+      ]
+    },
+    "rightForearm <-> rightUpperArm": {
+      "edges": 22,
+      "concave_fraction": 1.0,
+      "perimeter_m": 0.2782,
+      "mean_center": [
+        -0.3386,
+        0.0512,
+        0.4414
+      ]
+    },
+    "rightShin <-> rightThigh": {
+      "edges": 84,
+      "concave_fraction": 0.0,
+      "perimeter_m": 0.7381,
+      "mean_center": [
+        -0.1864,
+        -0.0114,
+        -0.1518
+      ]
+    },
+    "rightThigh <-> sideRightSkirtPart": {
+      "edges": 13,
+      "concave_fraction": 0.231,
+      "perimeter_m": 0.3234,
+      "mean_center": [
+        -0.2022,
+        -0.028,
+        0.1193
+      ]
+    },
+    "rightThigh <-> waistPart": {
+      "edges": 44,
+      "concave_fraction": 0.75,
+      "perimeter_m": 0.9557,
+      "mean_center": [
+        -0.0891,
+        0.0029,
+        0.1047
+      ]
+    },
+    "sideLeftSkirtPart <-> waistPart": {
+      "edges": 44,
+      "concave_fraction": 0.364,
+      "perimeter_m": 1.5608,
+      "mean_center": [
+        0.1917,
+        -0.0161,
+        0.243
+      ]
+    },
+    "sideRightSkirtPart <-> waistPart": {
+      "edges": 57,
+      "concave_fraction": 0.439,
+      "perimeter_m": 1.7986,
+      "mean_center": [
+        -0.1868,
+        0.0045,
+        0.2653
+      ]
+    }
+  },
+  "knee_bisect": {
+    "plane_equation": "z = -0.158 - 0.52 * y",
+    "plane_normal": [
+      0.0,
+      0.4614,
+      0.8872
+    ],
+    "triangles_before": 29999,
+    "triangles_after": 30518,
+    "added_triangles": 519
+  },
+  "cap_stats": {
+    "waistPart": {
+      "loops_capped": 9,
+      "cap_triangles": 303
+    },
+    "chestPart": {
+      "loops_capped": 10,
+      "cap_triangles": 166
+    },
+    "headPart": {
+      "loops_capped": 1,
+      "cap_triangles": 23
+    },
+    "rightUpperArm": {
+      "loops_capped": 5,
+      "cap_triangles": 59
+    },
+    "rightForearm": {
+      "loops_capped": 2,
+      "cap_triangles": 41
+    },
+    "rightPalm": {
+      "loops_capped": 1,
+      "cap_triangles": 19
+    },
+    "leftUpperArm": {
+      "loops_capped": 4,
+      "cap_triangles": 57
+    },
+    "leftForearm": {
+      "loops_capped": 3,
+      "cap_triangles": 59
+    },
+    "leftPalm": {
+      "loops_capped": 2,
+      "cap_triangles": 34
+    },
+    "rightThigh": {
+      "loops_capped": 3,
+      "cap_triangles": 141
+    },
+    "rightShin": {
+      "loops_capped": 4,
+      "cap_triangles": 134
+    },
+    "rightFoot": {
+      "loops_capped": 3,
+      "cap_triangles": 50
+    },
+    "leftThigh": {
+      "loops_capped": 5,
+      "cap_triangles": 157
+    },
+    "leftShin": {
+      "loops_capped": 4,
+      "cap_triangles": 147
+    },
+    "leftFoot": {
+      "loops_capped": 3,
+      "cap_triangles": 54
+    },
+    "frontRightSkirtPart": {
+      "loops_capped": 3,
+      "cap_triangles": 33
+    },
+    "frontLeftSkirtPart": {
+      "loops_capped": 1,
+      "cap_triangles": 32
+    },
+    "sideRightSkirtPart": {
+      "loops_capped": 3,
+      "cap_triangles": 71
+    },
+    "sideLeftSkirtPart": {
+      "loops_capped": 2,
+      "cap_triangles": 64
+    }
+  },
+  "joint_fillers": [
+    {
+      "name": "filler_torso",
+      "parent": "pelvis",
+      "shape": "cylinder",
+      "center": [
+        0.0,
+        -0.005,
+        0.332
+      ],
+      "radius_m": 0.078,
+      "depth_m": 0.092,
+      "axis": "Z",
+      "triangles": 80
+    },
+    {
+      "name": "filler_head",
+      "parent": "torso",
+      "shape": "cylinder",
+      "center": [
+        0.0,
+        0.025,
+        0.728
+      ],
+      "radius_m": 0.046,
+      "depth_m": 0.068,
+      "axis": "Z",
+      "triangles": 80
+    },
+    {
+      "name": "filler_rightShoulder",
+      "parent": "torso",
+      "shape": "sphere",
+      "center": [
+        -0.228,
+        0.045,
+        0.642
+      ],
+      "radius_m": 0.072,
+      "depth_m": null,
+      "axis": null,
+      "triangles": 396
+    },
+    {
+      "name": "filler_leftShoulder",
+      "parent": "torso",
+      "shape": "sphere",
+      "center": [
+        0.228,
+        0.045,
+        0.642
+      ],
+      "radius_m": 0.072,
+      "depth_m": null,
+      "axis": null,
+      "triangles": 396
+    },
+    {
+      "name": "filler_rightElbow",
+      "parent": "rightShoulder",
+      "shape": "cylinder",
+      "center": [
+        -0.348,
+        0.055,
+        0.428
+      ],
+      "radius_m": 0.046,
+      "depth_m": 0.088,
+      "axis": "X",
+      "triangles": 80
+    },
+    {
+      "name": "filler_leftElbow",
+      "parent": "leftShoulder",
+      "shape": "cylinder",
+      "center": [
+        0.348,
+        0.055,
+        0.428
+      ],
+      "radius_m": 0.046,
+      "depth_m": 0.088,
+      "axis": "X",
+      "triangles": 80
+    },
+    {
+      "name": "filler_rightWrist",
+      "parent": "rightElbow",
+      "shape": "sphere",
+      "center": [
+        -0.375,
+        -0.038,
+        0.134
+      ],
+      "radius_m": 0.036,
+      "depth_m": null,
+      "axis": null,
+      "triangles": 396
+    },
+    {
+      "name": "filler_leftWrist",
+      "parent": "leftElbow",
+      "shape": "sphere",
+      "center": [
+        0.375,
+        -0.038,
+        0.134
+      ],
+      "radius_m": 0.036,
+      "depth_m": null,
+      "axis": null,
+      "triangles": 396
+    },
+    {
+      "name": "filler_rightHip",
+      "parent": "pelvis",
+      "shape": "sphere",
+      "center": [
+        -0.145,
+        0.01,
+        0.135
+      ],
+      "radius_m": 0.076,
+      "depth_m": null,
+      "axis": null,
+      "triangles": 396
+    },
+    {
+      "name": "filler_leftHip",
+      "parent": "pelvis",
+      "shape": "sphere",
+      "center": [
+        0.145,
+        0.01,
+        0.135
+      ],
+      "radius_m": 0.076,
+      "depth_m": null,
+      "axis": null,
+      "triangles": 396
+    },
+    {
+      "name": "filler_pelvisCore",
+      "parent": "pelvis",
+      "shape": "cylinder",
+      "center": [
+        0.0,
+        0.005,
+        0.215
+      ],
+      "radius_m": 0.122,
+      "depth_m": 0.185,
+      "axis": "Z",
+      "triangles": 80
+    },
+    {
+      "name": "filler_rightKnee",
+      "parent": "rightHip",
+      "shape": "cylinder",
+      "center": [
+        -0.2,
+        0.012,
+        -0.194
+      ],
+      "radius_m": 0.062,
+      "depth_m": 0.118,
+      "axis": "X",
+      "triangles": 80
+    },
+    {
+      "name": "filler_leftKnee",
+      "parent": "leftHip",
+      "shape": "cylinder",
+      "center": [
+        0.2,
+        0.012,
+        -0.194
+      ],
+      "radius_m": 0.062,
+      "depth_m": 0.118,
+      "axis": "X",
+      "triangles": 80
+    },
+    {
+      "name": "filler_rightAnkle",
+      "parent": "rightKnee",
+      "shape": "cylinder",
+      "center": [
+        -0.32,
+        0.01,
+        -0.752
+      ],
+      "radius_m": 0.058,
+      "depth_m": 0.118,
+      "axis": "X",
+      "triangles": 80
+    },
+    {
+      "name": "filler_leftAnkle",
+      "parent": "leftKnee",
+      "shape": "cylinder",
+      "center": [
+        0.32,
+        0.01,
+        -0.752
+      ],
+      "radius_m": 0.058,
+      "depth_m": 0.118,
+      "axis": "X",
+      "triangles": 80
+    }
+  ],
+  "method": "Concavity-guided dual-graph min-cut segmentation along natural panel seams, centroid boundary loop capping with InnerFrameMaterial, parented inner-frame joint fillers, and 4 hip-driven secondary skirt armor bones (plus 2-ring smooth LBS weights preserved for comparison mode).",
   "cleanup": [
     {
-      "from": "chestPart",
-      "to": "headPart",
-      "faces": 202
+      "from": "waistPart",
+      "to": "sideRightSkirtPart",
+      "faces": 9
     },
     {
       "from": "chestPart",
-      "to": "waistPart",
-      "faces": 173
+      "to": "headPart",
+      "faces": 18
     },
     {
       "from": "chestPart",
       "to": "rightUpperArm",
-      "faces": 25
+      "faces": 8
     },
     {
       "from": "chestPart",
       "to": "leftUpperArm",
-      "faces": 15
+      "faces": 6
+    },
+    {
+      "from": "chestPart",
+      "to": "rightUpperArm",
+      "faces": 4
     },
     {
       "from": "chestPart",
       "to": "leftUpperArm",
+      "faces": 4
+    },
+    {
+      "from": "chestPart",
+      "to": "sideLeftSkirtPart",
       "faces": 1
     },
     {
-      "from": "rightUpperArm",
-      "to": "chestPart",
+      "from": "rightForearm",
+      "to": "rightPalm",
+      "faces": 4
+    },
+    {
+      "from": "rightPalm",
+      "to": "sideRightSkirtPart",
+      "faces": 36
+    },
+    {
+      "from": "leftForearm",
+      "to": "sideLeftSkirtPart",
+      "faces": 1
+    },
+    {
+      "from": "leftPalm",
+      "to": "sideLeftSkirtPart",
+      "faces": 6
+    },
+    {
+      "from": "leftPalm",
+      "to": "sideLeftSkirtPart",
+      "faces": 1
+    },
+    {
+      "from": "rightThigh",
+      "to": "sideRightSkirtPart",
+      "faces": 53
+    },
+    {
+      "from": "rightThigh",
+      "to": "waistPart",
+      "faces": 43
+    },
+    {
+      "from": "rightThigh",
+      "to": "rightShin",
+      "faces": 29
+    },
+    {
+      "from": "rightThigh",
+      "to": "frontRightSkirtPart",
+      "faces": 25
+    },
+    {
+      "from": "rightThigh",
+      "to": "rightShin",
+      "faces": 6
+    },
+    {
+      "from": "rightThigh",
+      "to": "waistPart",
       "faces": 3
     },
     {
-      "from": "rightForearm",
+      "from": "leftThigh",
+      "to": "leftShin",
+      "faces": 92
+    },
+    {
+      "from": "leftThigh",
+      "to": "sideLeftSkirtPart",
+      "faces": 74
+    },
+    {
+      "from": "leftThigh",
+      "to": "waistPart",
+      "faces": 15
+    },
+    {
+      "from": "leftThigh",
+      "to": "leftShin",
+      "faces": 14
+    },
+    {
+      "from": "leftThigh",
+      "to": "frontLeftSkirtPart",
+      "faces": 14
+    },
+    {
+      "from": "leftThigh",
+      "to": "leftShin",
+      "faces": 9
+    },
+    {
+      "from": "leftThigh",
+      "to": "leftShin",
+      "faces": 7
+    },
+    {
+      "from": "frontRightSkirtPart",
       "to": "waistPart",
       "faces": 8
     },
     {
-      "from": "rightForearm",
+      "from": "frontLeftSkirtPart",
+      "to": "waistPart",
+      "faces": 11
+    },
+    {
+      "from": "frontLeftSkirtPart",
       "to": "waistPart",
       "faces": 1
     },
     {
-      "from": "rightShin",
-      "to": "rightFoot",
-      "faces": 2
+      "from": "frontLeftSkirtPart",
+      "to": "leftThigh",
+      "faces": 1
     },
     {
-      "from": "leftShin",
-      "to": "leftFoot",
-      "faces": 10
+      "from": "sideRightSkirtPart",
+      "to": "frontRightSkirtPart",
+      "faces": 55
+    },
+    {
+      "from": "sideLeftSkirtPart",
+      "to": "frontLeftSkirtPart",
+      "faces": 6
     }
   ],
   "seam_checks": [
@@ -117,7 +767,7 @@
       "id": "bind",
       "label": "Bind / Rest Pose",
       "angles_deg": {},
-      "shared_vertices_checked": 819,
+      "shared_vertices_checked": 809,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
       "pelvis_vertical_offset_m": 0.0,
@@ -132,7 +782,7 @@
         "rightElbow": 55,
         "rightWrist": 10
       },
-      "shared_vertices_checked": 819,
+      "shared_vertices_checked": 809,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
       "pelvis_vertical_offset_m": 0.0,
@@ -147,7 +797,7 @@
         "leftElbow": 65,
         "leftWrist": -15
       },
-      "shared_vertices_checked": 819,
+      "shared_vertices_checked": 809,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
       "pelvis_vertical_offset_m": 0.0,
@@ -165,7 +815,7 @@
         "leftElbow": 60,
         "leftWrist": -15
       },
-      "shared_vertices_checked": 819,
+      "shared_vertices_checked": 809,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
       "pelvis_vertical_offset_m": 0.0,
@@ -184,7 +834,7 @@
         "leftShoulder": 20,
         "leftElbow": 35
       },
-      "shared_vertices_checked": 819,
+      "shared_vertices_checked": 809,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
       "pelvis_vertical_offset_m": 0.0,
@@ -195,21 +845,21 @@
       "id": "crouch",
       "label": "Symmetric Tactical Crouch",
       "angles_deg": {
-        "rightHip": 22,
-        "rightKnee": 44,
-        "rightAnkle": 22,
-        "leftHip": 22,
-        "leftKnee": 44,
-        "leftAnkle": 22,
+        "rightHip": 20,
+        "rightKnee": 40,
+        "rightAnkle": 20,
+        "leftHip": 20,
+        "leftKnee": 40,
+        "leftAnkle": 20,
         "rightShoulder": 25,
         "rightElbow": 45,
         "leftShoulder": 20,
         "leftElbow": 40
       },
-      "shared_vertices_checked": 819,
+      "shared_vertices_checked": 809,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
-      "pelvis_vertical_offset_m": -0.0483701229095459,
+      "pelvis_vertical_offset_m": -0.05465918779373169,
       "left_foot_min_height_m": 0.0,
       "right_foot_min_height_m": 0.00013333559036254883
     },
@@ -217,12 +867,12 @@
       "id": "deepCrouchAim",
       "label": "Deep Crouch + Dual Arm Aim/Guard",
       "angles_deg": {
-        "rightHip": 32,
-        "rightKnee": 64,
-        "rightAnkle": 32,
-        "leftHip": 32,
-        "leftKnee": 64,
-        "leftAnkle": 32,
+        "rightHip": 27,
+        "rightKnee": 54,
+        "rightAnkle": 27,
+        "leftHip": 27,
+        "leftKnee": 54,
+        "leftAnkle": 27,
         "torso": 15,
         "head": -15,
         "rightShoulder": 50,
@@ -232,10 +882,10 @@
         "leftElbow": 70,
         "leftWrist": -10
       },
-      "shared_vertices_checked": 819,
+      "shared_vertices_checked": 809,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
-      "pelvis_vertical_offset_m": -0.10219728946685791,
+      "pelvis_vertical_offset_m": -0.09845709800720215,
       "left_foot_min_height_m": 0.0,
       "right_foot_min_height_m": 0.00013333559036254883
     },
@@ -259,10 +909,10 @@
         "leftElbow": 55,
         "leftWrist": 15
       },
-      "shared_vertices_checked": 819,
+      "shared_vertices_checked": 809,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
-      "pelvis_vertical_offset_m": -0.03222590684890747,
+      "pelvis_vertical_offset_m": -0.044422447681427,
       "left_foot_min_height_m": 0.0,
       "right_foot_min_height_m": 0.00013333559036254883
     },
@@ -279,25 +929,25 @@
         "leftShoulder": 55,
         "leftElbow": 80,
         "leftWrist": -20,
-        "rightHip": 30,
-        "rightKnee": 60,
-        "rightAnkle": 30,
-        "leftHip": 30,
-        "leftKnee": 60,
-        "leftAnkle": 30
+        "rightHip": 27,
+        "rightKnee": 54,
+        "rightAnkle": 27,
+        "leftHip": 27,
+        "leftKnee": 54,
+        "leftAnkle": 27
       },
-      "shared_vertices_checked": 819,
+      "shared_vertices_checked": 809,
       "max_boundary_separation_m": 0.0,
       "max_boundary_separation_mm": 0.0,
-      "pelvis_vertical_offset_m": -0.08994251489639282,
+      "pelvis_vertical_offset_m": -0.09845709800720215,
       "left_foot_min_height_m": 0.0,
       "right_foot_min_height_m": 0.00013333559036254883
     }
   ],
   "limitations": [
-    "Two-ring transition bands around the 15 joints stretch slightly at extreme angles near joint limits to preserve C0 surface continuity without opening seams.",
-    "Self-collision avoidance is not implemented, so front/side waist skirt armor and shoulder pauldrons can intersect adjacent limbs when hips or shoulders pitch past ~35 deg.",
+    "Rigid armor mode keeps every armor plate strictly rigid (zero triangle strain) with capped cuts, inner-frame joint fillers, and hip-driven secondary skirt armor; smooth LBS mode is retained as a comparison baseline.",
+    "Self-collision avoidance is analytic for front/side skirts (k * hipAngle), while extreme combined arm/shoulder postures can still graze adjacent chest or pauldron armor.",
     "Foot grounding shifts the pelvis vertically to keep the supporting foot soles on the platform during symmetric crouches; full analytic two-bone leg IK is deferred to T16.",
-    "All parts share the packed 2K PBR texture atlas; custom regional shader recoloring is deferred to T05."
+    "All outer armor parts share the packed 2K PBR texture atlas; cut caps and joint fillers use a dedicated dark metallic InnerFrameMaterial."
   ]
 }

@@ -40,7 +40,7 @@ export function createStore() {
     ready: false,
     error: null,
     mode: "sentinel",
-    skinning: "lbs",
+    skinning: "rigid",
     action: "idle",
     status: "holding",
     transitionMode: "blend",

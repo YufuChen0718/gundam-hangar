@@ -1,0 +1,2431 @@
+{
+  "url": "http://127.0.0.1:5174/",
+  "model": "gundam-sentinel.glb",
+  "defaultSkinningMode": "rigid",
+  "browser": "157.0.8103.79",
+  "checks": [
+    "gundam-sentinel.glb (Rigid armor default) and 3 external equipment GLBs loaded",
+    "all 9 test poses pass Rigid armor zero-strain (<1e-5), skirt FK, Smooth LBS comparison (<1e-5 seam, <1e-6 vs Three.js), M6 attachment (<1e-6), and foot grounding",
+    "6-view x 9-pose silhouette visible-gap pixel check completed for Rigid armor vs Smooth LBS",
+    "captured edge-length strain heat-map screenshots for torsoTwist and maxArticulation",
+    "captured before/after same-camera close-ups (LBS vs Rigid) for shoulder decal, front skirt, waist twist, and knee bend",
+    "Loadout drawer, aim/swing auto-equip, and exact M6 attachment verified in Rigid armor mode",
+    "3-way skinning toggle (Rigid armor / Smooth LBS / Three.js) and frame-time comparison verified",
+    "model switch (\"Sentinel (new)\" / \"Legacy\") verified",
+    "play/pause/reset and 390px mobile layout verified",
+    "no console errors or failed HTTP responses"
+  ],
+  "frameTimes": {
+    "rigid": {
+      "mode": "rigid",
+      "samples": 85,
+      "meanMs": 17.253,
+      "medianMs": 16.7,
+      "p95Ms": 17.5
+    },
+    "lbs": {
+      "mode": "lbs",
+      "samples": 85,
+      "meanMs": 17.451,
+      "medianMs": 16.6,
+      "p95Ms": 18.1
+    },
+    "three": {
+      "mode": "three",
+      "samples": 85,
+      "meanMs": 17.447,
+      "medianMs": 16.6,
+      "p95Ms": 17.7
+    }
+  },
+  "actionAttachmentErrors": {
+    "aim": {
+      "saber": 4.775249788392736e-16,
+      "rifle": 4.775249788392736e-16,
+      "shield": 1.2412670766236366e-16
+    },
+    "swing": {
+      "saber": 1.2719202621569003e-16,
+      "rifle": 1.2719202621569003e-16,
+      "shield": 0
+    }
+  },
+  "poseResults": [
+    {
+      "pose": "bind",
+      "angles": {
+        "pelvis": 0,
+        "torso": 0,
+        "head": 0,
+        "rightShoulder": 0,
+        "rightElbow": 0,
+        "rightWrist": 0,
+        "leftShoulder": 0,
+        "leftElbow": 0,
+        "leftWrist": 0,
+        "rightHip": 0,
+        "rightKnee": 0,
+        "rightAnkle": 0,
+        "leftHip": 0,
+        "leftKnee": 0,
+        "leftAnkle": 0
+      },
+      "skirtAngles": {
+        "frontRightSkirt": 0,
+        "frontLeftSkirt": 0,
+        "sideRightSkirt": 0,
+        "sideLeftSkirt": 0
+      },
+      "boundaryGroups": 809,
+      "skinnedVertexCount": 36663,
+      "edgeStrainRigid": {
+        "maxStrain": 0,
+        "meanStrain": 0,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 0
+      },
+      "edgeStrainLbs": {
+        "maxStrain": 0.0000825669213255647,
+        "meanStrain": 1.2925246773798367e-7,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 0
+      },
+      "lbsSeamGapMax": 1.5669961994646542e-9,
+      "lbsSeamGapMean": 5.387750665014389e-11,
+      "lbsVsThreeMaxDiff": 1.8626452047421083e-9,
+      "lbsVsThreeMeanDiff": 4.836949718371487e-10,
+      "equipmentAttachmentErrors": {
+        "saber": 0,
+        "rifle": 0,
+        "shield": 0
+      },
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.00013333559036254883
+    },
+    {
+      "pose": "rightArmAim",
+      "angles": {
+        "pelvis": 0,
+        "torso": 0,
+        "head": 0,
+        "rightShoulder": 29.999999999999996,
+        "rightElbow": 55,
+        "rightWrist": 10,
+        "leftShoulder": 0,
+        "leftElbow": 0,
+        "leftWrist": 0,
+        "rightHip": 0,
+        "rightKnee": 0,
+        "rightAnkle": 0,
+        "leftHip": 0,
+        "leftKnee": 0,
+        "leftAnkle": 0
+      },
+      "skirtAngles": {
+        "frontRightSkirt": 0,
+        "frontLeftSkirt": 0,
+        "sideRightSkirt": 0,
+        "sideLeftSkirt": 0
+      },
+      "boundaryGroups": 809,
+      "skinnedVertexCount": 36663,
+      "edgeStrainRigid": {
+        "maxStrain": 2.422387638191318e-8,
+        "meanStrain": 1.5715812629102546e-9,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 0
+      },
+      "edgeStrainLbs": {
+        "maxStrain": 9.581178622024327,
+        "meanStrain": 0.003542194478825874,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 630
+      },
+      "lbsSeamGapMax": 5.7473809293536036e-8,
+      "lbsSeamGapMean": 2.4446812494210185e-9,
+      "lbsVsThreeMaxDiff": 5.720682675407575e-8,
+      "lbsVsThreeMeanDiff": 3.085525002536981e-9,
+      "equipmentAttachmentErrors": {
+        "saber": 5.551115123125783e-17,
+        "rifle": 5.551115123125783e-17,
+        "shield": 0
+      },
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.00013333559036254883
+    },
+    {
+      "pose": "leftArmGuard",
+      "angles": {
+        "pelvis": 0,
+        "torso": 0,
+        "head": 0,
+        "rightShoulder": 0,
+        "rightElbow": 0,
+        "rightWrist": 0,
+        "leftShoulder": 35,
+        "leftElbow": 65.00000000000001,
+        "leftWrist": -14.999999999999998,
+        "rightHip": 0,
+        "rightKnee": 0,
+        "rightAnkle": 0,
+        "leftHip": 0,
+        "leftKnee": 0,
+        "leftAnkle": 0
+      },
+      "skirtAngles": {
+        "frontRightSkirt": 0,
+        "frontLeftSkirt": 0,
+        "sideRightSkirt": 0,
+        "sideLeftSkirt": 0
+      },
+      "boundaryGroups": 809,
+      "skinnedVertexCount": 36663,
+      "edgeStrainRigid": {
+        "maxStrain": 2.7711177922520113e-8,
+        "meanStrain": 1.810452187373024e-9,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 0
+      },
+      "edgeStrainLbs": {
+        "maxStrain": 8.30424162229193,
+        "meanStrain": 0.005647089630519269,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 582
+      },
+      "lbsSeamGapMax": 5.271701017719247e-8,
+      "lbsSeamGapMean": 1.5698091750110883e-9,
+      "lbsVsThreeMaxDiff": 4.8587386240470914e-8,
+      "lbsVsThreeMeanDiff": 8.957852728710944e-10,
+      "equipmentAttachmentErrors": {
+        "saber": 0,
+        "rifle": 0,
+        "shield": 7.850462293418876e-17
+      },
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.00013333559036254883
+    },
+    {
+      "pose": "dualArmReady",
+      "angles": {
+        "pelvis": 0,
+        "torso": 0,
+        "head": 0,
+        "rightShoulder": 45.00000000000001,
+        "rightElbow": 75,
+        "rightWrist": 14.999999999999998,
+        "leftShoulder": 40,
+        "leftElbow": 59.99999999999999,
+        "leftWrist": -14.999999999999998,
+        "rightHip": 0,
+        "rightKnee": 0,
+        "rightAnkle": 0,
+        "leftHip": 0,
+        "leftKnee": 0,
+        "leftAnkle": 0
+      },
+      "skirtAngles": {
+        "frontRightSkirt": 0,
+        "frontLeftSkirt": 0,
+        "sideRightSkirt": 0,
+        "sideLeftSkirt": 0
+      },
+      "boundaryGroups": 809,
+      "skinnedVertexCount": 36663,
+      "edgeStrainRigid": {
+        "maxStrain": 2.7711177922520113e-8,
+        "meanStrain": 2.9323533747601205e-9,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 0
+      },
+      "edgeStrainLbs": {
+        "maxStrain": 14.328705900578628,
+        "meanStrain": 0.01094276052050686,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 1241
+      },
+      "lbsSeamGapMax": 5.345252636878321e-8,
+      "lbsSeamGapMean": 3.657830722146859e-9,
+      "lbsVsThreeMaxDiff": 5.3923622531731344e-8,
+      "lbsVsThreeMeanDiff": 4.528556041511668e-9,
+      "equipmentAttachmentErrors": {
+        "saber": 2.2887833992611187e-16,
+        "rifle": 2.2887833992611187e-16,
+        "shield": 5.551115123125783e-17
+      },
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.00013333559036254883
+    },
+    {
+      "pose": "torsoTwist",
+      "angles": {
+        "pelvis": -14.999999999999998,
+        "torso": 29.999999999999996,
+        "head": -25,
+        "rightShoulder": 19.999999999999996,
+        "rightElbow": 40,
+        "rightWrist": 0,
+        "leftShoulder": 19.999999999999996,
+        "leftElbow": 35,
+        "leftWrist": 0,
+        "rightHip": 0,
+        "rightKnee": 0,
+        "rightAnkle": 0,
+        "leftHip": 0,
+        "leftKnee": 0,
+        "leftAnkle": 0
+      },
+      "skirtAngles": {
+        "frontRightSkirt": 0,
+        "frontLeftSkirt": 0,
+        "sideRightSkirt": 0,
+        "sideLeftSkirt": 0
+      },
+      "boundaryGroups": 809,
+      "skinnedVertexCount": 36663,
+      "edgeStrainRigid": {
+        "maxStrain": 3.150821616254915e-8,
+        "meanStrain": 9.29609594272441e-9,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 0
+      },
+      "edgeStrainLbs": {
+        "maxStrain": 7.417242578822134,
+        "meanStrain": 0.012623448021859015,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 1684
+      },
+      "lbsSeamGapMax": 6.595340633553793e-8,
+      "lbsSeamGapMean": 6.867092860179902e-9,
+      "lbsVsThreeMaxDiff": 5.473714497938486e-8,
+      "lbsVsThreeMeanDiff": 6.079179779532678e-9,
+      "equipmentAttachmentErrors": {
+        "saber": 2.2887833992611187e-16,
+        "rifle": 2.2887833992611187e-16,
+        "shield": 2.482534153247273e-16
+      },
+      "leftFootMinY": 0,
+      "rightFootMinY": 0.00013333559036254883
+    },
+    {
+      "pose": "crouch",
+      "angles": {
+        "pelvis": 0,
+        "torso": 0,
+        "head": 0,
+        "rightShoulder": 25,
+        "rightElbow": 45.00000000000001,
+        "rightWrist": 0,
+        "leftShoulder": 19.999999999999996,
+        "leftElbow": 40,
+        "leftWrist": 0,
+        "rightHip": 19.999999999999996,
+        "rightKnee": 40,
+        "rightAnkle": 19.999999999999996,
+        "leftHip": 19.999999999999996,
+        "leftKnee": 40,
+        "leftAnkle": 19.999999999999996
+      },
+      "skirtAngles": {
+        "frontRightSkirt": 9.999999999999998,
+        "frontLeftSkirt": 9.999999999999998,
+        "sideRightSkirt": 5.999999999999999,
+        "sideLeftSkirt": 5.999999999999999
+      },
+      "boundaryGroups": 809,
+      "skinnedVertexCount": 36663,
+      "edgeStrainRigid": {
+        "maxStrain": 3.016464952896495e-8,
+        "meanStrain": 2.9931802914504013e-9,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 0
+      },
+      "edgeStrainLbs": {
+        "maxStrain": 189.41159091656056,
+        "meanStrain": 0.06388640939263393,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 3716
+      },
+      "lbsSeamGapMax": 5.96101649340339e-8,
+      "lbsSeamGapMean": 6.6031853355864465e-9,
+      "lbsVsThreeMaxDiff": 5.237935601740249e-8,
+      "lbsVsThreeMeanDiff": 1.5728549586810794e-8,
+      "equipmentAttachmentErrors": {
+        "saber": 5.551115123125783e-17,
+        "rifle": 5.551115123125783e-17,
+        "shield": 1.1443916996305594e-16
+      },
+      "leftFootMinY": -2.7755575615628914e-17,
+      "rightFootMinY": 0.00013333559036252107
+    },
+    {
+      "pose": "deepCrouchAim",
+      "angles": {
+        "pelvis": 0,
+        "torso": 14.999999999999998,
+        "head": -14.999999999999998,
+        "rightShoulder": 50.00000000000001,
+        "rightElbow": 79.99999999999999,
+        "rightWrist": 14.999999999999998,
+        "leftShoulder": 40,
+        "leftElbow": 70,
+        "leftWrist": -10,
+        "rightHip": 26.999999999999996,
+        "rightKnee": 54,
+        "rightAnkle": 26.999999999999996,
+        "leftHip": 26.999999999999996,
+        "leftKnee": 54,
+        "leftAnkle": 26.999999999999996
+      },
+      "skirtAngles": {
+        "frontRightSkirt": 13.499999999999998,
+        "frontLeftSkirt": 13.499999999999998,
+        "sideRightSkirt": 8.099999999999998,
+        "sideLeftSkirt": 8.099999999999998
+      },
+      "boundaryGroups": 809,
+      "skinnedVertexCount": 36663,
+      "edgeStrainRigid": {
+        "maxStrain": 3.469452015087403e-8,
+        "meanStrain": 5.554860641752153e-9,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 0
+      },
+      "edgeStrainLbs": {
+        "maxStrain": 251.47014670990168,
+        "meanStrain": 0.09402721186533733,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 4870
+      },
+      "lbsSeamGapMax": 8.378094450517308e-8,
+      "lbsSeamGapMean": 1.3663469032300808e-8,
+      "lbsVsThreeMaxDiff": 5.435099987637254e-8,
+      "lbsVsThreeMeanDiff": 3.3078248033624144e-8,
+      "equipmentAttachmentErrors": {
+        "saber": 7.364386412590295e-16,
+        "rifle": 7.364386412590295e-16,
+        "shield": 1.3877787807814457e-16
+      },
+      "leftFootMinY": -2.7755575615628914e-17,
+      "rightFootMinY": 0.00013333559036252107
+    },
+    {
+      "pose": "fullBodyTwistCrouch",
+      "angles": {
+        "pelvis": 19.999999999999996,
+        "torso": -29.999999999999996,
+        "head": 25,
+        "rightShoulder": 40,
+        "rightElbow": 65.00000000000001,
+        "rightWrist": -10,
+        "leftShoulder": 29.999999999999996,
+        "leftElbow": 55,
+        "leftWrist": 14.999999999999998,
+        "rightHip": 18.000000000000004,
+        "rightKnee": 35.99999999999999,
+        "rightAnkle": 18.000000000000004,
+        "leftHip": 18.000000000000004,
+        "leftKnee": 35.99999999999999,
+        "leftAnkle": 18.000000000000004
+      },
+      "skirtAngles": {
+        "frontRightSkirt": 9.000000000000002,
+        "frontLeftSkirt": 9.000000000000002,
+        "sideRightSkirt": 5.400000000000001,
+        "sideLeftSkirt": 5.400000000000001
+      },
+      "boundaryGroups": 809,
+      "skinnedVertexCount": 36663,
+      "edgeStrainRigid": {
+        "maxStrain": 3.1167470298266924e-8,
+        "meanStrain": 9.377092096428207e-9,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 0
+      },
+      "edgeStrainLbs": {
+        "maxStrain": 171.1175945575748,
+        "meanStrain": 0.0684522059570195,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 4815
+      },
+      "lbsSeamGapMax": 7.687411675898358e-8,
+      "lbsSeamGapMean": 1.4488502397222177e-8,
+      "lbsVsThreeMaxDiff": 6.245895999312338e-8,
+      "lbsVsThreeMeanDiff": 3.8113440276027464e-8,
+      "equipmentAttachmentErrors": {
+        "saber": 1.1102230246251565e-16,
+        "rifle": 5.551115123125783e-17,
+        "shield": 2.7194799110210365e-16
+      },
+      "leftFootMinY": 2.7755575615628914e-17,
+      "rightFootMinY": 0.00013333559036257658
+    },
+    {
+      "pose": "maxArticulation",
+      "angles": {
+        "pelvis": -25,
+        "torso": 35,
+        "head": -35,
+        "rightShoulder": 55,
+        "rightElbow": 85,
+        "rightWrist": 19.999999999999996,
+        "leftShoulder": 55,
+        "leftElbow": 79.99999999999999,
+        "leftWrist": -19.999999999999996,
+        "rightHip": 26.999999999999996,
+        "rightKnee": 54,
+        "rightAnkle": 26.999999999999996,
+        "leftHip": 26.999999999999996,
+        "leftKnee": 54,
+        "leftAnkle": 26.999999999999996
+      },
+      "skirtAngles": {
+        "frontRightSkirt": 13.499999999999998,
+        "frontLeftSkirt": 13.499999999999998,
+        "sideRightSkirt": 8.099999999999998,
+        "sideLeftSkirt": 8.099999999999998
+      },
+      "boundaryGroups": 809,
+      "skinnedVertexCount": 36663,
+      "edgeStrainRigid": {
+        "maxStrain": 3.3845516884250604e-8,
+        "meanStrain": 1.516200232880615e-8,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 0
+      },
+      "edgeStrainLbs": {
+        "maxStrain": 251.47014865205387,
+        "meanStrain": 0.10227765270907671,
+        "triangleCount": 30518,
+        "strainedTrianglesOver1Pct": 4946
+      },
+      "lbsSeamGapMax": 7.238627584769133e-8,
+      "lbsSeamGapMean": 1.7115311211149364e-8,
+      "lbsVsThreeMaxDiff": 5.8133890655529764e-8,
+      "lbsVsThreeMeanDiff": 3.361689923530246e-8,
+      "equipmentAttachmentErrors": {
+        "saber": 3.1401849173675503e-16,
+        "rifle": 3.1401849173675503e-16,
+        "shield": 1.0007415106216802e-16
+      },
+      "leftFootMinY": -2.7755575615628914e-17,
+      "rightFootMinY": 0.00013333559036252107
+    }
+  ],
+  "visibleGapReport": [
+    {
+      "pose": "bind",
+      "rigidTotalHolePixels": 746,
+      "rigidNoFillersTotalHolePixels": 794,
+      "lbsTotalHolePixels": 794,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 24,
+          "bodyPixels": 42933,
+          "componentCount": 7,
+          "largestComponentPx": 6,
+          "topComponents": [
+            {
+              "size": 6,
+              "cx": 177,
+              "cy": 238
+            },
+            {
+              "size": 6,
+              "cx": 333,
+              "cy": 237
+            },
+            {
+              "size": 6,
+              "cx": 302,
+              "cy": 232
+            },
+            {
+              "size": 2,
+              "cx": 346,
+              "cy": 434
+            },
+            {
+              "size": 2,
+              "cx": 214,
+              "cy": 138
+            }
+          ]
+        },
+        {
+          "view": "back",
+          "holePixels": 24,
+          "bodyPixels": 43654,
+          "componentCount": 7,
+          "largestComponentPx": 9,
+          "topComponents": [
+            {
+              "size": 9,
+              "cx": 181,
+              "cy": 238
+            },
+            {
+              "size": 8,
+              "cx": 332,
+              "cy": 238
+            },
+            {
+              "size": 3,
+              "cx": 209,
+              "cy": 232
+            },
+            {
+              "size": 1,
+              "cx": 184,
+              "cy": 239
+            },
+            {
+              "size": 1,
+              "cx": 246,
+              "cy": 238
+            }
+          ]
+        },
+        {
+          "view": "right",
+          "holePixels": 3,
+          "bodyPixels": 27814,
+          "componentCount": 3,
+          "largestComponentPx": 1,
+          "topComponents": [
+            {
+              "size": 1,
+              "cx": 211,
+              "cy": 171
+            },
+            {
+              "size": 1,
+              "cx": 229,
+              "cy": 160
+            },
+            {
+              "size": 1,
+              "cx": 230,
+              "cy": 157
+            }
+          ]
+        },
+        {
+          "view": "left",
+          "holePixels": 5,
+          "bodyPixels": 27749,
+          "componentCount": 2,
+          "largestComponentPx": 4,
+          "topComponents": [
+            {
+              "size": 4,
+              "cx": 281,
+              "cy": 158
+            },
+            {
+              "size": 1,
+              "cx": 299,
+              "cy": 170
+            }
+          ]
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 330,
+          "bodyPixels": 42580,
+          "componentCount": 5,
+          "largestComponentPx": 313,
+          "topComponents": [
+            {
+              "size": 313,
+              "cx": 218,
+              "cy": 178
+            },
+            {
+              "size": 8,
+              "cx": 263,
+              "cy": 106
+            },
+            {
+              "size": 7,
+              "cx": 232,
+              "cy": 102
+            },
+            {
+              "size": 1,
+              "cx": 185,
+              "cy": 428
+            },
+            {
+              "size": 1,
+              "cx": 206,
+              "cy": 238
+            }
+          ]
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 360,
+          "bodyPixels": 42546,
+          "componentCount": 8,
+          "largestComponentPx": 331,
+          "topComponents": [
+            {
+              "size": 331,
+              "cx": 292,
+              "cy": 178
+            },
+            {
+              "size": 10,
+              "cx": 278,
+              "cy": 103
+            },
+            {
+              "size": 9,
+              "cx": 248,
+              "cy": 106
+            },
+            {
+              "size": 4,
+              "cx": 304,
+              "cy": 238
+            },
+            {
+              "size": 2,
+              "cx": 291,
+              "cy": 447
+            }
+          ]
+        }
+      ],
+      "rigidNoFillersPerView": [
+        {
+          "view": "front",
+          "holePixels": 34,
+          "componentCount": 8
+        },
+        {
+          "view": "back",
+          "holePixels": 34,
+          "componentCount": 7
+        },
+        {
+          "view": "right",
+          "holePixels": 3,
+          "componentCount": 3
+        },
+        {
+          "view": "left",
+          "holePixels": 5,
+          "componentCount": 2
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 343,
+          "componentCount": 6
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 375,
+          "componentCount": 9
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 34,
+          "componentCount": 8
+        },
+        {
+          "view": "back",
+          "holePixels": 34,
+          "componentCount": 7
+        },
+        {
+          "view": "right",
+          "holePixels": 3,
+          "componentCount": 3
+        },
+        {
+          "view": "left",
+          "holePixels": 5,
+          "componentCount": 2
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 343,
+          "componentCount": 6
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 375,
+          "componentCount": 9
+        }
+      ]
+    },
+    {
+      "pose": "rightArmAim",
+      "rigidTotalHolePixels": 404,
+      "rigidNoFillersTotalHolePixels": 438,
+      "lbsTotalHolePixels": 440,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 15,
+          "bodyPixels": 41895,
+          "componentCount": 4,
+          "largestComponentPx": 6,
+          "topComponents": [
+            {
+              "size": 6,
+              "cx": 333,
+              "cy": 237
+            },
+            {
+              "size": 6,
+              "cx": 302,
+              "cy": 232
+            },
+            {
+              "size": 2,
+              "cx": 346,
+              "cy": 434
+            },
+            {
+              "size": 1,
+              "cx": 330,
+              "cy": 238
+            }
+          ]
+        },
+        {
+          "view": "back",
+          "holePixels": 16,
+          "bodyPixels": 41635,
+          "componentCount": 6,
+          "largestComponentPx": 9,
+          "topComponents": [
+            {
+              "size": 9,
+              "cx": 181,
+              "cy": 238
+            },
+            {
+              "size": 3,
+              "cx": 209,
+              "cy": 232
+            },
+            {
+              "size": 1,
+              "cx": 184,
+              "cy": 239
+            },
+            {
+              "size": 1,
+              "cx": 246,
+              "cy": 238
+            },
+            {
+              "size": 1,
+              "cx": 210,
+              "cy": 235
+            }
+          ]
+        },
+        {
+          "view": "right",
+          "holePixels": 1,
+          "bodyPixels": 30065,
+          "componentCount": 1,
+          "largestComponentPx": 1,
+          "topComponents": [
+            {
+              "size": 1,
+              "cx": 211,
+              "cy": 171
+            }
+          ]
+        },
+        {
+          "view": "left",
+          "holePixels": 5,
+          "bodyPixels": 29293,
+          "componentCount": 2,
+          "largestComponentPx": 4,
+          "topComponents": [
+            {
+              "size": 4,
+              "cx": 281,
+              "cy": 158
+            },
+            {
+              "size": 1,
+              "cx": 299,
+              "cy": 170
+            }
+          ]
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 9,
+          "bodyPixels": 39376,
+          "componentCount": 2,
+          "largestComponentPx": 8,
+          "topComponents": [
+            {
+              "size": 8,
+              "cx": 263,
+              "cy": 106
+            },
+            {
+              "size": 1,
+              "cx": 185,
+              "cy": 428
+            }
+          ]
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 358,
+          "bodyPixels": 43292,
+          "componentCount": 7,
+          "largestComponentPx": 331,
+          "topComponents": [
+            {
+              "size": 331,
+              "cx": 292,
+              "cy": 178
+            },
+            {
+              "size": 10,
+              "cx": 278,
+              "cy": 103
+            },
+            {
+              "size": 9,
+              "cx": 248,
+              "cy": 106
+            },
+            {
+              "size": 4,
+              "cx": 304,
+              "cy": 238
+            },
+            {
+              "size": 2,
+              "cx": 291,
+              "cy": 447
+            }
+          ]
+        }
+      ],
+      "rigidNoFillersPerView": [
+        {
+          "view": "front",
+          "holePixels": 21,
+          "componentCount": 5
+        },
+        {
+          "view": "back",
+          "holePixels": 26,
+          "componentCount": 6
+        },
+        {
+          "view": "right",
+          "holePixels": 1,
+          "componentCount": 1
+        },
+        {
+          "view": "left",
+          "holePixels": 7,
+          "componentCount": 3
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 22,
+          "componentCount": 3
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 361,
+          "componentCount": 8
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 23,
+          "componentCount": 6
+        },
+        {
+          "view": "back",
+          "holePixels": 26,
+          "componentCount": 6
+        },
+        {
+          "view": "right",
+          "holePixels": 1,
+          "componentCount": 1
+        },
+        {
+          "view": "left",
+          "holePixels": 7,
+          "componentCount": 3
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 22,
+          "componentCount": 3
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 361,
+          "componentCount": 8
+        }
+      ]
+    },
+    {
+      "pose": "leftArmGuard",
+      "rigidTotalHolePixels": 375,
+      "rigidNoFillersTotalHolePixels": 408,
+      "lbsTotalHolePixels": 408,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 22,
+          "bodyPixels": 42240,
+          "componentCount": 7,
+          "largestComponentPx": 6,
+          "topComponents": [
+            {
+              "size": 6,
+              "cx": 177,
+              "cy": 238
+            },
+            {
+              "size": 6,
+              "cx": 302,
+              "cy": 232
+            },
+            {
+              "size": 3,
+              "cx": 297,
+              "cy": 139
+            },
+            {
+              "size": 2,
+              "cx": 346,
+              "cy": 434
+            },
+            {
+              "size": 2,
+              "cx": 214,
+              "cy": 138
+            }
+          ]
+        },
+        {
+          "view": "back",
+          "holePixels": 15,
+          "bodyPixels": 41776,
+          "componentCount": 6,
+          "largestComponentPx": 8,
+          "topComponents": [
+            {
+              "size": 8,
+              "cx": 332,
+              "cy": 238
+            },
+            {
+              "size": 3,
+              "cx": 209,
+              "cy": 232
+            },
+            {
+              "size": 1,
+              "cx": 246,
+              "cy": 238
+            },
+            {
+              "size": 1,
+              "cx": 210,
+              "cy": 235
+            },
+            {
+              "size": 1,
+              "cx": 306,
+              "cy": 231
+            }
+          ]
+        },
+        {
+          "view": "right",
+          "holePixels": 3,
+          "bodyPixels": 29302,
+          "componentCount": 3,
+          "largestComponentPx": 1,
+          "topComponents": [
+            {
+              "size": 1,
+              "cx": 211,
+              "cy": 171
+            },
+            {
+              "size": 1,
+              "cx": 229,
+              "cy": 160
+            },
+            {
+              "size": 1,
+              "cx": 230,
+              "cy": 157
+            }
+          ]
+        },
+        {
+          "view": "left",
+          "holePixels": 1,
+          "bodyPixels": 30077,
+          "componentCount": 1,
+          "largestComponentPx": 1,
+          "topComponents": [
+            {
+              "size": 1,
+              "cx": 299,
+              "cy": 170
+            }
+          ]
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 330,
+          "bodyPixels": 43491,
+          "componentCount": 5,
+          "largestComponentPx": 313,
+          "topComponents": [
+            {
+              "size": 313,
+              "cx": 218,
+              "cy": 178
+            },
+            {
+              "size": 8,
+              "cx": 263,
+              "cy": 106
+            },
+            {
+              "size": 7,
+              "cx": 232,
+              "cy": 102
+            },
+            {
+              "size": 1,
+              "cx": 185,
+              "cy": 428
+            },
+            {
+              "size": 1,
+              "cx": 206,
+              "cy": 238
+            }
+          ]
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 4,
+          "bodyPixels": 39252,
+          "componentCount": 2,
+          "largestComponentPx": 2,
+          "topComponents": [
+            {
+              "size": 2,
+              "cx": 291,
+              "cy": 447
+            },
+            {
+              "size": 2,
+              "cx": 227,
+              "cy": 173
+            }
+          ]
+        }
+      ],
+      "rigidNoFillersPerView": [
+        {
+          "view": "front",
+          "holePixels": 30,
+          "componentCount": 7
+        },
+        {
+          "view": "back",
+          "holePixels": 24,
+          "componentCount": 5
+        },
+        {
+          "view": "right",
+          "holePixels": 3,
+          "componentCount": 3
+        },
+        {
+          "view": "left",
+          "holePixels": 1,
+          "componentCount": 1
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 332,
+          "componentCount": 5
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 18,
+          "componentCount": 3
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 30,
+          "componentCount": 7
+        },
+        {
+          "view": "back",
+          "holePixels": 24,
+          "componentCount": 5
+        },
+        {
+          "view": "right",
+          "holePixels": 3,
+          "componentCount": 3
+        },
+        {
+          "view": "left",
+          "holePixels": 1,
+          "componentCount": 1
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 332,
+          "componentCount": 5
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 18,
+          "componentCount": 3
+        }
+      ]
+    },
+    {
+      "pose": "dualArmReady",
+      "rigidTotalHolePixels": 39,
+      "rigidNoFillersTotalHolePixels": 59,
+      "lbsTotalHolePixels": 61,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 19,
+          "bodyPixels": 41850,
+          "componentCount": 5,
+          "largestComponentPx": 6,
+          "topComponents": [
+            {
+              "size": 6,
+              "cx": 302,
+              "cy": 232
+            },
+            {
+              "size": 6,
+              "cx": 179,
+              "cy": 104
+            },
+            {
+              "size": 3,
+              "cx": 297,
+              "cy": 139
+            },
+            {
+              "size": 2,
+              "cx": 346,
+              "cy": 434
+            },
+            {
+              "size": 2,
+              "cx": 294,
+              "cy": 108
+            }
+          ]
+        },
+        {
+          "view": "back",
+          "holePixels": 7,
+          "bodyPixels": 39924,
+          "componentCount": 5,
+          "largestComponentPx": 3,
+          "topComponents": [
+            {
+              "size": 3,
+              "cx": 209,
+              "cy": 232
+            },
+            {
+              "size": 1,
+              "cx": 246,
+              "cy": 238
+            },
+            {
+              "size": 1,
+              "cx": 210,
+              "cy": 235
+            },
+            {
+              "size": 1,
+              "cx": 306,
+              "cy": 231
+            },
+            {
+              "size": 1,
+              "cx": 211,
+              "cy": 141
+            }
+          ]
+        },
+        {
+          "view": "right",
+          "holePixels": 1,
+          "bodyPixels": 31664,
+          "componentCount": 1,
+          "largestComponentPx": 1,
+          "topComponents": [
+            {
+              "size": 1,
+              "cx": 211,
+              "cy": 171
+            }
+          ]
+        },
+        {
+          "view": "left",
+          "holePixels": 1,
+          "bodyPixels": 30426,
+          "componentCount": 1,
+          "largestComponentPx": 1,
+          "topComponents": [
+            {
+              "size": 1,
+              "cx": 299,
+              "cy": 170
+            }
+          ]
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 9,
+          "bodyPixels": 40072,
+          "componentCount": 2,
+          "largestComponentPx": 8,
+          "topComponents": [
+            {
+              "size": 8,
+              "cx": 263,
+              "cy": 106
+            },
+            {
+              "size": 1,
+              "cx": 185,
+              "cy": 428
+            }
+          ]
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 2,
+          "bodyPixels": 40356,
+          "componentCount": 1,
+          "largestComponentPx": 2,
+          "topComponents": [
+            {
+              "size": 2,
+              "cx": 291,
+              "cy": 447
+            }
+          ]
+        }
+      ],
+      "rigidNoFillersPerView": [
+        {
+          "view": "front",
+          "holePixels": 23,
+          "componentCount": 5
+        },
+        {
+          "view": "back",
+          "holePixels": 16,
+          "componentCount": 4
+        },
+        {
+          "view": "right",
+          "holePixels": 3,
+          "componentCount": 2
+        },
+        {
+          "view": "left",
+          "holePixels": 1,
+          "componentCount": 1
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 11,
+          "componentCount": 2
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 5,
+          "componentCount": 3
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 25,
+          "componentCount": 6
+        },
+        {
+          "view": "back",
+          "holePixels": 16,
+          "componentCount": 4
+        },
+        {
+          "view": "right",
+          "holePixels": 3,
+          "componentCount": 2
+        },
+        {
+          "view": "left",
+          "holePixels": 1,
+          "componentCount": 1
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 11,
+          "componentCount": 2
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 5,
+          "componentCount": 3
+        }
+      ]
+    },
+    {
+      "pose": "torsoTwist",
+      "rigidTotalHolePixels": 590,
+      "rigidNoFillersTotalHolePixels": 663,
+      "lbsTotalHolePixels": 634,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 4,
+          "bodyPixels": 40945,
+          "componentCount": 4,
+          "largestComponentPx": 1,
+          "topComponents": [
+            {
+              "size": 1,
+              "cx": 346,
+              "cy": 441
+            },
+            {
+              "size": 1,
+              "cx": 345,
+              "cy": 440
+            },
+            {
+              "size": 1,
+              "cx": 344,
+              "cy": 439
+            },
+            {
+              "size": 1,
+              "cx": 343,
+              "cy": 438
+            }
+          ]
+        },
+        {
+          "view": "back",
+          "holePixels": 523,
+          "bodyPixels": 41321,
+          "componentCount": 2,
+          "largestComponentPx": 519,
+          "topComponents": [
+            {
+              "size": 519,
+              "cx": 296,
+              "cy": 169
+            },
+            {
+              "size": 4,
+              "cx": 303,
+              "cy": 233
+            }
+          ]
+        },
+        {
+          "view": "right",
+          "holePixels": 16,
+          "bodyPixels": 35945,
+          "componentCount": 4,
+          "largestComponentPx": 12,
+          "topComponents": [
+            {
+              "size": 12,
+              "cx": 298,
+              "cy": 182
+            },
+            {
+              "size": 2,
+              "cx": 305,
+              "cy": 184
+            },
+            {
+              "size": 1,
+              "cx": 210,
+              "cy": 168
+            },
+            {
+              "size": 1,
+              "cx": 233,
+              "cy": 102
+            }
+          ]
+        },
+        {
+          "view": "left",
+          "holePixels": 1,
+          "bodyPixels": 34116,
+          "componentCount": 1,
+          "largestComponentPx": 1,
+          "topComponents": [
+            {
+              "size": 1,
+              "cx": 247,
+              "cy": 66
+            }
+          ]
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0,
+          "bodyPixels": 38168,
+          "componentCount": 0,
+          "largestComponentPx": 0,
+          "topComponents": []
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 46,
+          "bodyPixels": 42122,
+          "componentCount": 6,
+          "largestComponentPx": 39,
+          "topComponents": [
+            {
+              "size": 39,
+              "cx": 302,
+              "cy": 156
+            },
+            {
+              "size": 2,
+              "cx": 220,
+              "cy": 283
+            },
+            {
+              "size": 2,
+              "cx": 248,
+              "cy": 107
+            },
+            {
+              "size": 1,
+              "cx": 219,
+              "cy": 279
+            },
+            {
+              "size": 1,
+              "cx": 313,
+              "cy": 90
+            }
+          ]
+        }
+      ],
+      "rigidNoFillersPerView": [
+        {
+          "view": "front",
+          "holePixels": 13,
+          "componentCount": 10
+        },
+        {
+          "view": "back",
+          "holePixels": 533,
+          "componentCount": 3
+        },
+        {
+          "view": "right",
+          "holePixels": 16,
+          "componentCount": 4
+        },
+        {
+          "view": "left",
+          "holePixels": 30,
+          "componentCount": 3
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 21,
+          "componentCount": 2
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 50,
+          "componentCount": 7
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 7,
+          "componentCount": 5
+        },
+        {
+          "view": "back",
+          "holePixels": 542,
+          "componentCount": 2
+        },
+        {
+          "view": "right",
+          "holePixels": 16,
+          "componentCount": 4
+        },
+        {
+          "view": "left",
+          "holePixels": 19,
+          "componentCount": 2
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0,
+          "componentCount": 0
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 50,
+          "componentCount": 7
+        }
+      ]
+    },
+    {
+      "pose": "crouch",
+      "rigidTotalHolePixels": 62,
+      "rigidNoFillersTotalHolePixels": 164,
+      "lbsTotalHolePixels": 73,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 14,
+          "bodyPixels": 39135,
+          "componentCount": 8,
+          "largestComponentPx": 3,
+          "topComponents": [
+            {
+              "size": 3,
+              "cx": 297,
+              "cy": 150
+            },
+            {
+              "size": 2,
+              "cx": 345,
+              "cy": 432
+            },
+            {
+              "size": 2,
+              "cx": 303,
+              "cy": 236
+            },
+            {
+              "size": 2,
+              "cx": 294,
+              "cy": 119
+            },
+            {
+              "size": 2,
+              "cx": 295,
+              "cy": 116
+            }
+          ]
+        },
+        {
+          "view": "back",
+          "holePixels": 1,
+          "bodyPixels": 39496,
+          "componentCount": 1,
+          "largestComponentPx": 1,
+          "topComponents": [
+            {
+              "size": 1,
+              "cx": 209,
+              "cy": 246
+            }
+          ]
+        },
+        {
+          "view": "right",
+          "holePixels": 0,
+          "bodyPixels": 31262,
+          "componentCount": 0,
+          "largestComponentPx": 0,
+          "topComponents": []
+        },
+        {
+          "view": "left",
+          "holePixels": 12,
+          "bodyPixels": 30079,
+          "componentCount": 6,
+          "largestComponentPx": 7,
+          "topComponents": [
+            {
+              "size": 7,
+              "cx": 289,
+              "cy": 112
+            },
+            {
+              "size": 1,
+              "cx": 222,
+              "cy": 200
+            },
+            {
+              "size": 1,
+              "cx": 225,
+              "cy": 199
+            },
+            {
+              "size": 1,
+              "cx": 299,
+              "cy": 182
+            },
+            {
+              "size": 1,
+              "cx": 288,
+              "cy": 116
+            }
+          ]
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 12,
+          "bodyPixels": 39810,
+          "componentCount": 1,
+          "largestComponentPx": 12,
+          "topComponents": [
+            {
+              "size": 12,
+              "cx": 231,
+              "cy": 114
+            }
+          ]
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 23,
+          "bodyPixels": 40099,
+          "componentCount": 3,
+          "largestComponentPx": 15,
+          "topComponents": [
+            {
+              "size": 15,
+              "cx": 279,
+              "cy": 114
+            },
+            {
+              "size": 6,
+              "cx": 248,
+              "cy": 117
+            },
+            {
+              "size": 2,
+              "cx": 301,
+              "cy": 445
+            }
+          ]
+        }
+      ],
+      "rigidNoFillersPerView": [
+        {
+          "view": "front",
+          "holePixels": 18,
+          "componentCount": 11
+        },
+        {
+          "view": "back",
+          "holePixels": 1,
+          "componentCount": 1
+        },
+        {
+          "view": "right",
+          "holePixels": 52,
+          "componentCount": 2
+        },
+        {
+          "view": "left",
+          "holePixels": 56,
+          "componentCount": 10
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 12,
+          "componentCount": 1
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 25,
+          "componentCount": 4
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 16,
+          "componentCount": 8
+        },
+        {
+          "view": "back",
+          "holePixels": 8,
+          "componentCount": 3
+        },
+        {
+          "view": "right",
+          "holePixels": 0,
+          "componentCount": 0
+        },
+        {
+          "view": "left",
+          "holePixels": 13,
+          "componentCount": 6
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 12,
+          "componentCount": 1
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 24,
+          "componentCount": 3
+        }
+      ]
+    },
+    {
+      "pose": "deepCrouchAim",
+      "rigidTotalHolePixels": 133,
+      "rigidNoFillersTotalHolePixels": 324,
+      "lbsTotalHolePixels": 164,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 60,
+          "bodyPixels": 39623,
+          "componentCount": 4,
+          "largestComponentPx": 56,
+          "topComponents": [
+            {
+              "size": 56,
+              "cx": 200,
+              "cy": 112
+            },
+            {
+              "size": 2,
+              "cx": 344,
+              "cy": 430
+            },
+            {
+              "size": 1,
+              "cx": 337,
+              "cy": 410
+            },
+            {
+              "size": 1,
+              "cx": 304,
+              "cy": 244
+            }
+          ]
+        },
+        {
+          "view": "back",
+          "holePixels": 64,
+          "bodyPixels": 38886,
+          "componentCount": 6,
+          "largestComponentPx": 53,
+          "topComponents": [
+            {
+              "size": 53,
+              "cx": 178,
+              "cy": 145
+            },
+            {
+              "size": 5,
+              "cx": 237,
+              "cy": 122
+            },
+            {
+              "size": 2,
+              "cx": 207,
+              "cy": 250
+            },
+            {
+              "size": 2,
+              "cx": 206,
+              "cy": 248
+            },
+            {
+              "size": 1,
+              "cx": 246,
+              "cy": 259
+            }
+          ]
+        },
+        {
+          "view": "right",
+          "holePixels": 3,
+          "bodyPixels": 31998,
+          "componentCount": 2,
+          "largestComponentPx": 2,
+          "topComponents": [
+            {
+              "size": 2,
+              "cx": 231,
+              "cy": 123
+            },
+            {
+              "size": 1,
+              "cx": 233,
+              "cy": 123
+            }
+          ]
+        },
+        {
+          "view": "left",
+          "holePixels": 0,
+          "bodyPixels": 31806,
+          "componentCount": 0,
+          "largestComponentPx": 0,
+          "topComponents": []
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 0,
+          "bodyPixels": 39292,
+          "componentCount": 0,
+          "largestComponentPx": 0,
+          "topComponents": []
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 6,
+          "bodyPixels": 41308,
+          "componentCount": 2,
+          "largestComponentPx": 4,
+          "topComponents": [
+            {
+              "size": 4,
+              "cx": 248,
+              "cy": 127
+            },
+            {
+              "size": 2,
+              "cx": 304,
+              "cy": 444
+            }
+          ]
+        }
+      ],
+      "rigidNoFillersPerView": [
+        {
+          "view": "front",
+          "holePixels": 80,
+          "componentCount": 5
+        },
+        {
+          "view": "back",
+          "holePixels": 65,
+          "componentCount": 7
+        },
+        {
+          "view": "right",
+          "holePixels": 82,
+          "componentCount": 8
+        },
+        {
+          "view": "left",
+          "holePixels": 82,
+          "componentCount": 3
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 1,
+          "componentCount": 1
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 14,
+          "componentCount": 7
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 82,
+          "componentCount": 5
+        },
+        {
+          "view": "back",
+          "holePixels": 64,
+          "componentCount": 6
+        },
+        {
+          "view": "right",
+          "holePixels": 4,
+          "componentCount": 2
+        },
+        {
+          "view": "left",
+          "holePixels": 0,
+          "componentCount": 0
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 1,
+          "componentCount": 1
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 13,
+          "componentCount": 6
+        }
+      ]
+    },
+    {
+      "pose": "fullBodyTwistCrouch",
+      "rigidTotalHolePixels": 922,
+      "rigidNoFillersTotalHolePixels": 1057,
+      "lbsTotalHolePixels": 924,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 1,
+          "bodyPixels": 40560,
+          "componentCount": 1,
+          "largestComponentPx": 1,
+          "topComponents": [
+            {
+              "size": 1,
+              "cx": 269,
+              "cy": 115
+            }
+          ]
+        },
+        {
+          "view": "back",
+          "holePixels": 28,
+          "bodyPixels": 40507,
+          "componentCount": 3,
+          "largestComponentPx": 18,
+          "topComponents": [
+            {
+              "size": 18,
+              "cx": 332,
+              "cy": 136
+            },
+            {
+              "size": 9,
+              "cx": 207,
+              "cy": 154
+            },
+            {
+              "size": 1,
+              "cx": 236,
+              "cy": 110
+            }
+          ]
+        },
+        {
+          "view": "right",
+          "holePixels": 235,
+          "bodyPixels": 37767,
+          "componentCount": 3,
+          "largestComponentPx": 232,
+          "topComponents": [
+            {
+              "size": 232,
+              "cx": 247,
+              "cy": 384
+            },
+            {
+              "size": 2,
+              "cx": 312,
+              "cy": 300
+            },
+            {
+              "size": 1,
+              "cx": 311,
+              "cy": 301
+            }
+          ]
+        },
+        {
+          "view": "left",
+          "holePixels": 45,
+          "bodyPixels": 36224,
+          "componentCount": 6,
+          "largestComponentPx": 16,
+          "topComponents": [
+            {
+              "size": 16,
+              "cx": 282,
+              "cy": 111
+            },
+            {
+              "size": 15,
+              "cx": 272,
+              "cy": 419
+            },
+            {
+              "size": 7,
+              "cx": 285,
+              "cy": 98
+            },
+            {
+              "size": 5,
+              "cx": 269,
+              "cy": 404
+            },
+            {
+              "size": 1,
+              "cx": 300,
+              "cy": 177
+            }
+          ]
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 613,
+          "bodyPixels": 39674,
+          "componentCount": 4,
+          "largestComponentPx": 576,
+          "topComponents": [
+            {
+              "size": 576,
+              "cx": 243,
+              "cy": 403
+            },
+            {
+              "size": 35,
+              "cx": 269,
+              "cy": 295
+            },
+            {
+              "size": 1,
+              "cx": 257,
+              "cy": 369
+            },
+            {
+              "size": 1,
+              "cx": 267,
+              "cy": 116
+            }
+          ]
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0,
+          "bodyPixels": 38012,
+          "componentCount": 0,
+          "largestComponentPx": 0,
+          "topComponents": []
+        }
+      ],
+      "rigidNoFillersPerView": [
+        {
+          "view": "front",
+          "holePixels": 20,
+          "componentCount": 6
+        },
+        {
+          "view": "back",
+          "holePixels": 43,
+          "componentCount": 9
+        },
+        {
+          "view": "right",
+          "holePixels": 266,
+          "componentCount": 8
+        },
+        {
+          "view": "left",
+          "holePixels": 67,
+          "componentCount": 11
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 660,
+          "componentCount": 5
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 1,
+          "componentCount": 1
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 4,
+          "componentCount": 3
+        },
+        {
+          "view": "back",
+          "holePixels": 29,
+          "componentCount": 4
+        },
+        {
+          "view": "right",
+          "holePixels": 257,
+          "componentCount": 3
+        },
+        {
+          "view": "left",
+          "holePixels": 46,
+          "componentCount": 7
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 588,
+          "componentCount": 3
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 0,
+          "componentCount": 0
+        }
+      ]
+    },
+    {
+      "pose": "maxArticulation",
+      "rigidTotalHolePixels": 1391,
+      "rigidNoFillersTotalHolePixels": 1616,
+      "lbsTotalHolePixels": 1422,
+      "rigidPerView": [
+        {
+          "view": "front",
+          "holePixels": 340,
+          "bodyPixels": 40894,
+          "componentCount": 1,
+          "largestComponentPx": 340,
+          "topComponents": [
+            {
+              "size": 340,
+              "cx": 197,
+              "cy": 106
+            }
+          ]
+        },
+        {
+          "view": "back",
+          "holePixels": 0,
+          "bodyPixels": 40637,
+          "componentCount": 0,
+          "largestComponentPx": 0,
+          "topComponents": []
+        },
+        {
+          "view": "right",
+          "holePixels": 292,
+          "bodyPixels": 37480,
+          "componentCount": 9,
+          "largestComponentPx": 251,
+          "topComponents": [
+            {
+              "size": 251,
+              "cx": 236,
+              "cy": 415
+            },
+            {
+              "size": 18,
+              "cx": 230,
+              "cy": 123
+            },
+            {
+              "size": 15,
+              "cx": 277,
+              "cy": 302
+            },
+            {
+              "size": 2,
+              "cx": 242,
+              "cy": 393
+            },
+            {
+              "size": 2,
+              "cx": 267,
+              "cy": 96
+            }
+          ]
+        },
+        {
+          "view": "left",
+          "holePixels": 711,
+          "bodyPixels": 38568,
+          "componentCount": 5,
+          "largestComponentPx": 703,
+          "topComponents": [
+            {
+              "size": 703,
+              "cx": 264,
+              "cy": 387
+            },
+            {
+              "size": 3,
+              "cx": 272,
+              "cy": 421
+            },
+            {
+              "size": 3,
+              "cx": 244,
+              "cy": 97
+            },
+            {
+              "size": 1,
+              "cx": 270,
+              "cy": 422
+            },
+            {
+              "size": 1,
+              "cx": 238,
+              "cy": 296
+            }
+          ]
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 11,
+          "bodyPixels": 37897,
+          "componentCount": 1,
+          "largestComponentPx": 11,
+          "topComponents": [
+            {
+              "size": 11,
+              "cx": 266,
+              "cy": 126
+            }
+          ]
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 37,
+          "bodyPixels": 39210,
+          "componentCount": 6,
+          "largestComponentPx": 14,
+          "topComponents": [
+            {
+              "size": 14,
+              "cx": 278,
+              "cy": 124
+            },
+            {
+              "size": 10,
+              "cx": 277,
+              "cy": 420
+            },
+            {
+              "size": 5,
+              "cx": 275,
+              "cy": 414
+            },
+            {
+              "size": 5,
+              "cx": 281,
+              "cy": 102
+            },
+            {
+              "size": 2,
+              "cx": 280,
+              "cy": 99
+            }
+          ]
+        }
+      ],
+      "rigidNoFillersPerView": [
+        {
+          "view": "front",
+          "holePixels": 369,
+          "componentCount": 6
+        },
+        {
+          "view": "back",
+          "holePixels": 4,
+          "componentCount": 3
+        },
+        {
+          "view": "right",
+          "holePixels": 387,
+          "componentCount": 12
+        },
+        {
+          "view": "left",
+          "holePixels": 755,
+          "componentCount": 10
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 12,
+          "componentCount": 2
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 89,
+          "componentCount": 10
+        }
+      ],
+      "lbsPerView": [
+        {
+          "view": "front",
+          "holePixels": 367,
+          "componentCount": 3
+        },
+        {
+          "view": "back",
+          "holePixels": 0,
+          "componentCount": 0
+        },
+        {
+          "view": "right",
+          "holePixels": 289,
+          "componentCount": 9
+        },
+        {
+          "view": "left",
+          "holePixels": 713,
+          "componentCount": 4
+        },
+        {
+          "view": "frontRight34",
+          "holePixels": 11,
+          "componentCount": 1
+        },
+        {
+          "view": "frontLeft34",
+          "holePixels": 42,
+          "componentCount": 7
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "failedRequests": []
+}

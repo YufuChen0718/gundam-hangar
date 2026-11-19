@@ -18,6 +18,10 @@ const colors: Record<string, number> = {
   leftThigh: 0x4a8fe7,
   leftShin: 0x93c47d,
   leftFoot: 0xe06666,
+  frontRightSkirtPart: 0xf5d442,
+  frontLeftSkirtPart: 0xe8be32,
+  sideRightSkirtPart: 0xe6659e,
+  sideLeftSkirtPart: 0xd957b2,
   rifle: 0xea6676,
   shield: 0x7b9ec2,
 };

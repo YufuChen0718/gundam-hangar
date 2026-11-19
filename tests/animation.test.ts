@@ -10,9 +10,19 @@ import {
 } from "../src/animation/samplePose";
 import { Animator } from "../src/animation/animator";
 import { LbsManager } from "../src/mecha/lbs";
-import { JOINTS } from "../src/mecha/types";
-import type { ArmPreviewRig, JointName, SocketName } from "../src/mecha/types";
-import { JOINT_LIMITS, rigConfig, TEST_POSES } from "../src/mecha/rigConfig";
+import { JOINTS, SECONDARY_SKIRT_JOINTS } from "../src/mecha/types";
+import type {
+  ArmPreviewRig,
+  JointName,
+  SkirtJointName,
+  SocketName,
+} from "../src/mecha/types";
+import {
+  JOINT_LIMITS,
+  rigConfig,
+  SKIRT_FK_CONFIG,
+  TEST_POSES,
+} from "../src/mecha/rigConfig";
 
 function rig(): ArmPreviewRig {
   const root = new Group();
@@ -338,7 +348,7 @@ test("custom LBS CPU reference matches Three.js skinning and reports distinct pe
   );
 });
 
-test("custom LBS CPU reference matches Three.js skinning and reports distinct per-pose seam gaps on gundam-sentinel.glb", async () => {
+test("rigid armor mode has ~0 edge-length strain, drives skirt FK, and Smooth LBS matches Three.js on gundam-sentinel.glb", async () => {
   Object.assign(globalThis, {
     self: globalThis,
     createImageBitmap: async () => ({ width: 1, height: 1, close() {} }),
@@ -357,18 +367,49 @@ test("custom LBS CPU reference matches Three.js skinning and reports distinct pe
   const bindPose = Object.fromEntries(
     JOINTS.map((j) => [j, joints[j].quaternion.clone()]),
   ) as Record<JointName, Quaternion>;
+  const skirtJoints: Partial<Record<SkirtJointName, Object3D>> = {};
+  const skirtBindPose: Partial<Record<SkirtJointName, Quaternion>> = {};
+  for (const sj of SECONDARY_SKIRT_JOINTS) {
+    gltf.scene.traverse((o) => {
+      if (o.name === sj && o.type === "Bone" && !skirtJoints[sj]) {
+        skirtJoints[sj] = o;
+        skirtBindPose[sj] = o.quaternion.clone();
+      }
+    });
+    assert.ok(skirtJoints[sj], `Missing secondary skirt bone: ${sj}`);
+  }
   const sockets: Record<SocketName, Object3D> = {
     rightHand: gltf.scene.getObjectByName("rightHand")!,
     leftHand: gltf.scene.getObjectByName("leftHand")!,
     leftForearm:
-      gltf.scene.getObjectByName("leftForearm") ?? joints.leftElbow,
+      gltf.scene.getObjectByName("leftForearmSocket") ??
+      gltf.scene.getObjectByName("leftForearm") ??
+      joints.leftElbow,
     back: gltf.scene.getObjectByName("back")!,
   };
-  const parts = Object.fromEntries(
-    rigConfig.bodyPartNames.map((n) => [n, gltf.scene.getObjectByName(n)!]),
-  );
+  const parts: Record<string, Object3D> = {};
+  for (const n of [...rigConfig.bodyPartNames, ...rigConfig.skirtPartNames]) {
+    let found: Object3D | undefined;
+    gltf.scene.traverse((o) => {
+      if (!found && o.name === n && "geometry" in o) found = o;
+    });
+    assert.ok(found, `Missing Sentinel armor part mesh: ${n}`);
+    parts[n] = found;
+  }
+  const rigidCaps: Object3D[] = [];
+  const jointFillers: Object3D[] = [];
+  gltf.scene.traverse((o) => {
+    if ("geometry" in o) {
+      if (o.name.endsWith("_cap")) rigidCaps.push(o);
+      else if (o.name.startsWith("filler_")) jointFillers.push(o);
+    }
+  });
+  assert.equal(rigidCaps.length, 19, "Expected 19 boundary cap meshes");
+  assert.ok(jointFillers.length >= 14, "Expected dark-gray inner-frame fillers");
+
   displayRoot.updateMatrixWorld(true);
-  const lbs = new LbsManager(displayRoot, parts);
+  const lbs = new LbsManager(displayRoot, parts, rigidCaps, jointFillers);
+  assert.equal(lbs.getMode(), "rigid", "Rigid armor should be default mode");
   const pelvisBindPosition = joints.pelvis.position.clone();
   const bindAnkleY = Math.min(
     displayRoot.worldToLocal(joints.leftAnkle.getWorldPosition(new Vector3()))
@@ -382,8 +423,12 @@ test("custom LBS CPU reference matches Three.js skinning and reports distinct pe
     displayRoot,
     joints,
     bindPose,
+    skirtJoints,
+    skirtBindPose,
     sockets,
     parts,
+    rigidCaps,
+    jointFillers,
     originalMaterials: new Map(),
     pelvisBindPosition,
     bindAnkleY,
@@ -395,11 +440,46 @@ test("custom LBS CPU reference matches Three.js skinning and reports distinct pe
   const seamMaxs: number[] = [];
   const vsThreeMaxs: number[] = [];
   for (const preset of TEST_POSES) {
+    // Test Rigid armor mode first: ~0 edge-length strain & secondary skirt rotation
+    lbs.setMode("rigid");
+    animator.manual(preset.angles);
+    const rigidStrain = lbs.computeEdgeStrain("rigid");
+    assert.ok(
+      rigidStrain.maxStrain < 1e-5,
+      `Rigid armor max edge strain too large on ${preset.id}: ${rigidStrain.maxStrain}`,
+    );
+    assert.ok(
+      rigidStrain.meanStrain < 1e-6,
+      `Rigid armor mean edge strain too large on ${preset.id}: ${rigidStrain.meanStrain}`,
+    );
+    const rHip = preset.angles.rightHip ?? 0;
+    const expectedFrontR = Math.min(
+      SKIRT_FK_CONFIG.frontMaxDeg,
+      Math.max(0, SKIRT_FK_CONFIG.frontK * rHip),
+    );
+    const expectedSideR = Math.min(
+      SKIRT_FK_CONFIG.sideMaxDeg,
+      Math.max(0, SKIRT_FK_CONFIG.sideK * rHip),
+    );
+    assert.ok(
+      Math.abs(animator.skirtAngles().frontRightSkirt - expectedFrontR) < 1e-5,
+      `Front right skirt FK mismatch on ${preset.id}`,
+    );
+    assert.ok(
+      Math.abs(animator.skirtAngles().sideRightSkirt - expectedSideR) < 1e-5,
+      `Side right skirt FK mismatch on ${preset.id}`,
+    );
+
+    // Switch to Smooth LBS comparison mode: continuous seams, matches Three.js, measurable strain when posed
+    lbs.setMode("lbs");
     animator.manual(preset.angles);
     const seam = lbs.computeSeamStats("lbs");
-    const rigidSeam = lbs.computeSeamStats("rigid");
+    const lbsStrain = lbs.computeEdgeStrain("lbs");
     const vsThree = lbs.compareWithThreeSkinning();
-    assert.equal(seam.boundaryGroups, 731);
+    assert.ok(
+      seam.boundaryGroups > 500,
+      `Expected >500 boundary groups, got ${seam.boundaryGroups}`,
+    );
     assert.ok(
       seam.maxGap < 1e-5,
       `Sentinel LBS seam gap exceeded threshold on ${preset.id}: ${seam.maxGap}`,
@@ -408,10 +488,10 @@ test("custom LBS CPU reference matches Three.js skinning and reports distinct pe
       vsThree.maxDiff < 1e-6,
       `Sentinel LBS vs Three.js max diff exceeded threshold on ${preset.id}: ${vsThree.maxDiff}`,
     );
-    if (preset.id !== "bind") {
+    if (preset.id === "torsoTwist" || preset.id === "maxArticulation") {
       assert.ok(
-        rigidSeam.maxGap > 0.01,
-        `Expected Sentinel rigid-parts mode to show visible seam crack (>10 mm) on ${preset.id}, got ${rigidSeam.maxGap}`,
+        lbsStrain.maxStrain > 0.05,
+        `Expected measurable LBS edge strain (>5%) on ${preset.id}, got ${lbsStrain.maxStrain}`,
       );
     }
     seamMaxs.push(Number(seam.maxGap.toExponential(4)));

@@ -1,9 +1,10 @@
-import { MathUtils, Quaternion, Vector3 } from "three";
+import { Euler, MathUtils, Quaternion, Vector3 } from "three";
 import type {
   ArmPreviewRig,
   JointAngles,
   JointName,
   PoseInput,
+  SkirtJointName,
 } from "../mecha/types";
 import { JOINTS } from "../mecha/types";
 import {
@@ -11,6 +12,7 @@ import {
   jointAngleToEuler,
   jointQuatToAngle,
   normalizePoseInput,
+  SKIRT_FK_CONFIG,
 } from "../mecha/rigConfig";
 import { CLIPS, raiseArm } from "./clips";
 import type { ActionName, AnimatorStatus, TransitionMode } from "./clips";
@@ -39,12 +41,28 @@ export class Animator {
   private tmpA = new Vector3();
   private tmpB = new Vector3();
   private tmpQ = new Quaternion();
+  private tmpSkirtEuler = new Euler();
+  private tmpSkirtQ = new Quaternion();
+  private lastSkirtAngles: Record<SkirtJointName, number> = {
+    frontRightSkirt: 0,
+    frontLeftSkirt: 0,
+    sideRightSkirt: 0,
+    sideLeftSkirt: 0,
+  };
 
   constructor(private rig: ArmPreviewRig) {}
 
   setRig(rig: ArmPreviewRig) {
     this.rig = rig;
     this.apply();
+  }
+
+  reapply() {
+    this.apply();
+  }
+
+  skirtAngles(): Record<SkirtJointName, number> {
+    return { ...this.lastSkirtAngles };
   }
 
   get duration(): number {
@@ -70,6 +88,64 @@ export class Animator {
       this.rig.joints[j].quaternion
         .copy(this.rig.bindPose[j])
         .multiply(this.pose[j]);
+    }
+    // Secondary skirt armor FK (Requirement 6): driven directly from hip pitch in our FK update
+    const rigidActive = (this.rig.lbs?.getMode() ?? "rigid") === "rigid";
+    const rightHipDeg = rigidActive
+      ? clampJointAngle("rightHip", jointQuatToAngle("rightHip", this.pose.rightHip))
+      : 0;
+    const leftHipDeg = rigidActive
+      ? clampJointAngle("leftHip", jointQuatToAngle("leftHip", this.pose.leftHip))
+      : 0;
+    const frontRightDeg = MathUtils.clamp(
+      SKIRT_FK_CONFIG.frontK * rightHipDeg,
+      0,
+      SKIRT_FK_CONFIG.frontMaxDeg,
+    );
+    const frontLeftDeg = MathUtils.clamp(
+      SKIRT_FK_CONFIG.frontK * leftHipDeg,
+      0,
+      SKIRT_FK_CONFIG.frontMaxDeg,
+    );
+    const sideRightDeg = MathUtils.clamp(
+      SKIRT_FK_CONFIG.sideK * rightHipDeg,
+      0,
+      SKIRT_FK_CONFIG.sideMaxDeg,
+    );
+    const sideLeftDeg = MathUtils.clamp(
+      SKIRT_FK_CONFIG.sideK * leftHipDeg,
+      0,
+      SKIRT_FK_CONFIG.sideMaxDeg,
+    );
+    this.lastSkirtAngles = {
+      frontRightSkirt: frontRightDeg,
+      frontLeftSkirt: frontLeftDeg,
+      sideRightSkirt: sideRightDeg,
+      sideLeftSkirt: sideLeftDeg,
+    };
+    if (this.rig.skirtJoints && this.rig.skirtBindPose) {
+      const applySkirt = (
+        name: SkirtJointName,
+        rxDeg: number,
+        rzDeg: number,
+      ) => {
+        const joint = this.rig.skirtJoints?.[name];
+        const bind = this.rig.skirtBindPose?.[name];
+        if (!joint || !bind) return;
+        this.tmpSkirtEuler.set(
+          MathUtils.degToRad(rxDeg),
+          0,
+          MathUtils.degToRad(rzDeg),
+          "XYZ",
+        );
+        this.tmpSkirtQ.setFromEuler(this.tmpSkirtEuler);
+        joint.quaternion.copy(bind).multiply(this.tmpSkirtQ);
+      };
+      // Front skirts swing forward (-X rotation); side skirts flare outward (-Z right, +Z left)
+      applySkirt("frontRightSkirt", -frontRightDeg, 0);
+      applySkirt("frontLeftSkirt", -frontLeftDeg, 0);
+      applySkirt("sideRightSkirt", 0, -sideRightDeg);
+      applySkirt("sideLeftSkirt", 0, sideLeftDeg);
     }
     if (this.rig.pelvisBindPosition && this.rig.bindAnkleY !== undefined) {
       this.rig.joints.pelvis.position.copy(this.rig.pelvisBindPosition);

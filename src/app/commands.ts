@@ -165,8 +165,15 @@ export function createCommands(
     },
     setSkinningMode: (mode: SkinningMode) => {
       rig.lbs?.setMode(mode);
+      animator.reapply();
       store.set({ skinning: mode });
       repaint();
+    },
+    setStrainHeatmap: (enabled: boolean) => {
+      rig.lbs?.setStrainHeatmap(enabled);
+    },
+    setRigidInnerFrameVisible: (visible: boolean) => {
+      rig.lbs?.setRigidInnerFrameVisible(visible);
     },
     setRightHandItem: (item: RightHandItem) => {
       setRightHandItemInternal(item);
@@ -302,6 +309,11 @@ export function createCommands(
       target: [number, number, number],
       cameraPos: [number, number, number],
     ) => world.focus(target, cameraPos),
+    measureSilhouetteHoleView: (
+      target: [number, number, number],
+      cameraPos: [number, number, number],
+      size = 512,
+    ) => world.measureSilhouetteHoleView(target, cameraPos, size),
   };
 
   let accumulator = 0;
@@ -321,11 +333,12 @@ export function createCommands(
     const part = rig.parts[partName];
     if (!(part instanceof Mesh)) return 0;
     const count = part.geometry.attributes.position.count;
+    const evalMode = store.get().skinning === "rigid" ? "rigid" : "lbs";
     const v = new Vector3();
     let minY = Infinity;
     for (let i = 0; i < count; i++) {
       if (rig.lbs) {
-        rig.lbs.cpuPosition(part, i, "lbs", v);
+        rig.lbs.cpuPosition(part, i, evalMode, v);
       } else {
         part.getVertexPosition(i, v);
         part.localToWorld(v);
@@ -348,6 +361,18 @@ export function createCommands(
       maxGap: 0,
       meanGap: 0,
       boundaryGroups: 0,
+    };
+    const edgeStrainRigid = rig.lbs?.computeEdgeStrain("rigid") ?? {
+      maxStrain: 0,
+      meanStrain: 0,
+      triangleCount: 0,
+      strainedTrianglesOver1Pct: 0,
+    };
+    const edgeStrainLbs = rig.lbs?.computeEdgeStrain("lbs") ?? {
+      maxStrain: 0,
+      meanStrain: 0,
+      triangleCount: 0,
+      strainedTrianglesOver1Pct: 0,
     };
     const activeSeam = skinningMode === "rigid" ? rigidSeam : lbsSeam;
     const lbsVsThree = rig.lbs?.compareWithThreeSkinning() ?? {
@@ -389,6 +414,9 @@ export function createCommands(
       lbsSeamGapMean: lbsSeam.meanGap,
       rigidSeamGapMax: rigidSeam.maxGap,
       rigidSeamGapMean: rigidSeam.meanGap,
+      edgeStrainRigid,
+      edgeStrainLbs,
+      skirtAngles: animator.skirtAngles(),
       lbsVsThreeMaxDiff: lbsVsThree.maxDiff,
       lbsVsThreeMeanDiff: lbsVsThree.meanDiff,
       skinnedVertexCount: lbsVsThree.vertexCount,
