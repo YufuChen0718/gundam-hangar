@@ -682,7 +682,7 @@ try {
   }
   await page.locator("#reset-pose-panel").click();
 
-  await page.getByRole("tab", { name: "检查", exact: true }).click();
+  await page.getByRole("tab", { name: "Inspect", exact: true }).click();
   await page.locator('[data-skinning="lbs"]').click();
   assert.equal(
     await page.evaluate(() => window.__hangar.getState().skinning),
@@ -738,7 +738,7 @@ try {
   checks.push('model switch ("Sentinel (new)" / "Legacy") verified');
 
   // 8. Play, pause, reset & mobile 390px layout
-  await page.getByRole("tab", { name: "姿态", exact: true }).click();
+  await page.getByRole("tab", { name: "Pose", exact: true }).click();
   await page.locator("#reset-pose").click();
   assert.ok(
     (await page.evaluate(() => window.__hangar.diagnostics())).bindError < 1e-7,
