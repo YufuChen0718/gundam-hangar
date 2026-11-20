@@ -50,7 +50,7 @@ export function prepareMeshMaterials(root: Object3D) {
 
 function requireNode(root: Object3D, name: string): Object3D {
   const node = root.getObjectByName(name);
-  if (!node) throw new Error(`模型缺少节点：${name}`);
+  if (!node) throw new Error(`Model is missing node: ${name}`);
   return node;
 }
 

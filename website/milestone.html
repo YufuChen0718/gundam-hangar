@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gundam Hangar — Milestone</title>
+<link rel="stylesheet" href="milestone.css">
+<script src="milestone.js" defer></script>
+<noscript>
+<style>
+  .compare-frame { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .compare-frame .shot-after { position: static; clip-path: none; }
+  .compare-frame .shot-after img { position: static; height: auto; object-fit: fill; }
+  .compare-handle, .compare-range { display: none; }
+  .hint { display: none; }
+  .shot { cursor: default; }
+</style>
+</noscript>
+</head>
+<body>
+<main class="page">
+
+  <header class="masthead">
+    <p class="course">CS184 Computer Graphics &amp; Imaging · Final Project Milestone · Fall 2026</p>
+    <h1>Gundam Hangar — Milestone</h1>
+    <p class="team">Yufu Chen, Zihan Wang, Junxiang You, Dongyang Dai</p>
+    <p class="links">
+      <a href="#">Video (link coming)</a>
+      <a href="#">Slides (link coming)</a>
+      <a href="https://yufuchen0718.github.io/gundam-hangar/">Proposal</a>
+      <a href="https://github.com/YufuChen0718/gundam-hangar">Source</a>
+    </p>
+  </header>
+
+  <h2>Summary</h2>
+  
+  <p>
+    We started from a single static mesh generated with Meshy: about 1.86 million triangles, one 8K texture, and no skeleton at all. Since the proposal, we turned it into a robot you can pose and animate in the browser. Right now it has a 15-joint full-body rig, three actions (idle, aim, swing) that blend into each other, and a rifle, beam saber and shield that attach to sockets on the hands and forearm. The biggest change from our plan is the skinning: smooth LBS made the armor bend like rubber, so we switched to a rigid rig where every armor plate moves as one piece. Next we want to add spline interpolation, a simple IK solver, and a performance study.
+  </p>
+
+  <h2>Progress</h2>
+
+  <h3>Asset pipeline: decimation and texture baking</h3>
+
+  <p>
+    The raw mesh was way too heavy for the web, so we decimated it to about 30.7k triangles. This broke the texture: edge collapses merged vertices across UV seams, so the UVs got interpolated between unrelated islands and the shield star came out smeared. To fix it, we made a new UV altas for the low-poly mesh and baked the high-poly color, normal and metal/roughness maps onto it, which basically shoots a ray from each low-poly texel and copies what it hits on the original surface. One cage distance didn't work everywhere, so we used two passes, a tight one (5 mm ) for crevices and a wider one (15 mm) for deeper gaps. The final model went from 205 MB to 17.5 MB.
+  </p>
+  
+  <figure class="compare">
+    <div class="compare-frame">
+      <button class="shot shot-before" type="button" aria-label="Enlarge (a) before baking">
+        <img src="milestone-img/bake-before.jpg" alt="Shield star cross after decimation, with a smeared and streaked texture" width="560" height="340">
+      </button>
+      <button class="shot shot-after" type="button" aria-label="Enlarge (b) after baking">
+        <img src="milestone-img/bake-after.jpg" alt="The same shield star cross after high-to-low baking, with clean edges and color" width="560" height="340">
+      </button>
+      <span class="compare-handle" aria-hidden="true"></span>
+      <input class="compare-range" type="range" min="0" max="100" value="50" step="1" aria-label="Before and after comparison: reveal the baked shield">
+    </div>
+    <figcaption><span class="ab">(a) before</span> / <span class="ab">(b) after</span> — decimating to 1.5% of the triangles collapsed UV seams and smeared the star; a new atlas and a high-to-low bake restore the detail. <span class="hint">Drag the divider, or use the arrow keys.</span></figcaption>
+  </figure>
+
+  <h3>Full-body rig and forward kinematics</h3>
+  <!-- Facts to mention:
+       - Hierarchy: pelvis → torso → head and arms, pelvis → legs; a joint's world matrix is the product of its parents' local matrices.
+       - 15 body joints plus 6 skirt hinges, 21 rigid parts in total.
+       - Joint limits: knee 0°–55° one-way, torso twist ±40°.
+       - Feet stay on the platform by lowering the pelvis when crouching; foot deviation < 1 mm across 9 poses.
+       - CS184 link: hierarchical transforms, scene graphs, homogeneous coordinates. -->
+  <p>
+    The pelvis is the root joint. The torso, head and arms hang under it, and so do the two legs, so each joint's world matrix is just its parent's world matrix times its own local transform. In total there are 15 body joints plus 6 small hinges for the skirt plates, with limits so the knees only bend one way (0°–55°) and the torso twists at most ±40°. When the robot crouches, we lower the pelvis by the right =mount so both feet stay on the platform; across our 9 test poses the feet move less than 1 mm.
+  </p>
+
+  <figure class="pair-figure">
+    <div class="pair">
+      <button class="shot" type="button" aria-label="Enlarge (a) bind pose">
+        <img src="milestone-img/pipeline-final.jpg" alt="The rigged robot standing in its bind pose" width="560" height="457">
+      </button>
+      <button class="shot" type="button" aria-label="Enlarge (b) part segmentation">
+        <img src="milestone-img/rig-parts.jpg" alt="The same robot with each rigid part colored by its controlling joint" width="560" height="457">
+      </button>
+    </div>
+    <figcaption><span class="ab">(a)</span> Bind pose after rigging. <span class="ab">(b)</span> Rigid parts colored by their controlling joint; the skirt plates hang from extra hinges.</figcaption>
+  </figure>
+
+  <h3>Skinning: our LBS shader vs. rigid armor</h3>
+  
+  <p>
+    We wrote our own linear blend skinning in the vertex shader, p' = Σ w<sub>k</sub> M<sub>k</sub> p, using bone matrices from our FK code. It matches Three.js's built-in skinning to within 6 × 10<sup>-8</sup> m, so we know the math is right. The problem is that LBS blends vertices near a joint between two bones, and that is exactly what hard armor should never do: the plates stretched and twisted, with mean edge strain up to about 10% in our extreme poses. So we built a rigid rig instead. We cut the mesh slong concave seams (a min-cut on the dual graph where concave edges are cheaper), used a single clean plane at the knees and waist, capped every cut, and added simple inner-frame cylinders and spheres at the joints to hide the gaps. Rigid mode runs the same shader with one bone per vertex, and the strain drops to basically zero.
+  </p>
+
+  <figure class="compare">
+    <div class="compare-frame">
+      <button class="shot shot-before" type="button" aria-label="Enlarge (a) smooth LBS at the knee">
+        <img src="milestone-img/knee-lbs.jpg" alt="Knee close-up with smooth linear blend skinning; the armor bends like rubber" width="560" height="330">
+      </button>
+      <button class="shot shot-after" type="button" aria-label="Enlarge (b) rigid armor at the knee">
+        <img src="milestone-img/knee-rigid.jpg" alt="Knee close-up with rigid armor; the plates stay solid and overlap cleanly" width="560" height="330">
+      </button>
+      <span class="compare-handle" aria-hidden="true"></span>
+      <input class="compare-range" type="range" min="0" max="100" value="50" step="1" aria-label="Before and after comparison: smooth LBS and rigid armor at the knee">
+    </div>
+    <figcaption><span class="ab">(a) smooth LBS</span> / <span class="ab">(b) rigid armor</span> — the same knee bend at 55°. LBS stretches the plate like rubber; the rigid cut keeps a clean edge, with an inner-frame cylinder in the gap. <span class="hint">Drag the divider, or use the arrow keys.</span></figcaption>
+  </figure>
+  <table>
+    <caption>Per-triangle edge-length strain |l′ − l| / l, four test poses.</caption>
+    <thead>
+      <tr><th>Pose</th><th>Smooth LBS mean strain</th><th>LBS triangles &gt; 1%</th><th>Rigid max strain</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>torsoTwist</td><td>1.42%</td><td>1,611</td><td>3.2 × 10<sup>-8</sup></td></tr>
+      <tr><td>crouch</td><td>6.35%</td><td>3,670</td><td>3.0 × 10<sup>-8</sup></td></tr>
+      <tr><td>deepCrouchAim</td><td>9.42%</td><td>4,762</td><td>3.5 × 10<sup>-8</sup></td></tr>
+      <tr><td>maxArticulation</td><td>10.36%</td><td>4,813</td><td>3.4 × 10<sup>-8</sup></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Keyframe animation and blend vs. cut</h3>
+  
+  <p>
+    Each action is stored as a few key poses. Every frame, we find the two keys around the current time, apply that segment's easing curve, and slerp each joint's rotation. When the user switches actions in the m iddle of one, we save the pose the robot is in right now and slerp from it to the new clip iver 0.3s with smoothstep weights. We wrote all of this ourselves instead of using Three.js's AnimationMixer. In the plot, a hard cut makes the shoulder jump 48° in a single frame, while the bland's first step is only about half a degree.
+  </p>
+
+  <figure class="plot">
+    <button class="shot" type="button" aria-label="Enlarge the transition plot">
+      <img src="milestone-img/transition-plot.jpg" alt="Joint angle and angular velocity curves for a cut and a blended transition" width="1100" height="630">
+    </button>
+    <figcaption>idle → swing → aim, with the swing interrupted at t = 1.45 s. Top: joint angles; bottom: angular velocity. A cut jumps in one frame; a 0.3 s blend is continuous and the spike disappears.</figcaption>
+  </figure>
+  <table>
+    <thead>
+      <tr><th>Joint</th><th>Cut: jump in one frame</th><th>Blend (0.3 s): first-frame step</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>rightShoulder</td><td>48.0°</td><td>0.52°</td></tr>
+      <tr><td>torso</td><td>32.0°</td><td>0.35°</td></tr>
+      <tr><td>rightKnee</td><td>20.0°</td><td>0.21°</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Socket equipment</h3>
+
+  <p>
+    Each weapon is its own model, and its world transform is M<sub>joint</sub> · M<sub>socket</sub> · M<sub>offset</sub>, where the offset fixes the item's own modeling frame (where the grip is, which way the barrel or blade points). The rifle and saber share the right-hand socket, and the shield sits on the ledt forearm. We checked that the scene-graph result matches the explicit matrix product (difference around 10<sup>-16</sup> m), but that only tells us the code is consistent, so we still check the grip by eye.
+  </p>
+
+  <figure class="pair-figure three-up">
+    <div class="pair three">
+      <button class="shot" type="button" aria-label="Enlarge (a) beam saber">
+        <img src="milestone-img/loadout-saber.jpg" alt="Beam saber held in the right hand" width="420" height="342">
+      </button>
+      <button class="shot" type="button" aria-label="Enlarge (b) rifle">
+        <img src="milestone-img/loadout-rifle.jpg" alt="Rifle held in the right hand" width="420" height="342">
+      </button>
+      <button class="shot" type="button" aria-label="Enlarge (c) shield">
+        <img src="milestone-img/loadout-shield.jpg" alt="Shield mounted on the left forearm" width="420" height="247">
+      </button>
+    </div>
+    <figcaption><span class="ab">(a)</span> Beam saber on the right-hand socket. <span class="ab">(b)</span> Rifle on the same socket, different offset. <span class="ab">(c)</span> Shield on the left forearm socket.</figcaption>
+  </figure>
+
+  <section class="keep">
+    <h2>Problems and fixes</h2>
+
+    <p>
+      The waist gave us the most trouble. Our first cut went through the top edge of the skirt armor, so twisting the torso tore that edge into thin silvers and exposed the flat caps. We moved the cut to a horizontal plane inside the red abdomen, extended the abdomen 1.6 cm down inside the skirt ring, recessed the caps, and added an elliptical frame piece. Now we see no holes at the waist anywhere from −40° to +40°. Our main takeway was that where you cut the mesh matters a lot more than how you blend it.
+    </p>
+
+    <figure class="compare">
+      <div class="compare-frame">
+        <button class="shot shot-before" type="button" aria-label="Enlarge (a) waist before the fix">
+          <img src="milestone-img/waist-before.jpg" alt="Torso twist with the old waist cut; the skirt rim tears into slivers" width="560" height="392">
+        </button>
+        <button class="shot shot-after" type="button" aria-label="Enlarge (b) waist after the fix">
+          <img src="milestone-img/waist-after.jpg" alt="The same torso twist after the planar waist cut, with clean overlapping plates" width="560" height="330">
+        </button>
+        <span class="compare-handle" aria-hidden="true"></span>
+        <input class="compare-range" type="range" min="0" max="100" value="50" step="1" aria-label="Before and after comparison: the waist at a torso twist">
+      </div>
+      <figcaption><span class="ab">(a) before</span> / <span class="ab">(b) after</span> — a torso twist to 40°. The old cut crossed the skirt rim and tore the plate; the new cut runs inside the abdomen, with an overlapping sleeve and an elliptical filler. <span class="hint">Drag the divider, or use the arrow keys.</span></figcaption>
+    </figure>
+    <table>
+      <thead>
+        <tr><th>Problem</th><th>Cause</th><th>Fix</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Cracks at the shoulder and elbow</td><td>Rigid face cut through a fused shell</td><td>Shared skin weights on the original vertex indices</td></tr>
+        <tr><td>Smeared texture after decimation</td><td>UV seams collapsed (2M → 30k triangles)</td><td>New UV atlas and a high-to-low bake</td></tr>
+        <tr><td>Armor bending like rubber</td><td>LBS blend bands on hard surfaces</td><td>Rigid parts, capped cuts, joint fillers</td></tr>
+        <tr><td>Sawtooth rim at the knee</td><td>Cut followed long decimated triangles</td><td>Planar bisect; knee limit lowered to 55°</td></tr>
+        <tr><td>Waist tearing on twist</td><td>Cut crossed the skirt rim</td><td>Planar cut, abdomen overlap, elliptical frame</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <h2>Progress vs. proposal</h2>
+
+  <p>
+    All the baseline items from the proposal are working, and the rig ended up more complete wthan we planned. After the GSI feedback we spent less time on app features like color presents and more on graphics methods we implement and measure ourselves. The performance study and the Vision Pro test still left for the next two weeks.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>Proposal baseline</th><th>Status</th><th>Note</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Articulated robot</td><td>Done</td><td>Full body, rigid hard-surface rig</td></tr>
+      <tr><td>Two hand-held weapons and a shield</td><td>Done</td><td>Beam saber, rifle and shield as separate models</td></tr>
+      <tr><td>Idle / aim / swing with smooth transitions</td><td>Done</td><td>Blend vs. cut evaluated</td></tr>
+      <tr><td>Desktop web interface</td><td>Done</td><td>Pose, Equipment and Inspect tabs plus a loadout panel</td></tr>
+      <tr><td>Evaluation: attachments and continuity</td><td>Done</td><td>Plus strain and gap metrics we added</td></tr>
+      <tr><td>Evaluation: rendering performance</td><td>Not started</td><td>Week 3</td></tr>
+      <tr><td>Color presets / region recolor</td><td>Deprioritized</td><td>Less graphics content; may return as a mask shader</td></tr>
+      <tr><td>Vision Pro (Safari, windowed)</td><td>Not started</td><td>Week 4, small scope</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Next steps</h2>
+  <ul class="dates">
+    <li><span class="date">Nov 23–26</span> — Quaternion spline (squad) vs. slerp; angular velocity at the keys.</li>
+    <li><span class="date">Nov 23–29</span> — Two-bone IK for aiming and planted feet; end-effector error and foot slide.</li>
+    <li><span class="date">Nov 26–29</span> — Frame time vs. triangle count, shadows, rigid vs. LBS.</li>
+    <li><span class="date">Nov 30–Dec 2</span> — Vision Pro Safari test (windowed).</li>
+    <li><span class="date">Dec 2</span> — Feature freeze.</li>
+    <li><span class="date">Dec 3–6</span> — Final report, video, slides, showcase clip.</li>
+  </ul>
+
+  <footer>
+    <p>Model assets were generated with Meshy for this course project; see <a href="https://github.com/YufuChen0718/gundam-hangar/blob/main/docs/asset-sources.md">asset-sources.md</a>. The viewer will live at <span class="url">https://yufuchen0718.github.io/gundam-hangar/demo/</span> once it is deployed. Click any figure to open it full size.</p>
+  </footer>
+
+</main>
+</body>
+</html>

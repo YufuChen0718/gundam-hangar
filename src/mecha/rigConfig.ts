@@ -232,25 +232,25 @@ export const TEST_POSES: readonly TestPoseSpec[] = [
   {
     id: "bind",
     label: "Bind / Rest Pose",
-    shortLabel: "初始",
+    shortLabel: "Bind",
     angles: {},
   },
   {
     id: "rightArmAim",
     label: "Right Arm Rifle Aim",
-    shortLabel: "右臂举枪",
+    shortLabel: "R-arm aim",
     angles: { rightShoulder: 30, rightElbow: 55, rightWrist: 10 },
   },
   {
     id: "leftArmGuard",
     label: "Left Arm Shield Guard",
-    shortLabel: "左臂举盾",
+    shortLabel: "L-arm guard",
     angles: { leftShoulder: 35, leftElbow: 65, leftWrist: -15 },
   },
   {
     id: "dualArmReady",
     label: "Both Arms Combat Ready",
-    shortLabel: "双臂戒备",
+    shortLabel: "Both ready",
     angles: {
       rightShoulder: 45,
       rightElbow: 75,
@@ -263,7 +263,7 @@ export const TEST_POSES: readonly TestPoseSpec[] = [
   {
     id: "torsoTwist",
     label: "Pelvis & Torso Counter-Twist",
-    shortLabel: "扭腰转头",
+    shortLabel: "Torso twist",
     angles: {
       pelvis: -15,
       torso: 30,
@@ -277,7 +277,7 @@ export const TEST_POSES: readonly TestPoseSpec[] = [
   {
     id: "crouch",
     label: "Symmetric Tactical Crouch",
-    shortLabel: "战术半蹲",
+    shortLabel: "Crouch",
     angles: {
       rightHip: 20,
       rightKnee: 40,
@@ -294,7 +294,7 @@ export const TEST_POSES: readonly TestPoseSpec[] = [
   {
     id: "deepCrouchAim",
     label: "Deep Crouch + Dual Arm Aim/Guard",
-    shortLabel: "深蹲瞄准",
+    shortLabel: "Deep crouch",
     angles: {
       rightHip: 27,
       rightKnee: 54,
@@ -315,7 +315,7 @@ export const TEST_POSES: readonly TestPoseSpec[] = [
   {
     id: "fullBodyTwistCrouch",
     label: "Full-Body Twist + Crouch + Both Arms",
-    shortLabel: "全身联动",
+    shortLabel: "Twist crouch",
     angles: {
       pelvis: 20,
       torso: -30,
@@ -337,7 +337,7 @@ export const TEST_POSES: readonly TestPoseSpec[] = [
   {
     id: "maxArticulation",
     label: "All 15 Joints Active Near Limits",
-    shortLabel: "极限全动",
+    shortLabel: "Max range",
     angles: {
       pelvis: -25,
       torso: 35,

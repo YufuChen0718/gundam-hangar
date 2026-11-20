@@ -37,7 +37,7 @@ async function start() {
       const avg =
         samples.reduce((a, b) => a + b, 0) / Math.max(1, samples.length);
       document.getElementById("frame-time")!.textContent =
-        samples.length < 30 ? "采样中…" : `${avg.toFixed(1)} ms`;
+        samples.length < 30 ? "Sampling…" : `${avg.toFixed(1)} ms`;
       document.getElementById("seam-error")!.textContent =
         `${(app.diagnostics().skinSeamGap * 1000).toFixed(4)} mm`;
       document.getElementById("attachment-error")!.textContent =
@@ -62,6 +62,6 @@ start().catch((e) => {
   const msg = e instanceof Error ? e.message : String(e);
   store.set({ error: msg });
   document.getElementById("loading")!.innerHTML =
-    `<strong>模型未能载入</strong><span></span><button onclick="location.reload()">重试</button>`;
+    `<strong>Model failed to load</strong><span></span><button onclick="location.reload()">Retry</button>`;
   document.querySelector("#loading span")!.textContent = msg;
 });
