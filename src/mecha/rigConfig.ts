@@ -108,6 +108,99 @@ export const JOINT_LIMITS: Record<JointName, readonly [number, number]> = {
   leftAnkle: [-25, 35],
 } as const;
 
+/**
+ * Two-bone IK chain (M7 / T16): right arm, shoulder → elbow → wrist.
+ * The elbow keeps its one-way hinge limit from JOINT_LIMITS. While IK drives the
+ * shoulder it needs full 3D rotation, so its 1-axis pitch limit is replaced by a
+ * swing cone around the bind direction plus a twist range about the upper arm.
+ */
+export const IK_CONFIG = {
+  root: "rightShoulder",
+  mid: "rightElbow",
+  end: "rightWrist",
+  shoulderSwingMaxDeg: 110,
+  shoulderTwistMaxDeg: 60,
+  /** Default pole offset from the elbow when there is no bend to infer it from (displayRoot space: back and outward). */
+  defaultPoleOffset: [-0.12, -0.05, -0.35],
+  /** How far from the elbow the default pole is placed. */
+  poleDistance: 0.35,
+} as const satisfies {
+  root: JointName;
+  mid: JointName;
+  end: JointName;
+  shoulderSwingMaxDeg: number;
+  shoulderTwistMaxDeg: number;
+  defaultPoleOffset: readonly [number, number, number];
+  poleDistance: number;
+};
+
+/**
+ * Foot planting (M7 / T16): hip → knee → ankle per leg. While it is on, the
+ * pelvis can be lowered by a crouch depth and each ankle stays where it was
+ * planted (or where the user drags it, in the body's fore–aft/up–down plane).
+ * Limits: knee keeps its JOINT_LIMITS hinge; the hip pitches within its
+ * JOINT_LIMITS range and gets only a small elliptical sideways swing and twist
+ * (legs walk fore–aft, they do not splay); the ankle is projected onto its
+ * JOINT_LIMITS pitch.
+ */
+export const FOOT_IK_CONFIG = {
+  legs: [
+    { root: "rightHip", mid: "rightKnee", end: "rightAnkle" },
+    { root: "leftHip", mid: "leftKnee", end: "leftAnkle" },
+  ],
+  /** Hip sideways swing (abduction/adduction) allowed by IK, ± deg. */
+  hipSideMaxDeg: 12,
+  /** Hip twist about the thigh allowed by IK, ± deg. */
+  hipTwistMaxDeg: 15,
+  /**
+   * Small extra ankle freedom for IK on top of the JOINT_LIMITS pitch (a real
+   * subtalar joint has both). The legs slant outward, so the knee hinge is
+   * tilted and bending it turns the foot about the vertical by up to ~7° at the
+   * deepest crouch; ankle yaw lets the toes keep pointing forward. Roll
+   * (inversion/eversion) keeps lifted / stepped feet flat.
+   */
+  ankleRollMaxDeg: 12,
+  ankleYawMaxDeg: 8,
+  /** Knee pole: this far from the FK knee, on the side the knee bends toward. */
+  poleForward: 0.5,
+  /** Crouch slider range (m the pelvis is lowered). */
+  maxCrouch: 0.25,
+  // Body follow when feet are dragged ("hips follow feet"); only feet on the
+  // ground support the body, a lifted foot does not pull it.
+  /** A foot this high (m) above its planted height counts as fully lifted. */
+  liftHeight: 0.04,
+  /** Fraction of the support-point shift the pelvis follows fore–aft (Z). */
+  pelvisFollow: 0.4,
+  /**
+   * Fraction it follows sideways (X). Small: this mecha stands wide (ankles at
+   * ±0.32 m, hips at ±0.145 m), so a full weight shift would throw the pelvis
+   * ~13 cm over one foot.
+   */
+  pelvisSideFollow: 0.12,
+  /** Fraction of the foot-to-foot line's turn (about +Y) the pelvis follows. */
+  pelvisYawFollow: 0.3,
+  /** Fraction of the pelvis yaw the torso turns back (chest stays forward). */
+  torsoCounterYaw: 0.6,
+  maxPelvisYawDeg: 10,
+  /** Cap on the automatic pelvis drop that keeps spread feet reachable (m). */
+  maxAutoDrop: 0.2,
+} as const satisfies {
+  legs: readonly { root: JointName; mid: JointName; end: JointName }[];
+  hipSideMaxDeg: number;
+  hipTwistMaxDeg: number;
+  ankleRollMaxDeg: number;
+  ankleYawMaxDeg: number;
+  poleForward: number;
+  maxCrouch: number;
+  liftHeight: number;
+  pelvisFollow: number;
+  pelvisSideFollow: number;
+  pelvisYawFollow: number;
+  torsoCounterYaw: number;
+  maxPelvisYawDeg: number;
+  maxAutoDrop: number;
+};
+
 export const BODY_PART_NAMES = [
   "waistPart",
   "chestPart",

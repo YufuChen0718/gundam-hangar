@@ -2,7 +2,7 @@ import type { JointName } from "../mecha/types";
 import { clampJointAngle } from "../mecha/rigConfig";
 
 export type Ease = "linear" | "easeInOut";
-export type ActionName = "idle" | "aim" | "swing";
+export type ActionName = "idle" | "aim" | "swing" | "squat";
 export type TransitionMode = "blend" | "cut";
 export type AnimatorStatus = "playing" | "transitioning" | "holding";
 
@@ -10,6 +10,8 @@ export interface Keyframe {
   t: number;
   pose: Partial<Record<JointName, [number, number, number]>>;
   ease?: Ease;
+  /** Pelvis lowered by this much (m); applied through foot planting (Leg IK). */
+  pelvisDrop?: number;
 }
 
 export interface Clip {
@@ -355,10 +357,72 @@ export const swingClip: Clip = {
   ],
 };
 
+/** Idle rest pose, used as the squat's start and end so it blends from/to idle. */
+const standAngles = {
+  pelvis: 0,
+  torso: 0,
+  head: 0,
+  rightShoulder: 6,
+  rightElbow: 14,
+  rightWrist: 0,
+  leftShoulder: 5,
+  leftElbow: 12,
+  leftWrist: 0,
+  rightHip: 6,
+  rightKnee: 12,
+  rightAnkle: 6,
+  leftHip: 6,
+  leftKnee: 12,
+  leftAnkle: 6,
+};
+
+/** Bottom of the squat: arms forward for balance, head up. */
+const squatAngles = {
+  pelvis: 0,
+  torso: 0,
+  head: -6,
+  rightShoulder: 50,
+  rightElbow: 24,
+  rightWrist: 0,
+  leftShoulder: 50,
+  leftElbow: 24,
+  leftWrist: 0,
+  // Legs keep the standing angles: the depth comes only from pelvisDrop and the
+  // leg IK. (Bent FK legs would also lower the pelvis through grounding, so the
+  // drop would be applied twice and the planted feet would be out of reach.)
+  rightHip: 6,
+  rightKnee: 12,
+  rightAnkle: 6,
+  leftHip: 6,
+  leftKnee: 12,
+  leftAnkle: 6,
+};
+
+/**
+ * Squat (T16 foot planting): the animator keys the pelvis height (`pelvisDrop`)
+ * and the hip–knee IK solves the legs so the feet stay planted, the usual
+ * "animate the root, IK the feet" setup. Playing it turns Leg IK on; with Leg
+ * IK off only the arms and head move. 0.08 m stays inside the knee limit from
+ * the idle stance.
+ */
+export const squatClip: Clip = {
+  name: "squat",
+  duration: 2.6,
+  loop: false,
+  next: "idle",
+  keys: [
+    { t: 0, pose: poseEuler(standAngles), ease: "easeInOut", pelvisDrop: 0 },
+    { t: 0.9, pose: poseEuler(squatAngles), ease: "easeInOut", pelvisDrop: 0.08 },
+    { t: 1.5, pose: poseEuler(squatAngles), ease: "easeInOut", pelvisDrop: 0.08 },
+    { t: 2.6, pose: poseEuler(standAngles), pelvisDrop: 0 },
+  ],
+};
+
 export const CLIPS: Record<ActionName, Clip> = {
   idle: idleClip,
   aim: aimClip,
   swing: swingClip,
+  squat: squatClip,
 };
 
 export const raiseArm: Clip = {

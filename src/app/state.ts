@@ -33,6 +33,23 @@ export interface HangarState {
   playing: boolean;
   modelYawDeg: number;
   loading: boolean;
+  /** Two-bone IK on the right arm (T16). */
+  ik: boolean;
+  /** IK target / pole in displayRoot (model) space, meters. */
+  ikTarget: [number, number, number];
+  ikPole: [number, number, number];
+  ikReachable: boolean;
+  ikLimited: boolean;
+  /** |hand − target| in meters. */
+  ikError: number;
+  /** Foot planting on both legs (T16 step 7). */
+  footIk: boolean;
+  /** Requested pelvis drop while foot planting is on, meters. */
+  crouch: number;
+  footReachable: boolean;
+  footLimited: boolean;
+  /** Worst |ankle − planted position| in meters. */
+  footError: number;
 }
 
 export function createStore() {
@@ -58,6 +75,17 @@ export function createStore() {
     playing: false,
     modelYawDeg: 0,
     loading: false,
+    ik: false,
+    ikTarget: [0, 0, 0],
+    ikPole: [0, 0, 0],
+    ikReachable: true,
+    ikLimited: false,
+    ikError: 0,
+    footIk: false,
+    crouch: 0,
+    footReachable: true,
+    footLimited: false,
+    footError: 0,
   };
   const listeners = new Set<(s: HangarState) => void>();
   return {

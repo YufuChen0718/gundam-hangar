@@ -5,6 +5,7 @@ import { EquipmentManager } from "./mecha/equipment";
 import { createStore } from "./app/state";
 import { createCommands } from "./app/commands";
 import { createLayout, bindPanel } from "./ui/desktopPanel";
+import { attachIkDrag } from "./scene/ikGizmo";
 
 const viewport = createLayout(document.getElementById("app")!);
 const store = createStore();
@@ -18,6 +19,13 @@ async function start() {
   world.scene.updateMatrixWorld(true);
   const app = createCommands(store, rig, world, equipment);
   bindPanel(store, app.commands);
+  attachIkDrag(world, app.ikGizmo, {
+    target: (p) => app.commands.setIkTargetWorld(p.x, p.y, p.z),
+    pole: (p) => app.commands.setIkPoleWorld(p.x, p.y, p.z),
+    foot: (leg, p) => app.commands.setFootPlantWorld(leg, p.x, p.y, p.z),
+    footPlaneNormal: (leg) => app.commands.footDragPlaneNormal(leg),
+    knee: (leg, p) => app.commands.setFootPoleWorld(leg, p.x, p.y, p.z),
+  });
   store.set({ ready: true });
   document.getElementById("loading")!.hidden = true;
   let last: number | undefined;

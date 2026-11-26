@@ -9,7 +9,7 @@ import type {
   SkinningMode,
 } from "../mecha/types";
 import type { ActionName, TransitionMode } from "../animation/clips";
-import { JOINT_LIMITS, TEST_POSES } from "../mecha/rigConfig";
+import { FOOT_IK_CONFIG, JOINT_LIMITS, TEST_POSES } from "../mecha/rigConfig";
 
 const JOINT_GROUPS: {
   title: string;
@@ -63,6 +63,23 @@ const JOINT_GROUPS: {
   },
 ];
 
+/** Joints foot planting drives; their 1-axis sliders are read-only while it is on. */
+const LEG_IK_JOINTS: JointName[] = [
+  "rightHip",
+  "rightKnee",
+  "rightAnkle",
+  "leftHip",
+  "leftKnee",
+  "leftAnkle",
+];
+
+/** IK target slider ranges in model (displayRoot) space, meters. */
+const IK_AXES: ["x" | "y" | "z", number, number][] = [
+  ["x", -1.2, 1.2],
+  ["y", 0, 2.4],
+  ["z", -1.2, 1.2],
+];
+
 export function createLayout(root: HTMLElement) {
   root.innerHTML = `<header class="topbar"><a class="brand" href="#"><span class="brand-mark">GH</span><span>GUNDAM <b>HANGAR</b><small>CS184 / FULL-BODY FK &amp; EQUIPMENT WORKBENCH</small></span></a><div class="project-meta"><span class="live-dot"></span> DESKTOP PROTOTYPE <span class="version">15-JOINT · M6 SOCKETS</span></div></header>
  <main class="workspace"><aside class="loadout-drawer" id="loadout-drawer" aria-label="Loadout"><div class="loadout-header"><div class="loadout-title"><span class="eyebrow">M6 SOCKETS</span><h3>Loadout</h3></div><button id="loadout-collapse-btn" class="loadout-toggle-btn" aria-expanded="true" title="Collapse / expand loadout">◀</button></div>
@@ -84,7 +101,17 @@ export function createLayout(root: HTMLElement) {
  </section><aside class="inspector"><div class="panel-heading"><div class="eyebrow">CONTROL DECK</div><h2>Model Lab <span>15J</span></h2><p>15-joint hierarchical FK rooted at the pelvis, with a library of test poses.</p></div>
  <div class="model-switch" role="group" aria-label="Model version"><button data-model="sentinel" class="active" disabled>Sentinel (new)</button><button data-model="legacy" disabled>Legacy</button></div>
  <div class="tabs" role="tablist"><button role="tab" aria-selected="true" aria-controls="panel-pose" data-tab="pose" class="active">Pose</button><button role="tab" aria-selected="false" aria-controls="panel-equipment" data-tab="equipment">Equipment</button><button role="tab" aria-selected="false" aria-controls="panel-inspect" data-tab="inspect">Inspect</button></div>
- <div class="panel-content"><section id="panel-pose" role="tabpanel"><div class="section-caption">ACTIONS <span>idle / aim / swing</span></div><div class="presets"><button data-action="idle" disabled>Idle</button><button data-action="aim" disabled>Aim</button><button data-action="swing" disabled>Swing</button></div><div class="section-caption">TRANSITION <span>M5 switching mode</span></div><div class="model-switch" style="margin:10px 0 18px" role="group" aria-label="Transition mode"><button data-transition="blend" class="active" disabled>Blend (0.3s)</button><button data-transition="cut" disabled>Cut</button></div><div class="section-caption">TEST POSES <span>9 full-body test poses</span></div><div class="presets presets-grid">${TEST_POSES.map(
+ <div class="panel-content"><section id="panel-pose" role="tabpanel"><div class="section-caption">ACTIONS <span>idle / aim / swing / squat</span></div><div class="presets"><button data-action="idle" disabled>Idle</button><button data-action="aim" disabled>Aim</button><button data-action="swing" disabled>Swing</button><button data-action="squat" disabled title="Keys the pelvis height; Leg IK keeps the feet planted">Squat</button></div><div class="section-caption">TRANSITION <span>M5 switching mode</span></div><div class="model-switch" style="margin:10px 0 18px" role="group" aria-label="Transition mode"><button data-transition="blend" class="active" disabled>Blend (0.3s)</button><button data-transition="cut" disabled>Cut</button></div>
+ <div class="section-caption">TWO-BONE IK <span>M7 · right hand reaches a target</span></div><label class="toggle-row"><span>Right-arm IK<small>Drag the orange target in the viewport · cyan = elbow pole</small></span><input id="ik-toggle" type="checkbox" disabled/></label>
+ ${IK_AXES.map(
+   ([axis, min, max]) =>
+     `<label class="slider-label" for="ik-${axis}"><span>Target ${axis.toUpperCase()}<small>model space (m)</small></span><output id="ik-${axis}-value">0.00</output></label><input id="ik-${axis}" type="range" min="${min}" max="${max}" step="0.005" value="0" disabled/>`,
+ ).join("")}
+ <button id="ik-reset" class="reset-pose-btn" disabled>Snap target to hand</button><div class="note"><span>IK status</span><b id="ik-status">Off</b></div>
+ <div class="section-caption">FOOT PLANTING <span>M7 · hip–knee IK keeps the ankles put</span></div><label class="toggle-row"><span>Leg IK<small>Drag green = foot (step forward/back, lift up), purple = knee direction · joint limits apply</small></span><input id="foot-toggle" type="checkbox" disabled/></label>
+ <label class="slider-label" for="crouch"><span>Crouch depth<small>pelvis drop (m)</small></span><output id="crouch-value">0.000</output></label><input id="crouch" type="range" min="0" max="${FOOT_IK_CONFIG.maxCrouch}" step="0.005" value="0" disabled/>
+ <button id="foot-reset" class="reset-pose-btn" disabled>Re-plant feet · reset knees</button><div class="note"><span>Leg IK status</span><b id="foot-status">Off</b></div>
+ <div class="section-caption">TEST POSES <span>9 full-body test poses</span></div><div class="presets presets-grid">${TEST_POSES.map(
    (p) =>
      `<button data-pose="${p.id}" title="${p.label}" disabled>${p.shortLabel}</button>`,
  ).join(
@@ -187,6 +214,21 @@ export function bindPanel(store: Store, c: Commands) {
   ] as const)
     el<HTMLInputElement>(id).onchange = (e) =>
       fn((e.target as HTMLInputElement).checked);
+  el<HTMLInputElement>("ik-toggle").onchange = (e) =>
+    c.setIkEnabled((e.target as HTMLInputElement).checked);
+  IK_AXES.forEach(([axis], i) => {
+    el<HTMLInputElement>(`ik-${axis}`).oninput = (e) => {
+      const t = [...store.get().ikTarget] as [number, number, number];
+      t[i] = Number((e.target as HTMLInputElement).value);
+      c.setIkTarget(t[0], t[1], t[2]);
+    };
+  });
+  el("ik-reset").onclick = c.resetIkTarget;
+  el<HTMLInputElement>("foot-toggle").onchange = (e) =>
+    c.setFootIkEnabled((e.target as HTMLInputElement).checked);
+  el<HTMLInputElement>("crouch").oninput = (e) =>
+    c.setCrouch(Number((e.target as HTMLInputElement).value));
+  el("foot-reset").onclick = c.resetFootPlant;
   el("play").onclick = c.play;
   el("reset-pose").onclick = c.reset;
   el("reset-pose-panel").onclick = c.reset;
@@ -209,6 +251,34 @@ export function bindPanel(store: Store, c: Commands) {
       "timeline",
     ])
       (el(id) as HTMLInputElement).disabled = armDisabled;
+    // While IK drives the right arm, its 1-axis sliders cannot represent the 3D
+    // shoulder, so they become read-only.
+    el<HTMLInputElement>("rightShoulder").disabled = armDisabled || s.ik;
+    el<HTMLInputElement>("rightElbow").disabled = armDisabled || s.ik;
+    el<HTMLInputElement>("ik-toggle").disabled = armDisabled;
+    el<HTMLInputElement>("ik-toggle").checked = s.ik;
+    el<HTMLButtonElement>("ik-reset").disabled = armDisabled || !s.ik;
+    IK_AXES.forEach(([axis], i) => {
+      const input = el<HTMLInputElement>(`ik-${axis}`);
+      input.disabled = armDisabled || !s.ik;
+      input.value = String(s.ikTarget[i]);
+      el<HTMLOutputElement>(`ik-${axis}-value`).value = s.ikTarget[i].toFixed(3);
+    });
+    el("ik-status").textContent = !s.ik
+      ? "Off"
+      : `${s.ikReachable ? "Reachable" : "Out of reach · clamped"}${s.ikLimited ? " · shoulder limit" : ""} · error ${(s.ikError * 1000).toFixed(3)} mm`;
+    // Foot planting re-solves hips and knees and overrides the ankles.
+    for (const j of LEG_IK_JOINTS)
+      el<HTMLInputElement>(j).disabled = armDisabled || s.footIk;
+    el<HTMLInputElement>("foot-toggle").disabled = armDisabled;
+    el<HTMLInputElement>("foot-toggle").checked = s.footIk;
+    el<HTMLInputElement>("crouch").disabled = armDisabled || !s.footIk;
+    el<HTMLInputElement>("crouch").value = String(s.crouch);
+    el<HTMLOutputElement>("crouch-value").value = s.crouch.toFixed(3);
+    el<HTMLButtonElement>("foot-reset").disabled = armDisabled || !s.footIk;
+    el("foot-status").textContent = !s.footIk
+      ? "Off"
+      : `${s.footReachable ? "Feet planted" : "Too deep · legs clamped"}${s.footLimited ? " · hip limit" : ""} · ankle error ${(s.footError * 1000).toFixed(3)} mm`;
     el<HTMLInputElement>("wireframe").disabled = disabled;
     el<HTMLInputElement>("saber-blade-toggle").disabled =
       armDisabled || s.mode === "legacy" || s.rightHandItem !== "saber";

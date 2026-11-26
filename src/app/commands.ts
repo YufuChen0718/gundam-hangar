@@ -14,6 +14,7 @@ import type {
 } from "../mecha/types";
 import {
   clampJointAngle,
+  IK_CONFIG,
   normalizePoseInput,
   TEST_POSES,
 } from "../mecha/rigConfig";
@@ -22,7 +23,13 @@ import { EquipmentManager } from "../mecha/equipment";
 import { Appearance } from "../mecha/appearance";
 import { Animator } from "../animation/animator";
 import type { ActionName, TransitionMode } from "../animation/clips";
+import { runFootEvaluation, runIkEvaluation } from "../animation/ikEvaluation";
+import type {
+  FootEvalOptions,
+  IkEvalOptions,
+} from "../animation/ikEvaluation";
 import type { createScene } from "../scene/createScene";
+import { IkGizmo } from "../scene/ikGizmo";
 
 function attachHelpers(r: ArmPreviewRig): AxesHelper[] {
   return [
@@ -68,10 +75,17 @@ export function createCommands(
   helperMap.set(sentinelRig, attachHelpers(sentinelRig));
   gripLocalMap.set(sentinelRig, computeLegacyGripLocal(sentinelRig));
 
+  const ikGizmo = new IkGizmo(world.scene);
+  const tmpTarget = new Vector3();
+  const tmpPole = new Vector3();
+  const tmpShoulder = new Vector3();
+
   const repaint = () =>
     appearance.apply(store.get().parts, store.get().wireframe, original);
 
   function sync() {
+    const ik = animator.ikStatus();
+    const foot = animator.footStatus();
     store.set({
       action: animator.action,
       status: animator.status,
@@ -80,7 +94,52 @@ export function createCommands(
       time: animator.time,
       duration: animator.duration,
       playing: animator.playing,
+      ik: animator.ikIsEnabled,
+      ikTarget: animator.ikTargetPosition(),
+      ikPole: animator.ikPolePosition(),
+      ikReachable: ik.reachable,
+      ikLimited: ik.limited,
+      ikError: ik.error,
+      footIk: animator.footIsEnabled,
+      crouch: animator.crouch,
+      footReachable: foot.reachable,
+      footLimited: foot.limited,
+      footError: foot.error,
     });
+  }
+
+  /** World-space point → displayRoot (model) space of the current rig. */
+  function worldToModel(x: number, y: number, z: number): Vector3 {
+    rig.displayRoot.updateMatrixWorld(true);
+    return rig.displayRoot.worldToLocal(new Vector3(x, y, z));
+  }
+
+  function updateIkGizmo() {
+    const rigged = store.get().mode !== "original";
+    const feetVisible = rigged && animator.footIsActive;
+    const toWorld = ([x, y, z]: [number, number, number]) =>
+      rig.displayRoot.localToWorld(new Vector3(x, y, z));
+    ikGizmo.updateFeet(
+      feetVisible,
+      feetVisible ? animator.footPlantPositions().map(toWorld) : [],
+      feetVisible ? animator.footPolePositions().map(toWorld) : [],
+      feetVisible
+        ? (["rightKnee", "leftKnee"] as const).map((j) =>
+            rig.joints[j].getWorldPosition(new Vector3()),
+          )
+        : [],
+    );
+    const visible = rigged && animator.ikIsActive;
+    if (!visible) {
+      ikGizmo.update(false, tmpTarget, tmpPole, tmpShoulder);
+      return;
+    }
+    const [tx, ty, tz] = animator.ikTargetPosition();
+    const [px, py, pz] = animator.ikPolePosition();
+    rig.displayRoot.localToWorld(tmpTarget.set(tx, ty, tz));
+    rig.displayRoot.localToWorld(tmpPole.set(px, py, pz));
+    rig.joints[IK_CONFIG.root].getWorldPosition(tmpShoulder);
+    ikGizmo.update(true, tmpTarget, tmpPole, tmpShoulder);
   }
 
   function manual(angles: PoseInput) {
@@ -146,8 +205,16 @@ export function createCommands(
       } else if (action === "swing") {
         setRightHandItemInternal("saber");
       }
+      // Squat keys the pelvis height; the legs come from foot planting, so plant
+      // the feet where they stand now. Full weight at once: with the feet and
+      // pelvis at rest, IK reproduces the FK legs, so nothing jumps.
+      if (action === "squat" && !animator.footIsEnabled) {
+        animator.setFootIkEnabled(true);
+        animator.setFootWeightImmediate(1);
+      }
       animator.play(action);
       sync();
+      updateIkGizmo();
     },
     setTransitionMode: (mode: TransitionMode) => {
       animator.setTransitionMode(mode);
@@ -162,6 +229,126 @@ export function createCommands(
     reset: () => {
       animator.reset();
       sync();
+    },
+    // ── Two-bone IK (T16): right arm reaches a target ─────────────────────
+    setIkEnabled: (on: boolean) => {
+      if (store.get().mode === "original") return;
+      animator.setIkEnabled(on);
+      sync();
+      updateIkGizmo();
+    },
+    /** Target in model (displayRoot) space, meters. */
+    setIkTarget: (x: number, y: number, z: number) => {
+      if (store.get().mode === "original") return;
+      animator.setIkTarget(x, y, z);
+      sync();
+      updateIkGizmo();
+    },
+    /** Target in world space (used by viewport dragging). */
+    setIkTargetWorld: (x: number, y: number, z: number) => {
+      if (store.get().mode === "original") return;
+      const p = worldToModel(x, y, z);
+      animator.setIkTarget(p.x, p.y, p.z);
+      sync();
+      updateIkGizmo();
+    },
+    /** Pole in model (displayRoot) space: the elbow bends toward it. */
+    setIkPole: (x: number, y: number, z: number) => {
+      if (store.get().mode === "original") return;
+      animator.setIkPole(x, y, z);
+      sync();
+      updateIkGizmo();
+    },
+    setIkPoleWorld: (x: number, y: number, z: number) => {
+      if (store.get().mode === "original") return;
+      const p = worldToModel(x, y, z);
+      animator.setIkPole(p.x, p.y, p.z);
+      sync();
+      updateIkGizmo();
+    },
+    /** Snap the target back onto the hand of the current clip / manual pose. */
+    resetIkTarget: () => {
+      if (store.get().mode === "original") return;
+      animator.resetIkTarget();
+      sync();
+      updateIkGizmo();
+    },
+    /**
+     * T16 evaluation on the loaded rig (random reachable targets, unreachable
+     * targets, sweep through full extension). Resets the pose and leaves IK off.
+     */
+    runIkEvaluation: (opts: IkEvalOptions = {}) => {
+      if (store.get().mode === "original")
+        throw new Error("IK evaluation needs a rigged model");
+      const report = runIkEvaluation(animator, rig, opts);
+      sync();
+      updateIkGizmo();
+      return report;
+    },
+    // ── Foot planting (T16 step 7): ankles stay put while the pelvis lowers ──
+    setFootIkEnabled: (on: boolean) => {
+      if (store.get().mode === "original") return;
+      animator.setFootIkEnabled(on);
+      sync();
+      updateIkGizmo();
+    },
+    /** Pelvis drop in meters (0 … FOOT_IK_CONFIG.maxCrouch). */
+    setCrouch: (depth: number) => {
+      if (store.get().mode === "original") return;
+      animator.setCrouch(depth);
+      sync();
+      updateIkGizmo();
+    },
+    /**
+     * World normal of a leg's swing plane: the plane through the hip that holds
+     * the hip→planted-ankle line and the body's forward (+Z) axis. Dragging in
+     * it moves the foot forward/back and up/down along the leg (this mecha's
+     * legs slant outward), never sideways.
+     */
+    footDragPlaneNormal: (leg: 0 | 1) => {
+      const q = rig.displayRoot.getWorldQuaternion(new Quaternion());
+      const forward = new Vector3(0, 0, 1).applyQuaternion(q);
+      const hip = rig.joints[leg === 0 ? "rightHip" : "leftHip"].getWorldPosition(
+        new Vector3(),
+      );
+      const [x, y, z] = animator.footPlantPositions()[leg];
+      const ankle = rig.displayRoot.localToWorld(new Vector3(x, y, z));
+      const n = ankle.sub(hip).cross(forward);
+      return n.lengthSq() > 1e-10
+        ? n.normalize()
+        : new Vector3(1, 0, 0).applyQuaternion(q);
+    },
+    /** Move a planted ankle (world space, from viewport dragging); 0 = right, 1 = left. */
+    setFootPlantWorld: (leg: 0 | 1, x: number, y: number, z: number) => {
+      if (store.get().mode === "original") return;
+      const p = worldToModel(x, y, z);
+      animator.setFootPlant(leg, p.x, p.y, p.z);
+      sync();
+      updateIkGizmo();
+    },
+    /** Move a knee pole (world space, from viewport dragging); 0 = right, 1 = left. */
+    setFootPoleWorld: (leg: 0 | 1, x: number, y: number, z: number) => {
+      if (store.get().mode === "original") return;
+      const p = worldToModel(x, y, z);
+      animator.setFootPole(leg, p.x, p.y, p.z);
+      sync();
+      updateIkGizmo();
+    },
+    /** Re-plant both feet at the current clip / manual pose (knee poles back to auto). */
+    resetFootPlant: () => {
+      if (store.get().mode === "original") return;
+      animator.resetFootPlant();
+      sync();
+      updateIkGizmo();
+    },
+    /** Foot slide during a crouch: FK crouch poses vs foot-planting IK. */
+    runFootEvaluation: (opts: FootEvalOptions = {}) => {
+      if (store.get().mode === "original")
+        throw new Error("Foot evaluation needs a rigged model");
+      const report = runFootEvaluation(animator, rig, opts);
+      sync();
+      updateIkGizmo();
+      return report;
     },
     setSkinningMode: (mode: SkinningMode) => {
       rig.lbs?.setMode(mode);
@@ -348,6 +535,7 @@ export function createCommands(
         accumulator = 0;
       }
     }
+    updateIkGizmo();
   }
 
   function partMinPlatformY(partName: string): number {
@@ -447,6 +635,8 @@ export function createCommands(
       leftFootMinY,
       rightFootMinY,
       jointWorldPositions,
+      ik: animator.ikStatus(),
+      foot: animator.footStatus(),
       angles: store.get().angles as JointAngles,
       shoulderRotation: rig.joints.rightShoulder.quaternion.toArray(),
       elbowRotation: rig.joints.rightElbow.quaternion.toArray(),
@@ -464,7 +654,7 @@ export function createCommands(
     };
   }
 
-  return { commands, update, diagnostics };
+  return { commands, update, diagnostics, ikGizmo };
 }
 
 export type Commands = ReturnType<typeof createCommands>["commands"];
