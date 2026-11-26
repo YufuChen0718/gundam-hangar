@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-11-26T07:18:46.445Z",
+  "url": "http://127.0.0.1:5174/",
+  "chain": {
+    "upperLength": 0.2601922430508271,
+    "lowerLength": 0.2957177428424224,
+    "minReach": 0.3300136226995908,
+    "maxReach": 0.5400823833301566,
+    "minBendDeg": 0,
+    "maxBendDeg": 90,
+    "shoulderSwingMaxDeg": 110,
+    "shoulderTwistMaxDeg": 60
+  },
+  "reachable": {
+    "count": 500,
+    "limitedCount": 0,
+    "meanM": 1.657877177097552e-16,
+    "medianM": 1.415262216750919e-16,
+    "p95M": 3.4915808093142e-16,
+    "maxM": 7.575797802392804e-16,
+    "fractionUnder1mm": 1
+  },
+  "unreachableFar": {
+    "count": 200,
+    "limitedCount": 150,
+    "meanM": 0.14372327082116668,
+    "medianM": 0.11768752267592728,
+    "p95M": 0.469908762654472,
+    "maxM": 0.6126665436032372,
+    "fractionUnder1mm": 0.255
+  },
+  "unreachableFarWithinShoulderLimits": {
+    "count": 50,
+    "limitedCount": 0,
+    "meanM": 2.281808040997809e-16,
+    "medianM": 2.2247786310271853e-16,
+    "p95M": 5.034405433428661e-16,
+    "maxM": 5.661048867003676e-16,
+    "fractionUnder1mm": 1
+  },
+  "tooCloseBendErrorRad": {
+    "count": 200,
+    "limitedCount": 153,
+    "meanM": 0,
+    "medianM": 0,
+    "p95M": 0,
+    "maxM": 0,
+    "fractionUnder1mm": 1
+  },
+  "sweep": {
+    "fromDistance": 0.2970122604296317,
+    "toDistance": 0.7021070983292036,
+    "maxBendStepDeg": 1.9842439391105364,
+    "maxShoulderStepDeg": 2.9885617686823878,
+    "bendMonotonic": true
+  },
+  "foot": {
+    "kneeLimitDeg": 55,
+    "maxReachableCrouchM": 0.095,
+    "fkMaxSlideM": 0.0928114873333013,
+    "fkMaxDisp3dM": 0.0928114873333013,
+    "ikMaxSlideM": 2.237726045655905e-16,
+    "ikMaxDisp3dM": 2.498001805406602e-16,
+    "ikMaxFootTiltDeg": 0,
+    "ikReachableRows": 27,
+    "rows": 28
+  },
+  "errors": []
+}
