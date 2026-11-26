@@ -6,6 +6,7 @@ _site/
 .vscode/*
 !.vscode/extensions.json
 .idea/
+*.docx
 
 # Blender autosaves / backups (keep the .blend sources, skip the noise)
 *.blend1
